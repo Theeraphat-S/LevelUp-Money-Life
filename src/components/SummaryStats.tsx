@@ -1,4 +1,5 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { useTranslation } from "react-i18next";
 
 const categoryColors: Record<string, string> = {
   Food: "#003f5c",
@@ -14,6 +15,7 @@ const categoryColors: Record<string, string> = {
 const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
 export function SummaryStats({ transactions, month }: { transactions: import("../types").Transaction[]; month: string }) {
+  const { t } = useTranslation();
   const rows = transactions.filter((row) => row.date.startsWith(month));
   const income = rows.filter((row) => row.amount > 0).reduce((s, r) => s + r.amount, 0);
   const expenses = Math.abs(rows.filter((row) => row.amount < 0).reduce((s, r) => s + r.amount, 0));
@@ -29,14 +31,14 @@ export function SummaryStats({ transactions, month }: { transactions: import("..
   return (
     <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
       <div className="mb-5">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">Month-end summary</h2>
-        <p className="text-sm text-[var(--color-ink-soft)]">Where the money went this month.</p>
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("summary.title")}</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">{t("summary.subtitle")}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label="Income" value={`฿${thb.format(income)}`} tone="text-[var(--color-accent-ink)]" />
-        <Stat label="Expenses" value={`฿${thb.format(expenses)}`} tone="text-[oklch(48%_0.16_25)]" />
-        <Stat label="Net" value={`฿${thb.format(net)}`} tone={net >= 0 ? "text-[var(--color-accent-ink)]" : "text-[oklch(48%_0.16_25)]"} />
+        <Stat label={t("summary.income")} value={`฿${thb.format(income)}`} tone="text-[var(--color-accent-ink)]" />
+        <Stat label={t("summary.expenses")} value={`฿${thb.format(expenses)}`} tone="text-[oklch(48%_0.16_25)]" />
+        <Stat label={t("summary.net")} value={`฿${thb.format(net)}`} tone={net >= 0 ? "text-[var(--color-accent-ink)]" : "text-[oklch(48%_0.16_25)]"} />
       </div>
 
       <div className="mt-6 grid items-center gap-5 lg:grid-cols-[220px_1fr]">
@@ -47,20 +49,20 @@ export function SummaryStats({ transactions, month }: { transactions: import("..
                 {breakdown.map((entry) => <Cell key={entry.name} fill={categoryColors[entry.name] ?? "#94a3b8"} />)}
               </Pie>
               <Tooltip
-                formatter={(value) => [`฿${thb.format(Number(value))}`, "Spent"]}
+                formatter={(value) => [`฿${thb.format(Number(value))}`, t("summary.spent")]}
                 contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
               />
             </PieChart>
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[11px] uppercase tracking-wider text-[var(--color-ink-soft)]">Total</span>
+            <span className="text-[11px] uppercase tracking-wider text-[var(--color-ink-soft)]">{t("summary.total")}</span>
             <span className="font-mono text-lg font-semibold text-[var(--color-ink)]">฿{thb.format(expenses)}</span>
           </div>
         </div>
 
         <div className="space-y-2">
           {breakdown.length === 0 ? (
-            <p className="rounded-2xl bg-[var(--color-base)] px-4 py-5 text-sm text-[var(--color-ink-soft)]">No expenses logged this month yet.</p>
+            <p className="rounded-2xl bg-[var(--color-base)] px-4 py-5 text-sm text-[var(--color-ink-soft)]">{t("summary.empty")}</p>
           ) : (
             breakdown.map((item) => {
               const pct = expenses > 0 ? Math.round((item.value / expenses) * 100) : 0;
@@ -86,8 +88,7 @@ export function SummaryStats({ transactions, month }: { transactions: import("..
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone: string }) {
-  return (
+function Stat({ label, value, tone }: { label: string; value: string; tone: string }) {  return (
     <div className="rounded-2xl bg-[var(--color-base)] px-4 py-3.5">
       <div className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)]">{label}</div>
       <div className={`mt-1 font-mono text-xl font-semibold tracking-tight ${tone}`}>{value}</div>

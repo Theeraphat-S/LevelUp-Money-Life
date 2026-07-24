@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle, Circle, Plus } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 import type { Dispatch, SetStateAction } from "react";
 import type { Quest } from "../types";
 
@@ -20,6 +21,7 @@ const XpPulse = memo(function XpPulse({ xp }: { xp: number }) {
 });
 
 export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests: Dispatch<SetStateAction<Quest[]>> }) {
+  const { t } = useTranslation();
   const today = new Date().toISOString().slice(0, 10);
   const xp = quests.filter((q) => q.done).reduce((s, q) => s + q.xp, 0);
   const ordered = [...quests].sort((a, b) => Number(a.done) - Number(b.done));
@@ -31,8 +33,8 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
     <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[oklch(20%_0.012_260)] text-[oklch(96%_0.005_260)] shadow-[0_28px_56px_-24px_oklch(18%_0.02_260_/_0.6)] [box-shadow:inset_0_1px_0_0_rgba(255,255,255,0.08)]">
       <div className="flex items-start justify-between gap-4 px-6 pt-6">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Daily quests</h2>
-          <p className="text-sm text-[oklch(68%_0.01_260)]">Habits that compound. Plan ahead, check off.</p>
+          <h2 className="text-lg font-semibold tracking-tight">{t("quests.title")}</h2>
+          <p className="text-sm text-[oklch(68%_0.01_260)]">{t("quests.subtitle")}</p>
         </div>
         <XpPulse xp={xp} />
       </div>
@@ -61,12 +63,12 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
             </motion.button>
           ))}
         </AnimatePresence>
-        {quests.length === 0 && <p className="rounded-2xl bg-white/[0.04] px-4 py-6 text-center text-sm text-[oklch(68%_0.01_260)]">No quests yet. Add one to start the streak.</p>}
+        {quests.length === 0 && <p className="rounded-2xl bg-white/[0.04] px-4 py-6 text-center text-sm text-[oklch(68%_0.01_260)]">{t("quests.empty")}</p>}
       </div>
 
       <div className="border-t border-white/5 px-6 py-4">
         <button onClick={addQuest} className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-[oklch(96%_0.005_260)] transition active:translate-y-px hover:bg-white/[0.06] focus:outline-none focus-visible:shadow-[0_0_0_2px_oklch(72%_0.15_165_/_0.6)]">
-          <Plus size={15} weight="bold" /> Add quest
+          <Plus size={15} weight="bold" /> {t("quests.add")}
         </button>
       </div>
     </section>

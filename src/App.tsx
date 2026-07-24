@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { CalendarDots, ChartLineUp, Coins, ShieldCheck, Trophy } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 import { DailyQuests } from "./components/DailyQuests";
 import { ExpenseTable } from "./components/ExpenseTable";
 import { FinancialPlan } from "./components/FinancialPlan";
@@ -42,6 +43,7 @@ function tile(delay: number) {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>("levelup.transactions", sampleTransactions);
   const [allocations, setAllocations] = useLocalStorage<Allocation[]>("levelup.allocations", sampleAllocations);
   const [income, setIncome] = useLocalStorage<number>("levelup.income", 42000);
@@ -65,14 +67,14 @@ export default function App() {
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent-ink)] shadow-[var(--shadow-tile)]">
               <Trophy size={15} weight="fill" />
-              Level 12 · Money Adventurer
-              <span className="font-mono text-[var(--color-ink-soft)]">{xpEarned}/{xpGoal} XP</span>
+              {t("level", { level: 12 })}
+              <span className="font-mono text-[var(--color-ink-soft)]">{t("xp", { earned: xpEarned, goal: xpGoal })}</span>
             </div>
             <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-[var(--color-ink)] sm:text-5xl">
-              LevelUp <span className="text-[var(--color-accent)]">Money Life</span>
+              {t("app.title")}
             </h1>
             <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--color-ink-soft)] sm:text-base">
-              A personal finance cockpit — daily log, month-end clarity, allocation planning, and habit quests in one desk surface.
+              {t("app.subtitle")}
             </p>
             <div className="mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-[var(--color-line)]">
               <motion.div
@@ -84,10 +86,13 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[30rem]">
-            <Metric icon={<Coins size={18} weight="duotone" />} label="Spent · this month" value={`฿${thb.format(expenses)}`} />
-            <Metric icon={<ShieldCheck size={18} weight="duotone" />} label="Cleared logs" value={`${cleared}/${transactions.length}`} />
-            <Metric icon={<ChartLineUp size={18} weight="duotone" />} label="Net outlook" value={`฿${thb.format(income - expenses)}`} />
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end sm:justify-end lg:w-[34rem]">
+            <LanguageToggle />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:flex-1">
+              <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
+              <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
+              <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`฿${thb.format(income - expenses)}`} />
+            </div>
           </div>
         </motion.header>
 
@@ -122,6 +127,25 @@ export default function App() {
   );
 }
 
+function LanguageToggle() {
+  const { t, i18n } = useTranslation();
+  const current = i18n.language?.startsWith("th") ? "th" : "en";
+  return (
+    <div className="inline-flex items-center self-end rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-tile)]" role="group" aria-label={t("lang.toggle")}>
+      {(["en", "th"] as const).map((lng) => (
+        <button
+          key={lng}
+          onClick={() => i18n.changeLanguage(lng)}
+          aria-pressed={current === lng}
+          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${current === lng ? "bg-[var(--color-ink)] text-[var(--color-surface)]" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+        >
+          {t(`lang.${lng}`)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-tile)]">
@@ -132,6 +156,7 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 }
 
 function NextMonthPrep() {
+  const { t } = useTranslation();
   return (
     <section className="overflow-hidden rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
       <div className="flex items-center gap-3">
@@ -139,14 +164,14 @@ function NextMonthPrep() {
           <CalendarDots size={22} weight="duotone" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-[var(--color-ink)]">Next month prep</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">Tune categories before salary day.</p>
+          <h2 className="text-base font-semibold text-[var(--color-ink)]">{t("prep.title")}</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{t("prep.subtitle")}</p>
         </div>
       </div>
       <ul className="mt-5 space-y-2 text-sm text-[var(--color-ink-soft)]">
-        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> Compare planned vs actual spend</li>
-        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> Roll leftover savings forward</li>
-        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> Set next month&apos;s quest streak</li>
+        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i1")}</li>
+        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i2")}</li>
+        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i3")}</li>
       </ul>
     </section>
   );
