@@ -1,6 +1,6 @@
 [package]
 name = "levelup-money-life"
-version = "0.1.0"
+version = "0.2.0"
 description = "LevelUp Money Life desktop app"
 authors = ["Oven-Mobile Developer"]
 edition = "2021"

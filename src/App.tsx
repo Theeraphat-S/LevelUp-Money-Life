@@ -119,7 +119,7 @@ export default function App() {
         </div>
 
         <footer className="mt-8 flex items-center justify-between text-xs text-[var(--color-ink-soft)]">
-          <span className="font-mono">v0.1.0 · local-first</span>
+          <span className="font-mono">v0.2.0 · local-first</span>
           <span className="inline-flex items-center gap-1.5"><CalendarDots size={13} /> {today}</span>
         </footer>
       </div>
