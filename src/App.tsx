@@ -65,10 +65,13 @@ export default function App() {
           className="mb-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
         >
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent-ink)] shadow-[var(--shadow-tile)]">
-              <Trophy size={15} weight="fill" />
-              {t("level", { level: 12 })}
-              <span className="font-mono text-[var(--color-ink-soft)]">{t("xp", { earned: xpEarned, goal: xpGoal })}</span>
+            <div className="mb-3 flex items-center justify-between gap-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent-ink)] shadow-[var(--shadow-tile)]">
+                <Trophy size={15} weight="fill" />
+                {t("level", { level: 12 })}
+                <span className="font-mono text-[var(--color-ink-soft)]">{t("xp", { earned: xpEarned, goal: xpGoal })}</span>
+              </div>
+              <LanguageToggle />
             </div>
             <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-[var(--color-ink)] sm:text-5xl">
               {t("app.title")}
@@ -86,13 +89,10 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end sm:justify-end lg:w-[34rem]">
-            <LanguageToggle />
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:flex-1">
-              <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
-              <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
-              <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`฿${thb.format(income - expenses)}`} />
-            </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[30rem]">
+            <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
+            <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
+            <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`฿${thb.format(income - expenses)}`} />
           </div>
         </motion.header>
 
@@ -158,7 +158,7 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 function NextMonthPrep() {
   const { t } = useTranslation();
   return (
-    <section className="overflow-hidden rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
+    <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 pb-7 shadow-[var(--shadow-diffuse)]">
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]">
           <CalendarDots size={22} weight="duotone" />
