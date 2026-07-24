@@ -1,4 +1,5 @@
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { MagicWand, Scales } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import type { Allocation } from "../types";
 
@@ -11,6 +12,29 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
   const balanced = total === 100;
 
   const updatePercent = (id: string, percent: number) => setAllocations(allocations.map((item) => (item.id === id ? { ...item, percent } : item)));
+
+  const apply503020 = () => {
+    setAllocations([
+      { id: "needs", label: "Needs", percent: 50, color: "oklch(58% 0.13 165)" },
+      { id: "wants", label: "Wants", percent: 30, color: "oklch(62% 0.11 230)" },
+      { id: "savings", label: "Savings", percent: 20, color: "oklch(70% 0.14 80)" },
+    ]);
+  };
+
+  const autoBalance = () => {
+    if (total === 0) return;
+    const factor = 100 / total;
+    let currentSum = 0;
+    const next = allocations.map((item, idx) => {
+      if (idx === allocations.length - 1) {
+        return { ...item, percent: Math.max(0, 100 - currentSum) };
+      }
+      const val = Math.round(item.percent * factor);
+      currentSum += val;
+      return { ...item, percent: val };
+    });
+    setAllocations(next);
+  };
 
   return (
     <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
@@ -35,16 +59,35 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
               <div className="mb-2.5 flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2 font-medium text-[var(--color-ink)]">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  {item.label}
+                  {t(`alloc.${item.label}`, item.label)}
                 </span>
                 <span className="font-mono text-[var(--color-ink)]">{item.percent}% <span className="text-[var(--color-ink-soft)]">· ฿{thb.format((income * item.percent) / 100)}</span></span>
               </div>
               <input type="range" min="0" max="100" value={item.percent} onChange={(e) => updatePercent(item.id, Number(e.target.value))} className="w-full" />
             </div>
           ))}
-          <div className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium ${balanced ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]" : "bg-[oklch(95%_0.04_25)] text-[oklch(46%_0.16_25)]"}`}>
-            <span>{balanced ? t("plan.balanced") : t("plan.unbalanced")}</span>
-            <span className="font-mono">{total}%</span>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium ${balanced ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]" : "bg-rose-50 text-rose-700 border border-rose-200"}`}>
+              <span>{balanced ? t("plan.balanced") : t("plan.unbalanced")}</span>
+              <span className="font-mono font-bold">{total}%</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={apply503020}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-line)] bg-[var(--color-base)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-line)] active:translate-y-px"
+              >
+                <MagicWand size={14} className="text-[var(--color-accent)]" /> 50/30/20 Rule
+              </button>
+              {!balanced && (
+                <button
+                  onClick={autoBalance}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 active:translate-y-px"
+                >
+                  <Scales size={14} /> Auto-Balance
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

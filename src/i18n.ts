@@ -40,9 +40,11 @@ const resources = {
         date: "Date",
         category: "Category",
         cleared: "Cleared",
-        empty: "No entries yet. Hit “Add entry” to start logging.",
+        empty: "No entries match your view.",
         delete: "Delete entry",
         markCleared: "Mark {{name}} cleared",
+        searchPlaceholder: "Search transactions...",
+        allCategories: "All Categories",
       },
       category: {
         Income: "Income",
@@ -79,6 +81,8 @@ const resources = {
         subtitle: "Habits that compound. Plan ahead, check off.",
         add: "Add quest",
         empty: "No quests yet. Add one to start the streak.",
+        delete: "Delete quest",
+        newDefault: "New daily habit",
       },
       prep: {
         title: "Next month prep",
@@ -112,9 +116,11 @@ const resources = {
         date: "วันที่",
         category: "หมวดหมู่",
         cleared: "ยืนยัน",
-        empty: "ยังไม่มีรายการ กด “เพิ่มรายการ” เพื่อเริ่มบันทึก",
+        empty: "ไม่พบรายการตามเงื่อนไข",
         delete: "ลบรายการ",
         markCleared: "ทำเครื่องหมาย {{name}} ว่ายืนยันแล้ว",
+        searchPlaceholder: "ค้นหารายการ...",
+        allCategories: "ทุกหมวดหมู่",
       },
       category: {
         Income: "รายได้",
@@ -151,6 +157,8 @@ const resources = {
         subtitle: "นิสัยที่สะสม วางแผนล่วงหน้า แล้วทำเสร็จ",
         add: "เพิ่มเควส",
         empty: "ยังไม่มีเควส เพิ่มเพื่อเริ่มสะสมสถิติ",
+        delete: "ลบเควส",
+        newDefault: "นิสัยประจำวันใหม่",
       },
       prep: {
         title: "เตรียมเดือนหน้า",

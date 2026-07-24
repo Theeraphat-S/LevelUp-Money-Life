@@ -157,21 +157,48 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 
 function NextMonthPrep() {
   const { t } = useTranslation();
+  const [checkedItems, setCheckedItems] = useLocalStorage<Record<string, boolean>>("levelup.prepChecked", { i1: false, i2: false, i3: false });
+
+  const toggleItem = (key: string) => {
+    setCheckedItems((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const completedCount = Object.values(checkedItems).filter(Boolean).length;
+
   return (
-    <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 pb-7 shadow-[var(--shadow-diffuse)]">
-      <div className="flex items-center gap-3">
-        <div className="grid h-11 w-11 place-items-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]">
-          <CalendarDots size={22} weight="duotone" />
+    <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[oklch(20%_0.012_260)] p-6 pb-7 text-[oklch(96%_0.005_260)] shadow-[0_28px_56px_-24px_oklch(18%_0.02_260_/_0.6)] [box-shadow:inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/[0.08] text-[oklch(75%_0.16_165)]">
+            <CalendarDots size={22} weight="duotone" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-white">{t("prep.title")}</h2>
+            <p className="text-sm text-[oklch(78%_0.01_260)]">{t("prep.subtitle")}</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-base font-semibold text-[var(--color-ink)]">{t("prep.title")}</h2>
-          <p className="text-sm text-zinc-600">{t("prep.subtitle")}</p>
-        </div>
+        <span className="font-mono text-xs font-semibold text-[oklch(85%_0.14_165)] bg-white/[0.08] border border-white/10 px-3 py-1 rounded-full">
+          {completedCount}/3
+        </span>
       </div>
-      <ul className="mt-5 space-y-2 text-sm text-zinc-600">
-        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i1")}</li>
-        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i2")}</li>
-        <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i3")}</li>
+      <ul className="mt-5 space-y-2.5 text-sm">
+        {(["i1", "i2", "i3"] as const).map((key) => {
+          const isDone = !!checkedItems[key];
+          return (
+            <li
+              key={key}
+              onClick={() => toggleItem(key)}
+              className={`flex cursor-pointer items-center justify-between rounded-xl border border-white/5 px-3.5 py-2.5 transition ${isDone ? "bg-white/[0.08] text-[oklch(75%_0.16_165)]" : "bg-white/[0.04] text-white hover:bg-white/[0.08]"}`}
+            >
+              <span className="flex items-center gap-2.5">
+                <span className={`h-4 w-4 rounded-md border flex items-center justify-center text-xs transition ${isDone ? "border-[oklch(75%_0.16_165)] bg-[oklch(75%_0.16_165)] text-zinc-950 font-bold" : "border-white/20 bg-transparent text-transparent"}`}>
+                  ✓
+                </span>
+                <span className={isDone ? "line-through text-[oklch(65%_0.01_260)]" : "text-white"}>{t(`prep.${key}`)}</span>
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
