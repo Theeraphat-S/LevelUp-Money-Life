@@ -28,7 +28,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
         </div>
         <button
           onClick={addRow}
-          className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-4 py-2.5 text-sm font-semibold text-[var(--color-surface)] transition-[transform,box-shadow] duration-200 hover:shadow-[var(--shadow-tile)] active:translate-y-px active:shadow-[var(--shadow-press)] focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
+          className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white transition-[transform,box-shadow] duration-200 hover:shadow-[var(--shadow-tile)] active:translate-y-px active:shadow-[var(--shadow-press)] focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
         >
           <Plus size={16} weight="bold" /> {t("expense.add")}
         </button>

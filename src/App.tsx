@@ -137,7 +137,7 @@ function LanguageToggle() {
           key={lng}
           onClick={() => i18n.changeLanguage(lng)}
           aria-pressed={current === lng}
-          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${current === lng ? "bg-[var(--color-ink)] text-[var(--color-surface)]" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${current === lng ? "bg-zinc-950 text-white" : "text-zinc-500 hover:text-zinc-900"}`}
         >
           {t(`lang.${lng}`)}
         </button>
