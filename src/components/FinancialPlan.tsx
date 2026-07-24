@@ -1,47 +1,58 @@
-import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { Allocation } from "../types";
 
-const formatter = new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 });
+const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
 export function FinancialPlan({ income, setIncome, allocations, setAllocations }: { income: number; setIncome: (value: number) => void; allocations: Allocation[]; setAllocations: (value: Allocation[]) => void }) {
   const data = allocations.map((item) => ({ ...item, amount: Math.round((income * item.percent) / 100) }));
+  const total = allocations.reduce((s, a) => s + a.percent, 0);
+  const balanced = total === 100;
 
-  const updatePercent = (id: string, percent: number) => {
-    setAllocations(allocations.map((item) => (item.id === id ? { ...item, percent } : item)));
-  };
+  const updatePercent = (id: string, percent: number) => setAllocations(allocations.map((item) => (item.id === id ? { ...item, percent } : item)));
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-panel">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950">Financial Plan</h2>
-          <p className="text-sm text-slate-600">จัดสรรเงินเดือนเข้าแต่ละแผน</p>
+          <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">Financial plan</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">Allocate monthly income across each bucket.</p>
         </div>
-        <label className="text-sm font-medium text-slate-700">
+        <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wider text-[var(--color-ink-soft)]">
           Monthly income
-          <input type="number" value={income} onChange={(e) => setIncome(Number(e.target.value))} className="ml-2 w-36 rounded-xl border border-slate-200 px-3 py-2 font-semibold text-slate-950 outline-none focus:border-blue-500" />
+          <div className="flex items-center gap-1 rounded-xl border border-[var(--color-line)] bg-[var(--color-base)] px-3 py-2 focus-within:border-[var(--color-accent)]">
+            <span className="font-mono text-sm text-[var(--color-ink-soft)]">฿</span>
+            <input type="number" value={income} onChange={(e) => setIncome(Number(e.target.value))} className="w-32 bg-transparent font-mono text-sm font-semibold text-[var(--color-ink)] outline-none" />
+          </div>
         </label>
       </div>
-      <div className="grid gap-5 lg:grid-cols-[1fr_260px]">
-        <div className="space-y-4">
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+        <div className="space-y-5">
           {allocations.map((item) => (
             <div key={item.id}>
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-medium text-slate-800">{item.label}</span>
-                <span className="text-slate-600">{item.percent}% · {formatter.format((income * item.percent) / 100)}</span>
+              <div className="mb-2.5 flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2 font-medium text-[var(--color-ink)]">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                  {item.label}
+                </span>
+                <span className="font-mono text-[var(--color-ink)]">{item.percent}% <span className="text-[var(--color-ink-soft)]">· ฿{thb.format((income * item.percent) / 100)}</span></span>
               </div>
-              <input type="range" min="0" max="100" value={item.percent} onChange={(e) => updatePercent(item.id, Number(e.target.value))} className="w-full accent-blue-700" />
+              <input type="range" min="0" max="100" value={item.percent} onChange={(e) => updatePercent(item.id, Number(e.target.value))} className="w-full" />
             </div>
           ))}
+          <div className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-medium ${balanced ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]" : "bg-[oklch(95%_0.04_25)] text-[oklch(46%_0.16_25)]"}`}>
+            <span>{balanced ? "Allocations balanced" : "Total off 100% — adjust to balance"}</span>
+            <span className="font-mono">{total}%</span>
+          </div>
         </div>
-        <div className="h-64">
+
+        <div className="h-60">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" margin={{ left: 18, right: 12, top: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+            <BarChart data={data} layout="vertical" margin={{ left: 8, right: 8, top: 4, bottom: 4 }}>
               <XAxis type="number" hide />
-              <YAxis dataKey="label" type="category" width={78} tick={{ fontSize: 12, fill: "#475569" }} />
-              <Tooltip formatter={(value) => formatter.format(Number(value))} />
-              <Bar dataKey="amount" radius={[0, 8, 8, 0]} barSize={22}>
+              <YAxis dataKey="label" type="category" width={64} tickLine={false} axisLine={false} tick={{ fontSize: 12, fontFamily: "var(--font-sans)", fill: "var(--color-ink-soft)" }} />
+              <Tooltip cursor={{ fill: "var(--color-base)" }} formatter={(value) => [`฿${thb.format(Number(value))}`, "Allocated"]} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }} />
+              <Bar dataKey="amount" radius={[8, 8, 8, 8]} barSize={24}>
                 {data.map((entry) => <Cell key={entry.id} fill={entry.color} />)}
               </Bar>
             </BarChart>

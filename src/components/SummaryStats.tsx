@@ -1,5 +1,4 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import type { Transaction } from "../types";
 
 const categoryColors: Record<string, string> = {
   Food: "#003f5c",
@@ -12,50 +11,75 @@ const categoryColors: Record<string, string> = {
   Savings: "#ffa600",
 };
 
-const formatter = new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 });
+const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
-export function SummaryStats({ transactions, month }: { transactions: Transaction[]; month: string }) {
+export function SummaryStats({ transactions, month }: { transactions: import("../types").Transaction[]; month: string }) {
   const rows = transactions.filter((row) => row.date.startsWith(month));
-  const income = rows.filter((row) => row.amount > 0).reduce((sum, row) => sum + row.amount, 0);
-  const expenses = Math.abs(rows.filter((row) => row.amount < 0).reduce((sum, row) => sum + row.amount, 0));
+  const income = rows.filter((row) => row.amount > 0).reduce((s, r) => s + r.amount, 0);
+  const expenses = Math.abs(rows.filter((row) => row.amount < 0).reduce((s, r) => s + r.amount, 0));
   const net = income - expenses;
 
   const breakdown = Object.entries(
-    rows.filter((row) => row.amount < 0).reduce<Record<string, number>>((acc, row) => {
-      acc[row.category] = (acc[row.category] ?? 0) + Math.abs(row.amount);
+    rows.filter((r) => r.amount < 0).reduce<Record<string, number>>((acc, r) => {
+      acc[r.category] = (acc[r.category] ?? 0) + Math.abs(r.amount);
       return acc;
     }, {}),
   ).map(([name, value]) => ({ name, value }));
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-panel">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-slate-950">Month-end Summary</h2>
-        <p className="text-sm text-slate-600">สรุปเดือนนี้ใช้เงินไปกับอะไรบ้าง</p>
+    <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">Month-end summary</h2>
+        <p className="text-sm text-[var(--color-ink-soft)]">Where the money went this month.</p>
       </div>
+
       <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label="Income" value={formatter.format(income)} tone="text-emerald-700" />
-        <Stat label="Expenses" value={formatter.format(expenses)} tone="text-rose-700" />
-        <Stat label="Net" value={formatter.format(net)} tone={net >= 0 ? "text-blue-700" : "text-rose-700"} />
+        <Stat label="Income" value={`฿${thb.format(income)}`} tone="text-[var(--color-accent-ink)]" />
+        <Stat label="Expenses" value={`฿${thb.format(expenses)}`} tone="text-[oklch(48%_0.16_25)]" />
+        <Stat label="Net" value={`฿${thb.format(net)}`} tone={net >= 0 ? "text-[var(--color-accent-ink)]" : "text-[oklch(48%_0.16_25)]"} />
       </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[220px_1fr]">
-        <div className="h-52">
+
+      <div className="mt-6 grid items-center gap-5 lg:grid-cols-[220px_1fr]">
+        <div className="relative h-52">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={breakdown} dataKey="value" nameKey="name" innerRadius={58} outerRadius={86} paddingAngle={2}>
-                {breakdown.map((entry) => <Cell key={entry.name} fill={categoryColors[entry.name] ?? "#64748b"} />)}
+              <Pie data={breakdown} dataKey="value" nameKey="name" innerRadius={60} outerRadius={88} paddingAngle={2} stroke="none">
+                {breakdown.map((entry) => <Cell key={entry.name} fill={categoryColors[entry.name] ?? "#94a3b8"} />)}
               </Pie>
-              <Tooltip formatter={(value) => formatter.format(Number(value))} />
+              <Tooltip
+                formatter={(value) => [`฿${thb.format(Number(value))}`, "Spent"]}
+                contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
+              />
             </PieChart>
           </ResponsiveContainer>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[11px] uppercase tracking-wider text-[var(--color-ink-soft)]">Total</span>
+            <span className="font-mono text-lg font-semibold text-[var(--color-ink)]">฿{thb.format(expenses)}</span>
+          </div>
         </div>
+
         <div className="space-y-2">
-          {breakdown.length === 0 ? <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">ยังไม่มีค่าใช้จ่ายในเดือนนี้</p> : breakdown.map((item) => (
-            <div key={item.name} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm">
-              <span className="flex items-center gap-2 text-slate-700"><span className="h-3 w-3 rounded-full" style={{ backgroundColor: categoryColors[item.name] ?? "#64748b" }} />{item.name}</span>
-              <span className="font-semibold text-slate-950">{formatter.format(item.value)}</span>
-            </div>
-          ))}
+          {breakdown.length === 0 ? (
+            <p className="rounded-2xl bg-[var(--color-base)] px-4 py-5 text-sm text-[var(--color-ink-soft)]">No expenses logged this month yet.</p>
+          ) : (
+            breakdown.map((item) => {
+              const pct = expenses > 0 ? Math.round((item.value / expenses) * 100) : 0;
+              return (
+                <div key={item.name} className="rounded-2xl bg-[var(--color-base)] px-3.5 py-2.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-2 font-medium text-[var(--color-ink)]">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: categoryColors[item.name] ?? "#94a3b8" }} />
+                      {item.name}
+                    </span>
+                    <span className="font-mono text-[var(--color-ink)]">฿{thb.format(item.value)} <span className="text-[var(--color-ink-soft)]">· {pct}%</span></span>
+                  </div>
+                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--color-line)]">
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: categoryColors[item.name] ?? "#94a3b8" }} />
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </section>
@@ -63,5 +87,10 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
 }
 
 function Stat({ label, value, tone }: { label: string; value: string; tone: string }) {
-  return <div className="rounded-xl bg-slate-50 p-4"><div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div><div className={`mt-1 text-xl font-bold ${tone}`}>{value}</div></div>;
+  return (
+    <div className="rounded-2xl bg-[var(--color-base)] px-4 py-3.5">
+      <div className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)]">{label}</div>
+      <div className={`mt-1 font-mono text-xl font-semibold tracking-tight ${tone}`}>{value}</div>
+    </div>
+  );
 }
