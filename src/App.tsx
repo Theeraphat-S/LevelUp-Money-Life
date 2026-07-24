@@ -165,10 +165,10 @@ function NextMonthPrep() {
         </div>
         <div>
           <h2 className="text-base font-semibold text-[var(--color-ink)]">{t("prep.title")}</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">{t("prep.subtitle")}</p>
+          <p className="text-sm text-zinc-600">{t("prep.subtitle")}</p>
         </div>
       </div>
-      <ul className="mt-5 space-y-2 text-sm text-[var(--color-ink-soft)]">
+      <ul className="mt-5 space-y-2 text-sm text-zinc-600">
         <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i1")}</li>
         <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i2")}</li>
         <li className="flex items-center gap-2 rounded-xl bg-[var(--color-base)] px-3 py-2.5"><span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" /> {t("prep.i3")}</li>

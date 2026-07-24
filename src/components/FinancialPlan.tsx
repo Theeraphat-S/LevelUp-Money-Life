@@ -48,13 +48,13 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
           </div>
         </div>
 
-        <div className="h-60">
+        <div className="h-60 rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" margin={{ left: 8, right: 8, top: 4, bottom: 4 }}>
+            <BarChart data={data} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
               <XAxis type="number" hide />
-              <YAxis dataKey="label" type="category" width={64} tickLine={false} axisLine={false} tick={{ fontSize: 12, fontFamily: "var(--font-sans)", fill: "var(--color-ink-soft)" }} />
-              <Tooltip cursor={{ fill: "var(--color-base)" }} formatter={(value) => [`฿${thb.format(Number(value))}`, t("plan.allocated")]} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }} />
-              <Bar dataKey="amount" radius={[8, 8, 8, 8]} barSize={24}>
+              <YAxis dataKey="label" type="category" width={64} tickLine={false} axisLine={false} tick={{ fontSize: 12, fontFamily: "var(--font-sans)", fill: "#52525b" }} />
+              <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} formatter={(value) => [`฿${thb.format(Number(value))}`, t("plan.allocated")]} contentStyle={{ borderRadius: 12, border: "1px solid #e4e4e7", background: "#fff", fontSize: 12, fontFamily: "var(--font-mono)" }} />
+              <Bar dataKey="amount" radius={[8, 8, 8, 8]} barSize={24} stroke="rgba(0,0,0,0.10)" strokeWidth={1}>
                 {data.map((entry) => <Cell key={entry.id} fill={entry.color} />)}
               </Bar>
             </BarChart>
