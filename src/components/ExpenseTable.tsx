@@ -64,13 +64,15 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                       <input value={row.name} onChange={(e) => updateRow(row.id, { name: e.target.value })} className="w-56 rounded-lg border border-transparent bg-transparent px-2 py-1.5 text-[var(--color-ink)] outline-none transition focus:border-[var(--color-accent)] focus:bg-[var(--color-base)]" />
                     </td>
                     <td className="px-4 py-3">
-                      <input
-                        type="number"
-                        value={row.amount}
-                        onChange={(e) => updateRow(row.id, { amount: Number(e.target.value) })}
-                        className={`w-32 rounded-lg border border-transparent bg-transparent px-2 py-1.5 font-mono font-medium outline-none transition focus:border-[var(--color-accent)] focus:bg-[var(--color-base)] ${positive ? "text-[var(--color-accent-ink)]" : "text-[var(--color-ink)]"}`}
-                      />
-                      <span className={`ml-1 font-mono text-xs ${positive ? "text-[var(--color-accent)]" : "text-[var(--color-ink-soft)]"}`}>฿</span>
+                      <div className="flex items-center gap-1">
+                        <span className={`font-mono text-xs font-semibold ${positive ? "text-emerald-600" : "text-red-500"}`}>฿</span>
+                        <input
+                          type="number"
+                          value={row.amount}
+                          onChange={(e) => updateRow(row.id, { amount: Number(e.target.value) })}
+                          className={`w-28 rounded-lg border border-transparent bg-transparent px-2 py-1.5 font-mono font-medium outline-none transition focus:border-[var(--color-accent)] focus:bg-[var(--color-base)] ${positive ? "text-emerald-700" : "text-red-600"}`}
+                        />
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <input type="date" value={row.date} onChange={(e) => updateRow(row.id, { date: e.target.value })} className="rounded-lg border border-[var(--color-line)] bg-[var(--color-base)] px-2 py-1.5 font-mono text-xs text-[var(--color-ink-soft)] outline-none transition focus:border-[var(--color-accent)]" />
