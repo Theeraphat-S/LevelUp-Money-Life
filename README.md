@@ -27,17 +27,18 @@
 **LevelUp Money Life** is a lightweight, high-performance desktop application designed to make personal finance management engaging and effortless. By blending **Notion-style tracking** with **gamification elements** (XP, Leveling, Daily Quests), it turns daily financial discipline into an enjoyable game.
 
 ### ✨ Key Features
-- 📊 **Daily Money Log**: Notion-style interactive table for recording income and expenses with automatic local auto-save.
+- 📊 **Daily Money Log**: Notion-style interactive table for recording income and expenses with SQLite local-first storage.
 - 📈 **Month-End Summary**: Comprehensive visual breakdown of net balance, total income, expenses, and category charts (Recharts).
 - 🎯 **Financial Planning**: Interactive allocation sliders (e.g., 50/30/20 rule) with real-time target visualization.
 - 🎮 **Daily Quests & Gamification**: Earn XP and level up as you complete your daily habits and financial goals.
 - 🌐 **Multi-Language Support**: Instant switching between English and Thai.
-- ⚡ **Native Performance**: Built on Tauri v2 for minimal memory usage, instant launch, and small binary size.
+- ⚡ **Native Performance**: Built on Tauri v2 with SQLite plugin for minimal memory usage, fast local-first persistence, and small binary size.
 
 ### 🛠️ Tech Stack
 | Category | Technology |
 |---|---|
 | **Core Desktop Engine** | [Tauri v2](https://tauri.app/) (Rust) |
+| **Database / Persistence** | SQLite (`@tauri-apps/plugin-sql`) |
 | **Frontend Framework** | [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) |
 | **Build Tool** | [Vite](https://vitejs.dev/) |
 | **Styling & Fonts** | [Tailwind CSS v4](https://tailwindcss.com/), JetBrains Mono, Outfit |
@@ -80,17 +81,18 @@ npm run tauri build
 **LevelUp Money Life** คือแอปพลิเคชันเดสก์ท็อปสำหรับจัดการการเงินส่วนบุคคลและเป้าหมายชีวิตแบบ Gamification ที่ยกระดับการบันทึกรายรับ-รายจ่ายให้สนุกสนาน ไม่น่าเบื่อ รวมแนวคิดการบันทึกแบบ **Notion-style** เข้ากับระบบ **เก็บเลเวล (XP & Leveling)** และภารกิจรายวัน (Daily Quests)
 
 ### ✨ ฟีเจอร์หลัก
-- 📊 **บันทึกรายรับ-รายจ่ายรายวัน (Daily Log)**: ตารางบันทึกสไตล์ Notion ใช้งานง่าย บันทึกข้อมูลให้อัตโนมัติลงในเครื่อง (Local Storage)
+- 📊 **บันทึกรายรับ-รายจ่ายรายวัน (Daily Log)**: ตารางบันทึกสไตล์ Notion ใช้งานง่าย บันทึกข้อมูลแบบ Local-First ด้วย SQLite
 - 📈 **สรุปภาพรวมรายเดือน (Month-End Summary)**: วิเคราะห์รายได้ รายจ่าย ยอดคงเหลือ พร้อมกราฟวงกลมแยกหมวดหมู่ชัดเจน
 - 🎯 **วางแผนการเงิน (Financial Plan)**: เครื่องมือจัดสรรงบประมาณ (เช่น กฎ 50/30/20) พร้อมสไลเดอร์ปรับสัดส่วนแบบเรียลไทม์
 - 🎮 **ระบบภารกิจและเลเวล (Daily Quests & XP)**: ทำภารกิจรายวันเพื่อรับ XP ยกระดับเลเวลชีวิตและการเงิน
 - 🌐 **รองรับสองภาษา (TH/EN)**: สลับเปลี่ยนภาษาไทยและอังกฤษได้ทันทีภายในแอป
-- ⚡ **ทำงานรวดเร็ว เบา ไม่กินสเปก**: พัฒนาด้วย Tauri v2 ให้ประสิทธิภาพสูงและขนาดไฟล์ที่เล็ก
+- ⚡ **ทำงานรวดเร็ว เบา ไม่กินสเปก**: พัฒนาด้วย Tauri v2 และ SQLite ให้ประสิทธิภาพสูงและขนาดไฟล์ที่เล็ก
 
 ### 🛠️ เทคโนโลยีที่ใช้
 | หมวดหมู่ | เทคโนโลยี |
 |---|---|
 | **ระบบเดสก์ท็อป** | [Tauri v2](https://tauri.app/) (Rust) |
+| **ฐานข้อมูล / Persistence** | SQLite (`@tauri-apps/plugin-sql`) |
 | **เฟรมเวิร์ก Frontend** | [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) |
 | **เครื่องมือ Build** | [Vite](https://vitejs.dev/) |
 | **สไตล์และฟอนต์** | [Tailwind CSS v4](https://tailwindcss.com/), JetBrains Mono, Outfit |
@@ -135,6 +137,7 @@ LevelUp-Money-Life/
 │   ├── components/       # UI Components (ExpenseTable, SummaryStats, FinancialPlan, DailyQuests)
 │   ├── hooks/            # Custom React Hooks (useLocalStorage, etc.)
 │   ├── i18n/             # Internationalization config & translation files
+│   ├── services/         # Database service layer (db.ts for SQLite via @tauri-apps/plugin-sql)
 │   ├── App.tsx           # Main Application Container
 │   └── main.tsx          # React Entry Point
 ├── src-tauri/            # Tauri & Rust Backend Configuration
