@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Cell, Pie, PieChart, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
-import { PieChart as PieIcon, BarChart2 } from "lucide-react";
+import { ChartPie, ChartBar } from "@phosphor-icons/react";
 import { CATEGORY_COLORS, type Transaction, type TransactionCategory } from "../types";
 
 const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
@@ -29,6 +29,9 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
 
   breakdown.sort((a, b) => b.value - a.value);
 
+  const topCategory = breakdown.length > 0 ? breakdown[0] : null;
+  const topPct = topCategory && expenses > 0 ? Math.round((topCategory.value / expenses) * 100) : 0;
+
   return (
     <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
@@ -38,25 +41,31 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
         </div>
         <div className="flex gap-1 bg-[var(--color-base)] p-1 rounded-xl self-start sm:self-auto border border-[var(--color-line)]">
           <button
+            type="button"
             onClick={() => setChartType("donut")}
+            aria-pressed={chartType === "donut"}
+            aria-label={t("summary.viewDonutAria")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               chartType === "donut"
                 ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs"
                 : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
             }`}
           >
-            <PieIcon size={14} />
+            <ChartPie size={14} />
             {t("summary.viewDonut")}
           </button>
           <button
+            type="button"
             onClick={() => setChartType("bar")}
+            aria-pressed={chartType === "bar"}
+            aria-label={t("summary.viewBarAria")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               chartType === "bar"
                 ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs"
                 : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
             }`}
           >
-            <BarChart2 size={14} />
+            <ChartBar size={14} />
             {t("summary.viewBar")}
           </button>
         </div>
@@ -67,6 +76,16 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
         <Stat label={t("summary.expenses")} value={`-฿${thb.format(expenses)}`} tone="text-rose-600" />
         <Stat label={t("summary.net")} value={`${net >= 0 ? "+" : ""}฿${thb.format(net)}`} tone={net >= 0 ? "text-emerald-700" : "text-rose-600"} />
       </div>
+
+      {topCategory && (
+        <div className="mt-4 rounded-xl border border-[var(--color-line)] bg-[var(--color-base)] px-4 py-2.5 text-xs font-medium text-[var(--color-ink)]">
+          {t("summary.topCategory", {
+            category: topCategory.displayName,
+            amount: thb.format(topCategory.value),
+            pct: topPct,
+          })}
+        </div>
+      )}
 
       <div className="mt-6 grid items-center gap-5 lg:grid-cols-[240px_1fr]">
         <div className="relative h-56">
@@ -109,7 +128,10 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
 
         <div className="space-y-2">
           {breakdown.length === 0 ? (
-            <p className="rounded-2xl bg-[var(--color-base)] px-4 py-5 text-sm text-[var(--color-ink-soft)]">{t("summary.empty")}</p>
+            <div className="rounded-2xl bg-[var(--color-base)] px-4 py-5 text-center">
+              <h3 className="text-sm font-semibold text-[var(--color-ink)]">{t("summary.emptyTitle")}</h3>
+              <p className="mt-1 text-xs text-[var(--color-ink-soft)]">{t("summary.emptyHint")}</p>
+            </div>
           ) : (
             breakdown.map((item) => {
               const pct = expenses > 0 ? Math.round((item.value / expenses) * 100) : 0;

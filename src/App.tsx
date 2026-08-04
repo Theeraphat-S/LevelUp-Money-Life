@@ -136,11 +136,14 @@ export default function App() {
     });
   };
 
+  const monthRows = transactions.filter((row) => row.date.startsWith(month));
+  const monthIncome = monthRows.filter((row) => row.amount > 0).reduce((sum, row) => sum + row.amount, 0);
   const expenses = Math.abs(
-    transactions
-      .filter((row) => row.date.startsWith(month) && row.amount < 0)
+    monthRows
+      .filter((row) => row.amount < 0)
       .reduce((sum, row) => sum + row.amount, 0)
   );
+  const actualNet = monthIncome - expenses;
   const cleared = transactions.filter((row) => row.cleared).length;
   const xpEarned = quests.filter((q) => q.done).reduce((s, q) => s + q.xp, 0);
   const xpGoal = 200;
@@ -150,7 +153,7 @@ export default function App() {
     return (
       <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center font-mono text-sm text-[var(--color-ink-soft)]">
-          Loading LevelUp Money Life Database...
+          {t("app.loading")}
         </div>
       </main>
     );
@@ -190,10 +193,10 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[30rem]">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[33rem]">
             <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
             <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
-            <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`฿${thb.format(income - expenses)}`} />
+            <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`${actualNet >= 0 ? "+" : ""}฿${thb.format(actualNet)}`} />
           </div>
         </motion.header>
 
@@ -236,6 +239,7 @@ function LanguageToggle() {
       {(["en", "th"] as const).map((lng) => (
         <button
           key={lng}
+          type="button"
           onClick={() => i18n.changeLanguage(lng)}
           aria-pressed={current === lng}
           className={`rounded-full px-3 py-1 text-xs font-semibold transition ${current === lng ? "bg-zinc-950 text-white" : "text-zinc-500 hover:text-zinc-900"}`}
@@ -249,9 +253,12 @@ function LanguageToggle() {
 
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3 shadow-[var(--shadow-tile)]">
-      <div className="flex items-center gap-2 text-[var(--color-accent)]">{icon}<span className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-ink-soft)]">{label}</span></div>
-      <div className="mt-1.5 font-mono text-xl font-semibold tracking-tight text-[var(--color-ink)]">{value}</div>
+    <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-3 shadow-[var(--shadow-tile)]">
+      <div className="flex items-center gap-1.5 text-[var(--color-accent)]">
+        <span className="shrink-0">{icon}</span>
+        <span className="whitespace-nowrap text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-soft)] sm:text-[11px]">{label}</span>
+      </div>
+      <div className="mt-1.5 font-mono text-xl font-semibold tracking-tight text-[var(--color-ink)] whitespace-nowrap">{value}</div>
     </div>
   );
 }
@@ -294,17 +301,21 @@ function NextMonthPrep() {
         {(["i1", "i2", "i3"] as const).map((key) => {
           const isDone = !!checkedItems[key];
           return (
-            <li
-              key={key}
-              onClick={() => toggleItem(key)}
-              className={`flex cursor-pointer items-center justify-between rounded-xl border border-white/5 px-3.5 py-2.5 transition ${isDone ? "bg-white/[0.08] text-[oklch(75%_0.16_165)]" : "bg-white/[0.04] text-white hover:bg-white/[0.08]"}`}
-            >
-              <span className="flex items-center gap-2.5">
-                <span className={`h-4 w-4 rounded-md border flex items-center justify-center text-xs transition ${isDone ? "border-[oklch(75%_0.16_165)] bg-[oklch(75%_0.16_165)] text-zinc-950 font-bold" : "border-white/20 bg-transparent text-transparent"}`}>
-                  ✓
+            <li key={key}>
+              <button
+                type="button"
+                onClick={() => toggleItem(key)}
+                aria-pressed={isDone}
+                aria-label={t("prep.toggle", { item: t(`prep.${key}`) })}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-xl border border-white/5 px-3.5 py-2.5 text-left transition ${isDone ? "bg-white/[0.08] text-[oklch(75%_0.16_165)]" : "bg-white/[0.04] text-white hover:bg-white/[0.08]"} focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(75%_0.16_165)]`}
+              >
+                <span className="flex items-center gap-2.5">
+                  <span className={`h-4 w-4 rounded-md border flex items-center justify-center text-xs transition ${isDone ? "border-[oklch(75%_0.16_165)] bg-[oklch(75%_0.16_165)] text-zinc-950 font-bold" : "border-white/20 bg-transparent text-transparent"}`}>
+                    ✓
+                  </span>
+                  <span className={isDone ? "line-through text-[oklch(65%_0.01_260)]" : "text-white"}>{t(`prep.${key}`)}</span>
                 </span>
-                <span className={isDone ? "line-through text-[oklch(65%_0.01_260)]" : "text-white"}>{t(`prep.${key}`)}</span>
-              </span>
+              </button>
             </li>
           );
         })}

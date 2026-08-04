@@ -1,25 +1,57 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Funnel, MagnifyingGlass, Plus, Trash } from "@phosphor-icons/react";
+import { Funnel, MagnifyingGlass, Plus, Trash, ArrowUUpLeft } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import type { Dispatch, SetStateAction } from "react";
-import type { Transaction, TransactionCategory } from "../types";
-
-const categories: TransactionCategory[] = ["Income", "Food", "Transport", "Home", "Health", "Learning", "Fun", "Debt", "Savings"];
+import { EXPENSE_CATEGORIES, TRANSACTION_CATEGORIES, type Transaction, type TransactionCategory } from "../types";
 
 export function ExpenseTable({ transactions, setTransactions }: { transactions: Transaction[]; setTransactions: Dispatch<SetStateAction<Transaction[]>> }) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  const [lastDeleted, setLastDeleted] = useState<Transaction | null>(null);
 
-  const addRow = () => {
+  const addExpenseRow = () => {
     setTransactions((rows) => [
-      { id: crypto.randomUUID(), name: "New entry", amount: -100, date: new Date().toISOString().slice(0, 10), category: "Food", cleared: false },
+      { id: crypto.randomUUID(), name: t("expense.expenseType"), amount: -100, date: new Date().toISOString().slice(0, 10), category: "Food", cleared: false },
       ...rows,
     ]);
   };
+
+  const addIncomeRow = () => {
+    setTransactions((rows) => [
+      { id: crypto.randomUUID(), name: t("expense.incomeType"), amount: 1000, date: new Date().toISOString().slice(0, 10), category: "Income", cleared: false },
+      ...rows,
+    ]);
+  };
+
   const updateRow = (id: string, patch: Partial<Transaction>) => setTransactions((rows) => rows.map((row) => (row.id === id ? { ...row, ...patch } : row)));
-  const deleteRow = (id: string) => setTransactions((rows) => rows.filter((row) => row.id !== id));
+
+  const toggleRowType = (row: Transaction, isIncome: boolean) => {
+    const absAmount = Math.abs(row.amount) || (isIncome ? 1000 : 100);
+    if (isIncome) {
+      updateRow(row.id, { amount: absAmount, category: "Income" });
+    } else {
+      const nextCat = row.category === "Income" ? "Food" : row.category;
+      updateRow(row.id, { amount: -absAmount, category: nextCat });
+    }
+  };
+
+  const deleteRow = (row: Transaction) => {
+    setLastDeleted(row);
+    setTransactions((rows) => rows.filter((r) => r.id !== row.id));
+  };
+
+  const undoDelete = () => {
+    if (!lastDeleted) return;
+    setTransactions((rows) => [lastDeleted, ...rows.filter((r) => r.id !== lastDeleted.id)]);
+    setLastDeleted(null);
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setCategoryFilter("ALL");
+  };
 
   const filteredTransactions = transactions.filter((row) => {
     const matchesSearch = row.name.toLowerCase().includes(search.toLowerCase());
@@ -34,13 +66,40 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
           <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("expense.title")}</h2>
           <p className="text-sm text-[var(--color-ink-soft)]">{t("expense.subtitle")}</p>
         </div>
-        <button
-          onClick={addRow}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white transition-[transform,box-shadow] duration-200 hover:shadow-[var(--shadow-tile)] active:translate-y-px active:shadow-[var(--shadow-press)] focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
-        >
-          <Plus size={16} weight="bold" /> {t("expense.add")}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={addExpenseRow}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2 text-xs font-semibold text-white transition-[transform,box-shadow] duration-200 hover:shadow-[var(--shadow-tile)] active:translate-y-px focus:outline-none focus-visible:shadow-[var(--ring-accent)] sm:text-sm"
+          >
+            <Plus size={15} weight="bold" /> {t("expense.addExpense")}
+          </button>
+          <button
+            onClick={addIncomeRow}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--color-line)] bg-[var(--color-base)] px-4 py-2 text-xs font-semibold text-[var(--color-accent-ink)] transition hover:bg-[var(--color-line)] active:translate-y-px focus:outline-none focus-visible:shadow-[var(--ring-accent)] sm:text-sm"
+          >
+            <Plus size={15} weight="bold" /> {t("expense.addIncome")}
+          </button>
+        </div>
       </div>
+
+      <AnimatePresence>
+        {lastDeleted && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center justify-between border-b border-amber-200/60 bg-amber-50 px-6 py-2.5 text-xs text-amber-900"
+          >
+            <span>{t("expense.deleted")}</span>
+            <button
+              onClick={undoDelete}
+              className="inline-flex items-center gap-1 font-semibold text-amber-950 underline hover:no-underline"
+            >
+              <ArrowUUpLeft size={14} /> {t("expense.undo")}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-base)] px-6 py-3">
         <div className="flex flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 focus-within:border-[var(--color-accent)]">
@@ -49,7 +108,8 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("expense.searchPlaceholder", "Search logs...")}
+            placeholder={t("expense.searchPlaceholder")}
+            aria-label={t("expense.searchPlaceholder")}
             className="w-full bg-transparent text-xs text-[var(--color-ink)] outline-none"
           />
         </div>
@@ -58,10 +118,11 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
+            aria-label={t("expense.category")}
             className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--color-accent)]"
           >
-            <option value="ALL">{t("expense.allCategories", "All Categories")}</option>
-            {categories.map((c) => (
+            <option value="ALL">{t("expense.allCategories")}</option>
+            {TRANSACTION_CATEGORIES.map((c) => (
               <option key={c} value={c}>{t(`category.${c}`)}</option>
             ))}
           </select>
@@ -71,8 +132,9 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
       <div className="overflow-x-auto">
         <table className="min-w-full border-separate border-spacing-0 text-sm">
           <thead>
-            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)]">
+            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)] whitespace-nowrap">
               <th className="px-6 py-3 font-semibold">{t("expense.name")}</th>
+              <th className="px-4 py-3 font-semibold">{t("expense.type")}</th>
               <th className="px-4 py-3 font-semibold">{t("expense.amount")}</th>
               <th className="px-4 py-3 font-semibold">{t("expense.date")}</th>
               <th className="px-4 py-3 font-semibold">{t("expense.category")}</th>
@@ -98,41 +160,74 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                       <input
                         value={row.name}
                         onChange={(e) => updateRow(row.id, { name: e.target.value })}
-                        className="w-56 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2.5 py-1.5 text-[var(--color-ink)] transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none"
+                        aria-label={t("expense.nameFor", { name: row.name || "entry" })}
+                        className="w-48 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2.5 py-1.5 text-[var(--color-ink)] transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none"
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
-                          {positive ? "+฿" : "-฿"}
-                        </span>
-                        <input
-                          type="number"
-                          value={Math.abs(row.amount)}
-                          onChange={(e) => {
-                            const val = Number(e.target.value);
-                            updateRow(row.id, { amount: positive ? val : -val });
-                          }}
-                          className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-emerald-700" : "text-rose-600"}`}
-                        />
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="inline-flex rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-0.5" role="group" aria-label={t("expense.type")}>
+                        <button
+                          type="button"
+                          onClick={() => toggleRowType(row, false)}
+                          aria-pressed={!positive}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${!positive ? "bg-rose-100 text-rose-800" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                        >
+                          {t("expense.expenseType")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleRowType(row, true)}
+                          aria-pressed={positive}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${positive ? "bg-emerald-100 text-emerald-800" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                        >
+                          {t("expense.incomeType")}
+                        </button>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-1">
+                          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                            {positive ? "+฿" : "-฿"}
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={Math.abs(row.amount)}
+                            onChange={(e) => {
+                              const val = Math.abs(Number(e.target.value));
+                              updateRow(row.id, { amount: positive ? val : -val });
+                            }}
+                            aria-label={t("expense.amountFor", { name: row.name || "entry" })}
+                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-emerald-700" : "text-rose-600"}`}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <input
                         type="date"
                         value={row.date}
                         onChange={(e) => updateRow(row.id, { date: e.target.value })}
+                        aria-label={t("expense.dateFor", { name: row.name || "entry" })}
                         className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1.5 font-mono text-xs text-[var(--color-ink-soft)] outline-none transition focus:border-[var(--color-accent)]"
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={row.category}
-                        onChange={(e) => updateRow(row.id, { category: e.target.value as TransactionCategory })}
-                        className="cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--color-accent)]"
-                      >
-                        {categories.map((c) => <option key={c} value={c}>{t(`category.${c}`)}</option>)}
-                      </select>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {positive ? (
+                        <span className="whitespace-nowrap inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                          {t("category.Income")}
+                        </span>
+                      ) : (
+                        <select
+                          value={row.category}
+                          onChange={(e) => updateRow(row.id, { category: e.target.value as TransactionCategory })}
+                          aria-label={t("expense.categoryFor", { name: row.name || "entry" })}
+                          className="whitespace-nowrap cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--color-accent)]"
+                        >
+                          {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{t(`category.${c}`)}</option>)}
+                        </select>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <input
@@ -145,7 +240,8 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                     </td>
                     <td className="px-6 py-3 text-right">
                       <button
-                        onClick={() => deleteRow(row.id)}
+                        type="button"
+                        onClick={() => deleteRow(row)}
                         className="rounded-lg p-2 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
                         aria-label={t("expense.delete")}
                       >
@@ -158,8 +254,40 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
             </AnimatePresence>
           </tbody>
         </table>
-        {filteredTransactions.length === 0 && (
-          <div className="px-6 py-12 text-center text-sm text-[var(--color-ink-soft)]">{t("expense.empty")}</div>
+        {transactions.length === 0 && (
+          <div className="px-6 py-10 text-center">
+            <h3 className="text-base font-semibold text-[var(--color-ink)]">{t("expense.emptyTitle")}</h3>
+            <p className="mt-1 text-xs text-[var(--color-ink-soft)]">{t("expense.emptyHint")}</p>
+            <div className="mt-4 flex justify-center gap-2">
+              <button
+                type="button"
+                onClick={addExpenseRow}
+                className="rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white hover:bg-zinc-800"
+              >
+                {t("expense.addExpense")}
+              </button>
+              <button
+                type="button"
+                onClick={addIncomeRow}
+                className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-base)]"
+              >
+                {t("expense.addIncome")}
+              </button>
+            </div>
+          </div>
+        )}
+        {transactions.length > 0 && filteredTransactions.length === 0 && (
+          <div className="px-6 py-10 text-center">
+            <h3 className="text-base font-semibold text-[var(--color-ink)]">{t("expense.noResultsTitle")}</h3>
+            <p className="mt-1 text-xs text-[var(--color-ink-soft)]">{t("expense.noResultsHint")}</p>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-base)]"
+            >
+              {t("expense.clearFilters")}
+            </button>
+          </div>
         )}
       </div>
     </section>

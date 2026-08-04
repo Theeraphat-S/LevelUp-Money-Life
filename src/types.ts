@@ -1,4 +1,18 @@
-export type TransactionCategory = "Income" | "Food" | "Transport" | "Home" | "Health" | "Learning" | "Fun" | "Debt" | "Savings";
+export const TRANSACTION_CATEGORIES = [
+  "Income",
+  "Food",
+  "Transport",
+  "Home",
+  "Health",
+  "Learning",
+  "Fun",
+  "Debt",
+  "Savings",
+] as const;
+
+export const EXPENSE_CATEGORIES = TRANSACTION_CATEGORIES.filter((category) => category !== "Income");
+
+export type TransactionCategory = (typeof TRANSACTION_CATEGORIES)[number];
 
 export const CATEGORY_COLORS: Record<TransactionCategory, string> = {
   Income: "oklch(60% 0.15 150)", // Emerald
@@ -35,4 +49,3 @@ export type Quest = {
   xp: number;
   done: boolean;
 };
-
