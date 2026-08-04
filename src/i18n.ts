@@ -45,6 +45,10 @@ const resources = {
         markCleared: "Mark {{name}} cleared",
         searchPlaceholder: "Search transactions...",
         allCategories: "All Categories",
+        exportCSV: "Export CSV",
+        exportJSON: "Backup (JSON)",
+        importCSV: "Import CSV",
+        importJSON: "Restore (JSON)",
       },
       category: {
         Income: "Income",
@@ -67,6 +71,9 @@ const resources = {
         total: "Total",
         spent: "Spent",
         empty: "No expenses logged this month yet.",
+        viewDonut: "Donut View",
+        viewBar: "Bar View",
+        spendingAnalytics: "Category Breakdown Analytics",
       },
       plan: {
         title: "Financial plan",
@@ -121,6 +128,10 @@ const resources = {
         markCleared: "ทำเครื่องหมาย {{name}} ว่ายืนยันแล้ว",
         searchPlaceholder: "ค้นหารายการ...",
         allCategories: "ทุกหมวดหมู่",
+        exportCSV: "ส่งออก CSV",
+        exportJSON: "สำรองข้อมูล (JSON)",
+        importCSV: "นำเข้า CSV",
+        importJSON: "กู้คืนข้อมูล (JSON)",
       },
       category: {
         Income: "รายได้",
@@ -143,6 +154,9 @@ const resources = {
         total: "รวม",
         spent: "ใช้จ่าย",
         empty: "ยังไม่มีค่าใช้จ่ายในเดือนนี้",
+        viewDonut: "มุมมองโดนัท",
+        viewBar: "มุมมองแท่ง",
+        spendingAnalytics: "วิเคราะห์ค่าใช้จ่ายตามหมวดหมู่",
       },
       plan: {
         title: "แผนการเงิน",

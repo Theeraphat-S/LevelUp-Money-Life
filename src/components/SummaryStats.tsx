@@ -1,11 +1,15 @@
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { useState } from "react";
+import { Cell, Pie, PieChart, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
+import { PieChart as PieIcon, BarChart2 } from "lucide-react";
 import { CATEGORY_COLORS, type Transaction, type TransactionCategory } from "../types";
 
 const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
 export function SummaryStats({ transactions, month }: { transactions: Transaction[]; month: string }) {
   const { t } = useTranslation();
+  const [chartType, setChartType] = useState<"donut" | "bar">("donut");
+
   const rows = transactions.filter((row) => row.date.startsWith(month));
   const income = rows.filter((row) => row.amount > 0).reduce((s, r) => s + r.amount, 0);
   const expenses = Math.abs(rows.filter((row) => row.amount < 0).reduce((s, r) => s + r.amount, 0));
@@ -16,13 +20,46 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
       acc[r.category] = (acc[r.category] ?? 0) + Math.abs(r.amount);
       return acc;
     }, {}),
-  ).map(([name, value]) => ({ name: name as TransactionCategory, value }));
+  ).map(([name, value]) => ({
+    name: name as TransactionCategory,
+    displayName: t(`category.${name}`),
+    value,
+    color: CATEGORY_COLORS[name as TransactionCategory] ?? "oklch(60% 0.05 260)",
+  }));
+
+  breakdown.sort((a, b) => b.value - a.value);
 
   return (
     <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("summary.title")}</h2>
-        <p className="text-sm text-[var(--color-ink-soft)]">{t("summary.subtitle")}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("summary.title")}</h2>
+          <p className="text-sm text-[var(--color-ink-soft)]">{t("summary.subtitle")}</p>
+        </div>
+        <div className="flex gap-1 bg-[var(--color-base)] p-1 rounded-xl self-start sm:self-auto border border-[var(--color-line)]">
+          <button
+            onClick={() => setChartType("donut")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              chartType === "donut"
+                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs"
+                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+            }`}
+          >
+            <PieIcon size={14} />
+            {t("summary.viewDonut")}
+          </button>
+          <button
+            onClick={() => setChartType("bar")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              chartType === "bar"
+                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs"
+                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+            }`}
+          >
+            <BarChart2 size={14} />
+            {t("summary.viewBar")}
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
@@ -31,23 +68,43 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
         <Stat label={t("summary.net")} value={`${net >= 0 ? "+" : ""}฿${thb.format(net)}`} tone={net >= 0 ? "text-emerald-700" : "text-rose-600"} />
       </div>
 
-      <div className="mt-6 grid items-center gap-5 lg:grid-cols-[220px_1fr]">
-        <div className="relative h-52">
+      <div className="mt-6 grid items-center gap-5 lg:grid-cols-[240px_1fr]">
+        <div className="relative h-56">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={breakdown} dataKey="value" nameKey="name" innerRadius={60} outerRadius={88} paddingAngle={2} stroke="none">
-                {breakdown.map((entry) => <Cell key={entry.name} fill={CATEGORY_COLORS[entry.name] ?? "oklch(60% 0.05 260)"} />)}
-              </Pie>
-              <Tooltip
-                formatter={(value, name) => [`฿${thb.format(Number(value))}`, t(`category.${name}`)]}
-                contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
-              />
-            </PieChart>
+            {chartType === "donut" ? (
+              <PieChart>
+                <Pie data={breakdown} dataKey="value" nameKey="name" innerRadius={60} outerRadius={88} paddingAngle={2} stroke="none">
+                  {breakdown.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value, name) => [`฿${thb.format(Number(value))}`, t(`category.${name}`)]}
+                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
+                />
+              </PieChart>
+            ) : (
+              <BarChart data={breakdown} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                <XAxis dataKey="displayName" stroke="var(--color-ink-soft)" fontSize={10} tickLine={false} />
+                <YAxis stroke="var(--color-ink-soft)" fontSize={10} tickLine={false} tickFormatter={(v) => `฿${v}`} />
+                <Tooltip
+                  formatter={(value, name) => [`฿${thb.format(Number(value))}`, t(`category.${name}`)]}
+                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
+                />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {breakdown.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            )}
           </ResponsiveContainer>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[11px] uppercase tracking-wider text-[var(--color-ink-soft)]">{t("summary.total")}</span>
-            <span className="font-mono text-lg font-semibold text-[var(--color-ink)]">฿{thb.format(expenses)}</span>
-          </div>
+          {chartType === "donut" && (
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-[11px] uppercase tracking-wider text-[var(--color-ink-soft)]">{t("summary.total")}</span>
+              <span className="font-mono text-lg font-semibold text-[var(--color-ink)]">฿{thb.format(expenses)}</span>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -56,18 +113,17 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
           ) : (
             breakdown.map((item) => {
               const pct = expenses > 0 ? Math.round((item.value / expenses) * 100) : 0;
-              const color = CATEGORY_COLORS[item.name] ?? "oklch(60% 0.05 260)";
               return (
                 <div key={item.name} className="rounded-2xl bg-[var(--color-base)] px-3.5 py-2.5">
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2 font-medium text-[var(--color-ink)]">
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
                       {t(`category.${item.name}`)}
                     </span>
                     <span className="font-mono text-[var(--color-ink)]">฿{thb.format(item.value)} <span className="text-[var(--color-ink-soft)]">· {pct}%</span></span>
                   </div>
                   <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--color-line)]">
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: item.color }} />
                   </div>
                 </div>
               );
@@ -79,7 +135,8 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone: string }) {  return (
+function Stat({ label, value, tone }: { label: string; value: string; tone: string }) {
+  return (
     <div className="rounded-2xl bg-[var(--color-base)] px-4 py-3.5">
       <div className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)]">{label}</div>
       <div className={`mt-1 font-mono text-xl font-semibold tracking-tight ${tone}`}>{value}</div>
