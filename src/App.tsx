@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarDots, ChartLineUp, Coins, ShieldCheck, Trophy } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
@@ -5,7 +6,16 @@ import { DailyQuests } from "./components/DailyQuests";
 import { ExpenseTable } from "./components/ExpenseTable";
 import { FinancialPlan } from "./components/FinancialPlan";
 import { SummaryStats } from "./components/SummaryStats";
-import { useLocalStorage } from "./hooks/useLocalStorage";
+import {
+  getTransactions,
+  saveAllTransactions,
+  getAllocations,
+  saveAllocations,
+  getQuests,
+  saveAllQuests,
+  getSetting,
+  saveSetting,
+} from "./services/db";
 import type { Allocation, Quest, Transaction } from "./types";
 
 const today = new Date().toISOString().slice(0, 10);
@@ -44,16 +54,107 @@ function tile(delay: number) {
 
 export default function App() {
   const { t } = useTranslation();
-  const [transactions, setTransactions] = useLocalStorage<Transaction[]>("levelup.transactions", sampleTransactions);
-  const [allocations, setAllocations] = useLocalStorage<Allocation[]>("levelup.allocations", sampleAllocations);
-  const [income, setIncome] = useLocalStorage<number>("levelup.income", 42000);
-  const [quests, setQuests] = useLocalStorage<Quest[]>("levelup.quests", sampleQuests);
+  const [loading, setLoading] = useState(true);
+  const [transactions, setTransactionsState] = useState<Transaction[]>([]);
+  const [allocations, setAllocationsState] = useState<Allocation[]>([]);
+  const [income, setIncomeState] = useState<number>(42000);
+  const [quests, setQuestsState] = useState<Quest[]>([]);
 
-  const expenses = Math.abs(transactions.filter((row) => row.date.startsWith(month) && row.amount < 0).reduce((sum, row) => sum + row.amount, 0));
+  useEffect(() => {
+    async function loadData() {
+      try {
+        let txs = await getTransactions();
+        if (txs.length === 0) {
+          const localTxs = localStorage.getItem("levelup.transactions");
+          txs = localTxs ? JSON.parse(localTxs) : sampleTransactions;
+          await saveAllTransactions(txs);
+        }
+
+        let allocs = await getAllocations();
+        if (allocs.length === 0) {
+          const localAllocs = localStorage.getItem("levelup.allocations");
+          allocs = localAllocs ? JSON.parse(localAllocs) : sampleAllocations;
+          await saveAllocations(allocs);
+        }
+
+        let qsts = await getQuests();
+        if (qsts.length === 0) {
+          const localQuests = localStorage.getItem("levelup.quests");
+          qsts = localQuests ? JSON.parse(localQuests) : sampleQuests;
+          await saveAllQuests(qsts);
+        }
+
+        const localInc = localStorage.getItem("levelup.income");
+        const defaultInc = localInc ? JSON.parse(localInc) : 42000;
+        const inc = await getSetting<number>("income", defaultInc);
+        if (localInc) {
+          await saveSetting("income", inc);
+        }
+
+        setTransactionsState(txs);
+        setAllocationsState(allocs);
+        setQuestsState(qsts);
+        setIncomeState(inc);
+      } catch (err) {
+        console.error("Failed loading data from SQLite, fallback to local state", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const setTransactions = (value: Transaction[] | ((prev: Transaction[]) => Transaction[])) => {
+    setTransactionsState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      saveAllTransactions(next).catch(console.error);
+      return next;
+    });
+  };
+
+  const setAllocations = (value: Allocation[] | ((prev: Allocation[]) => Allocation[])) => {
+    setAllocationsState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      saveAllocations(next).catch(console.error);
+      return next;
+    });
+  };
+
+  const setQuests = (value: Quest[] | ((prev: Quest[]) => Quest[])) => {
+    setQuestsState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      saveAllQuests(next).catch(console.error);
+      return next;
+    });
+  };
+
+  const setIncome = (value: number | ((prev: number) => number)) => {
+    setIncomeState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      saveSetting("income", next).catch(console.error);
+      return next;
+    });
+  };
+
+  const expenses = Math.abs(
+    transactions
+      .filter((row) => row.date.startsWith(month) && row.amount < 0)
+      .reduce((sum, row) => sum + row.amount, 0)
+  );
   const cleared = transactions.filter((row) => row.cleared).length;
   const xpEarned = quests.filter((q) => q.done).reduce((s, q) => s + q.xp, 0);
   const xpGoal = 200;
   const levelPct = Math.min(100, Math.round((xpEarned / xpGoal) * 100));
+
+  if (loading) {
+    return (
+      <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-bg)]">
+        <div className="text-center font-mono text-sm text-[var(--color-ink-soft)]">
+          Loading LevelUp Money Life Database...
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-[100dvh] px-4 py-6 sm:px-6 lg:px-10">
@@ -119,7 +220,7 @@ export default function App() {
         </div>
 
         <footer className="mt-8 flex items-center justify-between text-xs text-[var(--color-ink-soft)]">
-          <span className="font-mono">v0.2.0 · local-first</span>
+          <span className="font-mono">v0.2.0 · local-first (SQLite)</span>
           <span className="inline-flex items-center gap-1.5"><CalendarDots size={13} /> {today}</span>
         </footer>
       </div>
@@ -157,10 +258,18 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 
 function NextMonthPrep() {
   const { t } = useTranslation();
-  const [checkedItems, setCheckedItems] = useLocalStorage<Record<string, boolean>>("levelup.prepChecked", { i1: false, i2: false, i3: false });
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({ i1: false, i2: false, i3: false });
+
+  useEffect(() => {
+    getSetting<Record<string, boolean>>("prepChecked", { i1: false, i2: false, i3: false }).then(setCheckedItems);
+  }, []);
 
   const toggleItem = (key: string) => {
-    setCheckedItems((prev) => ({ ...prev, [key]: !prev[key] }));
+    setCheckedItems((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      saveSetting("prepChecked", next).catch(console.error);
+      return next;
+    });
   };
 
   const completedCount = Object.values(checkedItems).filter(Boolean).length;
