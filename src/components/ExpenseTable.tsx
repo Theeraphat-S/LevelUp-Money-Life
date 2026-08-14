@@ -60,24 +60,24 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
   });
 
   return (
-    <section className="overflow-hidden rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-diffuse)]">
-      <div className="flex flex-col gap-4 border-b border-[var(--color-line)] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+    <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
+      <div className="flex flex-col gap-4 border-b border-[var(--color-line)] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("expense.title")}</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">{t("expense.subtitle")}</p>
+          <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("expense.title")}</h2>
+          <p className="text-xs text-[var(--color-ink-soft)]">{t("expense.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={addExpenseRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2 text-xs font-semibold text-white transition-[transform,box-shadow] duration-200 hover:shadow-[var(--shadow-tile)] active:translate-y-px focus:outline-none focus-visible:shadow-[var(--ring-accent)] sm:text-sm"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 shadow-xs"
           >
-            <Plus size={15} weight="bold" /> {t("expense.addExpense")}
+            <Plus size={14} weight="bold" /> {t("expense.addExpense")}
           </button>
           <button
             onClick={addIncomeRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--color-line)] bg-[var(--color-base)] px-4 py-2 text-xs font-semibold text-[var(--color-accent-ink)] transition hover:bg-[var(--color-line)] active:translate-y-px focus:outline-none focus-visible:shadow-[var(--ring-accent)] sm:text-sm"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-zinc-100 shadow-xs"
           >
-            <Plus size={15} weight="bold" /> {t("expense.addIncome")}
+            <Plus size={14} weight="bold" /> {t("expense.addIncome")}
           </button>
         </div>
       </div>

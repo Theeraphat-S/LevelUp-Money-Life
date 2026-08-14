@@ -4,21 +4,22 @@
   --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Zinc neutrals + single emerald accent. Off-black, not pure. */
-  --color-ink: oklch(22% 0.012 260);
-  --color-ink-soft: oklch(44% 0.012 260);
-  --color-line: oklch(92% 0.006 260);
-  --color-surface: oklch(99% 0.004 260);
-  --color-base: oklch(98.5% 0.004 260);
+  /* Refined EasyLife SaaS surface tokens */
+  --color-ink: oklch(20% 0.015 260);
+  --color-ink-soft: oklch(42% 0.015 260);
+  --color-line: oklch(90% 0.008 260);
+  --color-surface: oklch(100% 0 0);
+  --color-surface-subtle: oklch(97.5% 0.005 260);
+  --color-base: oklch(96.5% 0.005 260);
 
-  --color-accent: oklch(58% 0.13 165);
-  --color-accent-soft: oklch(94% 0.04 165);
-  --color-accent-ink: oklch(34% 0.09 165);
+  --color-accent: oklch(58% 0.14 165);
+  --color-accent-soft: oklch(95% 0.03 165);
+  --color-accent-ink: oklch(32% 0.1 165);
 
-  --shadow-diffuse: 0 24px 48px -24px oklch(22% 0.02 260 / 0.16);
-  --shadow-tile: 0 2px 8px -2px oklch(22% 0.02 260 / 0.08);
-  --shadow-press: 0 1px 2px oklch(22% 0.02 260 / 0.08);
-  --ring-accent: 0 0 0 3px oklch(58% 0.13 165 / 0.28);
+  --shadow-diffuse: 0 20px 40px -20px oklch(20% 0.02 260 / 0.12);
+  --shadow-tile: 0 1px 3px 0 oklch(20% 0.02 260 / 0.06), 0 1px 2px -1px oklch(20% 0.02 260 / 0.06);
+  --shadow-press: 0 1px 2px oklch(20% 0.02 260 / 0.08);
+  --ring-accent: 0 0 0 3px oklch(58% 0.14 165 / 0.25);
 }
 
 @layer base {
@@ -40,8 +41,8 @@
     margin: 0;
     min-height: 100vh;
     background:
-      radial-gradient(60rem 60rem at -10% -10%, oklch(96% 0.03 165 / 0.7), transparent 60%),
-      radial-gradient(48rem 48rem at 110% 0%, oklch(95% 0.02 220 / 0.6), transparent 55%),
+      radial-gradient(50rem 50rem at 0% 0%, oklch(96% 0.03 165 / 0.5), transparent 50%),
+      radial-gradient(40rem 40rem at 100% 100%, oklch(95% 0.02 220 / 0.4), transparent 50%),
       var(--color-base);
   }
 

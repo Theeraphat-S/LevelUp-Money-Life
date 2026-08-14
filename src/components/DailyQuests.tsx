@@ -43,11 +43,11 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
   };
 
   return (
-    <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[oklch(20%_0.012_260)] text-[oklch(96%_0.005_260)] shadow-[0_28px_56px_-24px_oklch(18%_0.02_260_/_0.6)] [box-shadow:inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-      <div className="flex items-start justify-between gap-4 px-6 pt-6">
+    <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
+      <div className="flex items-start justify-between gap-4 border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-white">{t("quests.title")}</h2>
-          <p className="text-sm text-[oklch(78%_0.01_260)]">{t("quests.subtitle")}</p>
+          <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("quests.title")}</h2>
+          <p className="text-xs text-[var(--color-ink-soft)]">{t("quests.subtitle")}</p>
         </div>
         <XpPulse xp={xp} />
       </div>
@@ -58,13 +58,13 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-300/30 bg-amber-500/20 px-6 py-2.5 text-xs text-amber-200"
+            className="flex items-center justify-between border-b border-amber-200 bg-amber-50 px-6 py-2 text-xs text-amber-800"
           >
             <span>{t("quests.deleted")}</span>
             <button
               type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-semibold text-amber-100 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-semibold text-amber-900 underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("quests.undo")}
             </button>
@@ -72,8 +72,8 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
         )}
       </AnimatePresence>
 
-      <div className="p-6">
-        <ul className="space-y-2.5">
+      <div className="p-5">
+        <ul className="space-y-2">
           <AnimatePresence initial={false}>
             {ordered.map((quest) => (
               <motion.li
@@ -83,53 +83,53 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
-                className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition-colors hover:bg-white/[0.08]"
+                className="group flex items-center justify-between rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-2.5 text-left transition-colors hover:bg-[var(--color-surface-subtle)]"
               >
                 <button
                   type="button"
                   onClick={() => toggleQuest(quest.id)}
                   aria-pressed={quest.done}
                   aria-label={t("quests.toggle", { title: quest.title })}
-                  className="flex flex-1 items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(72%_0.15_165)] rounded-lg py-0.5"
+                  className="flex flex-1 items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-0.5"
                 >
                   <motion.div whileTap={{ scale: 0.85 }}>
                     {quest.done ? (
-                      <CheckCircle size={22} weight="fill" className="text-[oklch(75%_0.16_165)]" />
+                      <CheckCircle size={20} weight="fill" className="text-emerald-600" />
                     ) : (
-                      <Circle size={22} weight="duotone" className="text-[oklch(70%_0.01_260)]" />
+                      <Circle size={20} weight="duotone" className="text-zinc-400" />
                     )}
                   </motion.div>
                   <div>
-                    <span className={`block text-sm font-medium transition-all ${quest.done ? "text-[oklch(65%_0.01_260)] line-through" : "text-white"}`}>{quest.title}</span>
-                    <span className="block font-mono text-[11px] text-[oklch(72%_0.01_260)]">{quest.date}</span>
+                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-zinc-400 line-through" : "text-[var(--color-ink)]"}`}>{quest.title}</span>
+                    <span className="block font-mono text-[10px] text-[var(--color-ink-soft)]">{quest.date}</span>
                   </div>
                 </button>
 
-                <div className="flex items-center gap-3 pl-2">
-                  <span className="font-mono text-xs font-semibold text-[oklch(80%_0.14_165)]">+{quest.xp}</span>
+                <div className="flex items-center gap-2 pl-2">
+                  <span className="font-mono text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">+{quest.xp}</span>
                   <button
                     type="button"
                     onClick={() => deleteQuest(quest)}
-                    className="rounded-lg p-1.5 text-[oklch(60%_0.01_260)] transition hover:bg-rose-500/20 hover:text-rose-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                    className="rounded-md p-1 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
                     aria-label={t("quests.delete")}
                   >
-                    <Trash size={15} />
+                    <Trash size={14} />
                   </button>
                 </div>
               </motion.li>
             ))}
           </AnimatePresence>
         </ul>
-        {quests.length === 0 && <p className="mt-2.5 rounded-2xl bg-white/[0.04] px-4 py-6 text-center text-sm text-[oklch(78%_0.01_260)]">{t("quests.empty")}</p>}
+        {quests.length === 0 && <p className="mt-2 rounded-xl bg-[var(--color-surface-subtle)] px-4 py-5 text-center text-xs text-[var(--color-ink-soft)]">{t("quests.empty")}</p>}
       </div>
 
-      <div className="border-t border-white/5 px-6 py-4">
+      <div className="border-t border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-5 py-3">
         <button
           type="button"
           onClick={addQuest}
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-[oklch(96%_0.005_260)] transition active:translate-y-px hover:bg-white/[0.06] focus:outline-none focus-visible:shadow-[0_0_0_2px_oklch(72%_0.15_165_/_0.6)]"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-zinc-100 shadow-xs"
         >
-          <Plus size={15} weight="bold" /> {t("quests.add")}
+          <Plus size={14} weight="bold" /> {t("quests.add")}
         </button>
       </div>
     </section>

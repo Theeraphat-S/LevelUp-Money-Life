@@ -33,21 +33,21 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
   const topPct = topCategory && expenses > 0 ? Math.round((topCategory.value / expenses) * 100) : 0;
 
   return (
-    <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
+    <section className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-tile)]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("summary.title")}</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">{t("summary.subtitle")}</p>
+          <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("summary.title")}</h2>
+          <p className="text-xs text-[var(--color-ink-soft)]">{t("summary.subtitle")}</p>
         </div>
-        <div className="flex gap-1 bg-[var(--color-base)] p-1 rounded-xl self-start sm:self-auto border border-[var(--color-line)]">
+        <div className="flex gap-1 bg-[var(--color-surface-subtle)] p-1 rounded-lg self-start sm:self-auto border border-[var(--color-line)] shadow-xs">
           <button
             type="button"
             onClick={() => setChartType("donut")}
             aria-pressed={chartType === "donut"}
             aria-label={t("summary.viewDonutAria")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
               chartType === "donut"
-                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs"
+                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs border border-[var(--color-line)]"
                 : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
             }`}
           >

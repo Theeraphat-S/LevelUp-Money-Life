@@ -166,37 +166,39 @@ export default function App() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+          className="mb-7 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 sm:p-6 shadow-[var(--shadow-tile)]"
         >
-          <div>
-            <div className="mb-3 flex items-center justify-between gap-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent-ink)] shadow-[var(--shadow-tile)]">
-                <Trophy size={15} weight="fill" />
-                {t("level", { level: 12 })}
-                <span className="font-mono text-[var(--color-ink-soft)]">{t("xp", { earned: xpEarned, goal: xpGoal })}</span>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex-1">
+              <div className="mb-3 flex items-center justify-between gap-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 text-xs font-semibold tracking-wide text-emerald-800 shadow-xs">
+                  <Trophy size={15} weight="fill" className="text-emerald-600" />
+                  {t("level", { level: 12 })}
+                  <span className="font-mono text-emerald-700/80">{t("xp", { earned: xpEarned, goal: xpGoal })}</span>
+                </div>
+                <LanguageToggle />
               </div>
-              <LanguageToggle />
+              <h1 className="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">
+                {t("app.title")}
+              </h1>
+              <p className="mt-1 max-w-xl text-sm leading-relaxed text-[var(--color-ink-soft)]">
+                {t("app.subtitle")}
+              </p>
+              <div className="mt-3.5 h-2 w-full max-w-md overflow-hidden rounded-full bg-[var(--color-line)]">
+                <motion.div
+                  className="h-full rounded-full bg-[var(--color-accent)]"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${levelPct}%` }}
+                  transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                />
+              </div>
             </div>
-            <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-[var(--color-ink)] sm:text-5xl">
-              {t("app.title")}
-            </h1>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--color-ink-soft)] sm:text-base">
-              {t("app.subtitle")}
-            </p>
-            <div className="mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-[var(--color-line)]">
-              <motion.div
-                className="h-full rounded-full bg-[var(--color-accent)]"
-                initial={{ width: 0 }}
-                animate={{ width: `${levelPct}%` }}
-                transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[33rem]">
-            <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
-            <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
-            <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`${actualNet >= 0 ? "+" : ""}฿${thb.format(actualNet)}`} />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[32rem]">
+              <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
+              <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
+              <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`${actualNet >= 0 ? "+" : ""}฿${thb.format(actualNet)}`} />
+            </div>
           </div>
         </motion.header>
 
@@ -282,44 +284,46 @@ function NextMonthPrep() {
   const completedCount = Object.values(checkedItems).filter(Boolean).length;
 
   return (
-    <section className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[oklch(20%_0.012_260)] p-6 pb-7 text-[oklch(96%_0.005_260)] shadow-[0_28px_56px_-24px_oklch(18%_0.02_260_/_0.6)] [box-shadow:inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-      <div className="flex items-center justify-between gap-3">
+    <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/[0.08] text-[oklch(75%_0.16_165)]">
-            <CalendarDots size={22} weight="duotone" />
+          <div className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200">
+            <CalendarDots size={20} weight="duotone" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-white">{t("prep.title")}</h2>
-            <p className="text-sm text-[oklch(78%_0.01_260)]">{t("prep.subtitle")}</p>
+            <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("prep.title")}</h2>
+            <p className="text-xs text-[var(--color-ink-soft)]">{t("prep.subtitle")}</p>
           </div>
         </div>
-        <span className="font-mono text-xs font-semibold text-[oklch(85%_0.14_165)] bg-white/[0.08] border border-white/10 px-3 py-1 rounded-full">
+        <span className="font-mono text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
           {completedCount}/3
         </span>
       </div>
-      <ul className="mt-5 space-y-2.5 text-sm">
-        {(["i1", "i2", "i3"] as const).map((key) => {
-          const isDone = !!checkedItems[key];
-          return (
-            <li key={key}>
-              <button
-                type="button"
-                onClick={() => toggleItem(key)}
-                aria-pressed={isDone}
-                aria-label={t("prep.toggle", { item: t(`prep.${key}`) })}
-                className={`flex w-full cursor-pointer items-center justify-between rounded-xl border border-white/5 px-3.5 py-2.5 text-left transition ${isDone ? "bg-white/[0.08] text-[oklch(75%_0.16_165)]" : "bg-white/[0.04] text-white hover:bg-white/[0.08]"} focus:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(75%_0.16_165)]`}
-              >
-                <span className="flex items-center gap-2.5">
-                  <span className={`h-4 w-4 rounded-md border flex items-center justify-center text-xs transition ${isDone ? "border-[oklch(75%_0.16_165)] bg-[oklch(75%_0.16_165)] text-zinc-950 font-bold" : "border-white/20 bg-transparent text-transparent"}`}>
-                    ✓
+      <div className="p-5">
+        <ul className="space-y-2 text-sm">
+          {(["i1", "i2", "i3"] as const).map((key) => {
+            const isDone = !!checkedItems[key];
+            return (
+              <li key={key}>
+                <button
+                  type="button"
+                  onClick={() => toggleItem(key)}
+                  aria-pressed={isDone}
+                  aria-label={t("prep.toggle", { item: t(`prep.${key}`) })}
+                  className={`flex w-full cursor-pointer items-center justify-between rounded-xl border px-3.5 py-2.5 text-left transition ${isDone ? "border-emerald-200 bg-emerald-50/50 text-emerald-900" : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] hover:bg-[var(--color-surface-subtle)]"}`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <span className={`h-4 w-4 rounded-md border flex items-center justify-center text-xs transition ${isDone ? "border-emerald-600 bg-emerald-600 text-white font-bold" : "border-zinc-300 bg-transparent text-transparent"}`}>
+                      ✓
+                    </span>
+                    <span className={isDone ? "line-through text-emerald-700/70" : "text-[var(--color-ink)]"}>{t(`prep.${key}`)}</span>
                   </span>
-                  <span className={isDone ? "line-through text-[oklch(65%_0.01_260)]" : "text-white"}>{t(`prep.${key}`)}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   );
 }

@@ -42,16 +42,16 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
   };
 
   return (
-    <section className="rounded-[1.75rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)]">
+    <section className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-tile)]">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-[var(--color-ink)]">{t("plan.title")}</h2>
-          <p className="text-sm text-[var(--color-ink-soft)]">{t("plan.subtitle")}</p>
+          <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("plan.title")}</h2>
+          <p className="text-xs text-[var(--color-ink-soft)]">{t("plan.subtitle")}</p>
         </div>
-        <label className="flex flex-col gap-1.5 text-xs font-medium uppercase tracking-wider text-[var(--color-ink-soft)]">
+        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--color-ink-soft)]">
           {t("plan.incomeLabel")}
-          <div className="flex items-center gap-1 rounded-xl border border-[var(--color-line)] bg-[var(--color-base)] px-3 py-2 focus-within:border-[var(--color-accent)]">
-            <span className="font-mono text-sm text-[var(--color-ink-soft)]">฿</span>
+          <div className="flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 focus-within:border-[var(--color-accent)] shadow-xs">
+            <span className="font-mono text-xs text-[var(--color-ink-soft)]">฿</span>
             <input
               type="number"
               min="0"
