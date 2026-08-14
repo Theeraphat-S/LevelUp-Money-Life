@@ -87,7 +87,7 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               <Fire size={32} weight="fill" />
             </div>
             <div>
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-amber-700">
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                 Discipline Streak
               </span>
               <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)]">
@@ -106,12 +106,12 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
           header={
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Trophy size={18} weight="fill" className="text-emerald-600" />
+                <Trophy size={18} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
                 <h3 className="text-sm font-bold text-[var(--color-ink)]">
                   {t("quests.roadmapTitle")}
                 </h3>
               </div>
-              <span className="font-mono text-xs font-bold text-emerald-700">
+              <span className="font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400">
                 Level {gamification.level}
               </span>
             </div>
@@ -120,24 +120,20 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {RANKS.map((r) => {
               const isPassed = gamification.level >= r.level;
-              const isCurrent =
-                gamification.level >= r.level &&
-                (RANKS.find((nextR) => nextR.level > r.level && gamification.level < nextR.level) !== undefined ||
-                  r.level === 20);
 
               return (
                 <div
                   key={r.level}
                   className={`rounded-xl border p-2.5 transition ${
                     isPassed
-                      ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-900"
+                      ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-900 dark:text-emerald-300"
                       : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-[var(--color-ink-soft)] opacity-60"
                   }`}
                 >
                   <div className="flex items-center justify-between text-[11px] font-mono font-bold">
                     <span>Lv. {r.level}+</span>
                     {isPassed ? (
-                      <CheckCircle size={14} weight="fill" className="text-emerald-600" />
+                      <CheckCircle size={14} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
                     ) : (
                       <Lock size={12} />
                     )}
@@ -167,7 +163,7 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
             <button
               type="button"
               onClick={() => setIsAdding((p) => !p)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-800 transition shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-emerald-400 transition shadow-xs"
             >
               <Plus size={14} weight="bold" />
               <span>{t("quests.add")}</span>
@@ -181,13 +177,13 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-3 flex items-center justify-between border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-900 rounded-xl"
+              className="mb-3 flex items-center justify-between border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-900 dark:text-amber-200 rounded-xl"
             >
               <span>{t("quests.deleted")}</span>
               <button
                 type="button"
                 onClick={undoDelete}
-                className="inline-flex items-center gap-1 font-bold text-amber-950 underline hover:no-underline"
+                className="inline-flex items-center gap-1 font-bold text-amber-950 dark:text-amber-300 underline hover:no-underline"
               >
                 <ArrowUUpLeft size={14} /> {t("quests.undo")}
               </button>
@@ -228,7 +224,7 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               key={quest.id}
               className={`flex items-center justify-between rounded-xl border p-3.5 transition ${
                 quest.done
-                  ? "border-emerald-500/30 bg-emerald-500/5 text-zinc-400"
+                  ? "border-emerald-500/30 bg-emerald-500/5 text-zinc-400 dark:text-zinc-500"
                   : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] hover:bg-[var(--color-surface-subtle)]"
               }`}
             >
@@ -238,14 +234,14 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                 className="flex flex-1 items-center gap-3 text-left"
               >
                 {quest.done ? (
-                  <CheckCircle size={22} weight="fill" className="text-emerald-600 shrink-0" />
+                  <CheckCircle size={22} weight="fill" className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                 ) : (
-                  <Circle size={22} weight="duotone" className="text-zinc-400 shrink-0" />
+                  <Circle size={22} weight="duotone" className="text-zinc-400 dark:text-zinc-500 shrink-0" />
                 )}
                 <div>
                   <span
                     className={`block text-xs font-semibold ${
-                      quest.done ? "line-through text-zinc-400" : "text-[var(--color-ink)]"
+                      quest.done ? "line-through text-zinc-400 dark:text-zinc-500" : "text-[var(--color-ink)]"
                     }`}
                   >
                     {quest.title}
@@ -257,13 +253,13 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               </button>
 
               <div className="flex items-center gap-2 pl-2">
-                <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
                   <Sparkle size={12} weight="fill" /> +{quest.xp} XP
                 </span>
                 <button
                   type="button"
                   onClick={() => deleteQuest(quest)}
-                  className="rounded-lg p-1.5 text-zinc-400 hover:bg-rose-50 hover:text-rose-600 transition"
+                  className="rounded-lg p-1.5 text-zinc-400 dark:text-zinc-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 transition"
                 >
                   <Trash size={14} />
                 </button>
@@ -291,7 +287,7 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                 Unlock permanent financial trophies as your habits grow.
               </p>
             </div>
-            <span className="rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-bold text-emerald-700 border border-emerald-500/20">
+            <span className="rounded-full bg-emerald-500/10 px-3 py-1 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
               {t("quests.unlockedCount", {
                 unlocked: unlockedCount,
                 total: achievements.length,
@@ -315,14 +311,14 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                   <div
                     className={`grid h-9 w-9 place-items-center rounded-xl border text-base ${
                       ach.unlocked
-                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                         : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)]"
                     }`}
                   >
                     <Trophy size={18} weight={ach.unlocked ? "fill" : "duotone"} />
                   </div>
 
-                  <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  <span className="font-mono text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                     +{ach.xpReward} XP
                   </span>
                 </div>
@@ -338,7 +334,7 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
 
                 <div className="mt-3 border-t border-[var(--color-line)] pt-2 text-[10px] text-[var(--color-ink-faint)] font-mono">
                   {ach.unlocked ? (
-                    <span className="text-emerald-700 font-semibold">
+                    <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
                       {t("quests.unlockedAt", { date: ach.unlockedAt || today })}
                     </span>
                   ) : (

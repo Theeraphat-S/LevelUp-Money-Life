@@ -150,7 +150,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
               onClick={() => setIsMonthScoped((prev) => !prev)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
                 isMonthScoped
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-800"
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
                   : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
               }`}
             >
@@ -161,9 +161,9 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
             <button
               type="button"
               onClick={onOpenQuickAdd}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 transition hover:bg-zinc-800 dark:hover:bg-emerald-400 shadow-xs"
             >
-              <Plus size={14} weight="bold" className="text-emerald-400" />
+              <Plus size={14} weight="bold" className="text-emerald-400 dark:text-zinc-950" />
               <span>{t("header.quickAdd")}</span>
             </button>
           </div>
@@ -177,13 +177,13 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-500/30 bg-amber-500/10 px-6 py-2.5 text-xs text-amber-900"
+            className="flex items-center justify-between border-b border-amber-500/30 bg-amber-500/10 px-6 py-2.5 text-xs text-amber-900 dark:text-amber-200"
           >
             <span>{t("expense.deleted")}</span>
             <button
               type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-bold text-amber-950 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-bold text-amber-950 dark:text-amber-300 underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("expense.undo")}
             </button>
@@ -240,14 +240,14 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       <div className="flex flex-wrap items-center justify-between border-b border-[var(--color-line)] bg-[var(--color-base)] px-6 py-2 text-xs font-mono">
         <div className="flex items-center gap-4">
           <span className="text-[var(--color-ink-soft)]">
-            In: <span className="font-bold text-emerald-700">+฿{thb.format(viewIncome)}</span>
+            In: <span className="font-bold text-emerald-700 dark:text-emerald-400">+฿{thb.format(viewIncome)}</span>
           </span>
           <span className="text-[var(--color-ink-soft)]">
-            Out: <span className="font-bold text-rose-600">-฿{thb.format(viewExpense)}</span>
+            Out: <span className="font-bold text-rose-600 dark:text-rose-400">-฿{thb.format(viewExpense)}</span>
           </span>
           <span className="text-[var(--color-ink-soft)]">
             Net:{" "}
-            <span className={`font-bold ${viewNet >= 0 ? "text-emerald-700" : "text-rose-600"}`}>
+            <span className={`font-bold ${viewNet >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
               {viewNet >= 0 ? "+" : ""}฿{thb.format(viewNet)}
             </span>
           </span>
@@ -256,7 +256,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
           <button
             type="button"
             onClick={clearFilters}
-            className="text-[11px] font-sans font-semibold text-emerald-700 hover:underline"
+            className="text-[11px] font-sans font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
           >
             {t("expense.clearFilters")}
           </button>
@@ -343,8 +343,8 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                     {/* Category */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       {isPositive ? (
-                        <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-800 text-[11px]">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                        <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-800 dark:text-emerald-300 text-[11px]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
                           {t("category.Income")}
                         </span>
                       ) : (
@@ -379,7 +379,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                       <div className="flex items-center justify-end gap-1">
                         <span
                           className={`font-mono text-xs font-bold ${
-                            isPositive ? "text-emerald-700" : "text-rose-600"
+                            isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                           }`}
                         >
                           {isPositive ? "+" : "-"}฿
@@ -394,7 +394,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                             updateRow(row.id, { amount: isPositive ? val : -val });
                           }}
                           className={`w-24 text-right bg-transparent font-mono text-xs font-bold outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-emerald-500 ${
-                            isPositive ? "text-emerald-700" : "text-rose-600"
+                            isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                           }`}
                         />
                       </div>
@@ -407,13 +407,13 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                         onClick={() => updateRow(row.id, { cleared: !row.cleared })}
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition ${
                           row.cleared
-                            ? "bg-emerald-500/10 text-emerald-800 border border-emerald-500/30"
-                            : "bg-amber-500/10 text-amber-800 border border-amber-500/30"
+                            ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
+                            : "bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/30"
                         }`}
                       >
                         {row.cleared ? (
                           <>
-                            <ShieldCheck size={12} weight="fill" className="text-emerald-600" />
+                            <ShieldCheck size={12} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
                             <span>{t("expense.cleared")}</span>
                           </>
                         ) : (
@@ -427,7 +427,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                       <button
                         type="button"
                         onClick={() => deleteRow(row)}
-                        className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
+                        className="rounded-lg p-1.5 text-zinc-400 dark:text-zinc-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400"
                         aria-label={t("expense.delete")}
                       >
                         <Trash size={15} />

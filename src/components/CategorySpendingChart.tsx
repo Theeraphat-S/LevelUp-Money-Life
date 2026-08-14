@@ -51,18 +51,18 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-5 backdrop-blur-md shadow-sm">
+    <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 backdrop-blur-md shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <h3 className="text-base font-semibold text-[var(--color-ink)] flex items-center gap-2">
           {t("summary.spendingAnalytics")}
         </h3>
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+        <div className="flex gap-1 bg-[var(--color-surface-subtle)] border border-[var(--color-line)] p-1 rounded-xl">
           <button
             onClick={() => setChartType("donut")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               chartType === "donut"
-                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs"
-                : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs border border-[var(--color-line)]"
+                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
             }`}
           >
             <PieIcon size={14} />
@@ -72,8 +72,8 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
             onClick={() => setChartType("bar")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               chartType === "bar"
-                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs"
-                : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs border border-[var(--color-line)]"
+                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
             }`}
           >
             <BarChart2 size={14} />
@@ -102,26 +102,36 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
               <Tooltip
                 formatter={(value: any) => [formatMoney(Number(value || 0)), t("summary.spent")]}
                 contentStyle={{
-                  backgroundColor: "rgba(15, 23, 42, 0.9)",
-                  borderColor: "rgba(51, 65, 85, 0.5)",
+                  backgroundColor: "var(--color-surface)",
+                  borderColor: "var(--color-line)",
                   borderRadius: "12px",
-                  color: "#fff",
+                  color: "var(--color-ink)",
+                  boxShadow: "var(--shadow-tile)",
+                  fontSize: 12,
+                  fontFamily: "var(--font-mono)",
                 }}
+                itemStyle={{ color: "var(--color-ink)" }}
+                labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
               />
               <Legend />
             </PieChart>
           ) : (
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} tickFormatter={(v) => formatMoney(v)} />
+              <XAxis dataKey="name" stroke="var(--color-ink-soft)" fontSize={12} tickLine={false} />
+              <YAxis stroke="var(--color-ink-soft)" fontSize={12} tickLine={false} tickFormatter={(v) => formatMoney(v)} />
               <Tooltip
                 formatter={(value: any) => [formatMoney(Number(value || 0)), t("summary.spent")]}
                 contentStyle={{
-                  backgroundColor: "rgba(15, 23, 42, 0.9)",
-                  borderColor: "rgba(51, 65, 85, 0.5)",
+                  backgroundColor: "var(--color-surface)",
+                  borderColor: "var(--color-line)",
                   borderRadius: "12px",
-                  color: "#fff",
+                  color: "var(--color-ink)",
+                  boxShadow: "var(--shadow-tile)",
+                  fontSize: 12,
+                  fontFamily: "var(--font-mono)",
                 }}
+                itemStyle={{ color: "var(--color-ink)" }}
+                labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
               />
               <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
                 {chartData.map((entry, index) => (

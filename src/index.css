@@ -1,10 +1,41 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", monospace;
 
   /* Refined FinTech Command Center Bento Tokens */
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-faint: var(--color-ink-faint);
+  --color-line: var(--color-line);
+  --color-line-subtle: var(--color-line-subtle);
+  --color-surface: var(--color-surface);
+  --color-surface-subtle: var(--color-surface-subtle);
+  --color-base: var(--color-base);
+
+  /* Curated OKLCH Accents */
+  --color-accent: oklch(58% 0.15 160);       /* Emerald Core */
+  --color-accent-soft: var(--color-accent-soft);
+  --color-accent-ink: var(--color-accent-ink);
+
+  --color-rose-core: oklch(58% 0.18 20);     /* Rose Red */
+  --color-rose-soft: var(--color-rose-soft);
+  --color-amber-core: oklch(65% 0.16 75);    /* Amber Gold */
+  --color-amber-soft: var(--color-amber-soft);
+  --color-indigo-core: oklch(55% 0.16 260);  /* Indigo Blue */
+  --color-indigo-soft: var(--color-indigo-soft);
+
+  --shadow-diffuse: var(--shadow-diffuse);
+  --shadow-tile: var(--shadow-tile);
+  --shadow-press: var(--shadow-press);
+  --shadow-glow-emerald: var(--shadow-glow-emerald);
+  --ring-accent: 0 0 0 3px oklch(58% 0.15 160 / 0.25);
+}
+
+:root {
   --color-ink: oklch(18% 0.015 260);
   --color-ink-soft: oklch(44% 0.015 260);
   --color-ink-faint: oklch(62% 0.01 260);
@@ -14,21 +45,53 @@
   --color-surface-subtle: oklch(98% 0.005 260);
   --color-base: oklch(96% 0.005 260);
 
-  /* Curated OKLCH Accents */
-  --color-accent: oklch(58% 0.15 160);       /* Emerald Core */
   --color-accent-soft: oklch(95% 0.03 160);  /* Soft Emerald Tint */
   --color-accent-ink: oklch(30% 0.12 160);  /* Deep Emerald Text */
 
-  --color-rose-core: oklch(58% 0.18 20);     /* Rose Red */
-  --color-rose-soft: oklch(96% 0.03 20);     /* Soft Rose Tint */
-  --color-amber-core: oklch(65% 0.16 75);    /* Amber Gold */
-  --color-indigo-core: oklch(55% 0.16 260);  /* Indigo Blue */
+  --color-rose-soft: oklch(96% 0.03 20);
+  --color-amber-soft: oklch(96% 0.03 75);
+  --color-indigo-soft: oklch(96% 0.03 260);
 
   --shadow-diffuse: 0 20px 40px -15px oklch(20% 0.02 260 / 0.08);
   --shadow-tile: 0 1px 3px 0 oklch(20% 0.02 260 / 0.05), 0 1px 2px -1px oklch(20% 0.02 260 / 0.05);
   --shadow-press: 0 1px 2px oklch(20% 0.02 260 / 0.08);
   --shadow-glow-emerald: 0 0 24px -4px oklch(58% 0.15 160 / 0.25);
-  --ring-accent: 0 0 0 3px oklch(58% 0.15 160 / 0.25);
+
+  --color-bg-gradient-1: oklch(96% 0.035 160 / 0.45);
+  --color-bg-gradient-2: oklch(95% 0.03 240 / 0.35);
+
+  --scrollbar-thumb: oklch(80% 0.01 260);
+  --scrollbar-thumb-hover: oklch(65% 0.01 260);
+}
+
+.dark, [data-theme="dark"] {
+  /* Deep Obsidian Zinc & Emerald Refraction (NO pure black #000000) */
+  --color-ink: oklch(96% 0.005 260);          /* Crisp Silver/White Text */
+  --color-ink-soft: oklch(72% 0.015 260);     /* Soft Muted Text */
+  --color-ink-faint: oklch(52% 0.015 260);    /* Subtle Secondary Text */
+  --color-line: oklch(24% 0.015 260);         /* Frosted Border Edge */
+  --color-line-subtle: oklch(28% 0.015 260);  /* Inner Dividers */
+  --color-surface: oklch(16% 0.014 260);      /* Obsidian Zinc Card Base */
+  --color-surface-subtle: oklch(13% 0.012 260); /* Deep Charcoal Recessed */
+  --color-base: oklch(10% 0.01 260);          /* Obsidian Background (Zinc-950 tone) */
+
+  --color-accent-soft: oklch(22% 0.05 160);   /* Muted Emerald Pill */
+  --color-accent-ink: oklch(78% 0.15 160);   /* Bright Emerald Glow Text */
+
+  --color-rose-soft: oklch(22% 0.06 20);
+  --color-amber-soft: oklch(22% 0.05 75);
+  --color-indigo-soft: oklch(22% 0.05 260);
+
+  --shadow-diffuse: 0 20px 40px -15px oklch(0% 0 0 / 0.55);
+  --shadow-tile: 0 1px 3px 0 oklch(0% 0 0 / 0.35), 0 1px 2px -1px oklch(0% 0 0 / 0.25);
+  --shadow-press: 0 1px 2px oklch(0% 0 0 / 0.45);
+  --shadow-glow-emerald: 0 0 28px -4px oklch(58% 0.18 160 / 0.35);
+
+  --color-bg-gradient-1: oklch(22% 0.05 160 / 0.18);
+  --color-bg-gradient-2: oklch(18% 0.04 250 / 0.15);
+
+  --scrollbar-thumb: oklch(30% 0.01 260);
+  --scrollbar-thumb-hover: oklch(42% 0.01 260);
 }
 
 @layer base {
@@ -50,9 +113,11 @@
     margin: 0;
     min-height: 100dvh;
     background:
-      radial-gradient(60rem 50rem at 0% 0%, oklch(96% 0.035 160 / 0.45), transparent 60%),
-      radial-gradient(50rem 45rem at 100% 100%, oklch(95% 0.03 240 / 0.35), transparent 55%),
+      radial-gradient(60rem 50rem at 0% 0%, var(--color-bg-gradient-1), transparent 60%),
+      radial-gradient(50rem 45rem at 100% 100%, var(--color-bg-gradient-2), transparent 55%),
       var(--color-base);
+    color: var(--color-ink);
+    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     overflow-x: hidden;
   }
 
@@ -70,7 +135,8 @@
 }
 
 ::selection {
-  background: oklch(58% 0.15 160 / 0.25);
+  background: oklch(58% 0.15 160 / 0.3);
+  color: inherit;
 }
 
 /* Custom Sleek Scrollbar */
@@ -82,11 +148,12 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(80% 0.01 260);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
+  transition: background-color 0.2s ease;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(65% 0.01 260);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Slider Controls */
@@ -113,12 +180,12 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 0 6px oklch(58% 0.15 160 / 0.14), var(--shadow-tile);
+  box-shadow: 0 0 0 6px oklch(58% 0.15 160 / 0.2), var(--shadow-tile);
 }
 input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
   transform: scale(1.05);
-  box-shadow: 0 0 0 8px oklch(58% 0.15 160 / 0.2), var(--shadow-tile);
+  box-shadow: 0 0 0 8px oklch(58% 0.15 160 / 0.25), var(--shadow-tile);
 }
 input[type="range"]::-moz-range-thumb {
   width: 22px;

@@ -67,7 +67,7 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
       </div>
 
       {income <= 0 && (
-        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-900">
+        <div className="mb-4 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-4 py-2.5 text-xs text-amber-900 dark:text-amber-200">
           {t("plan.incomeHint")}
         </div>
       )}
@@ -96,7 +96,7 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
             </div>
           ))}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <div className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium ${balanced ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]" : "bg-rose-50 text-rose-700 border border-rose-200"}`}>
+            <div className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium ${balanced ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]" : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50"}`}>
               <span>{balanced ? t("plan.balanced") : t("plan.unbalanced")}</span>
               <span className="font-mono font-bold">{total}%</span>
             </div>
@@ -113,7 +113,7 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
                 <button
                   type="button"
                   onClick={autoBalance}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 active:translate-y-px"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 transition hover:bg-zinc-800 dark:hover:bg-emerald-400 active:translate-y-px"
                 >
                   <Scales size={14} /> {t("plan.autoBalance")}
                 </button>
@@ -127,7 +127,21 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
             <BarChart data={data} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
               <XAxis type="number" hide />
               <YAxis dataKey="label" type="category" width={64} tickLine={false} axisLine={false} tick={{ fontSize: 12, fontFamily: "var(--font-sans)", fill: "var(--color-ink-soft)" }} />
-              <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} formatter={(value) => [`฿${thb.format(Number(value))}`, t("plan.allocated")]} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }} />
+              <Tooltip
+                cursor={{ fill: "rgba(0,0,0,0.04)" }}
+                formatter={(value) => [`฿${thb.format(Number(value))}`, t("plan.allocated")]}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: "1px solid var(--color-line)",
+                  background: "var(--color-surface)",
+                  color: "var(--color-ink)",
+                  fontSize: 12,
+                  fontFamily: "var(--font-mono)",
+                  boxShadow: "var(--shadow-tile)",
+                }}
+                itemStyle={{ color: "var(--color-ink)" }}
+                labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
+              />
               <Bar dataKey="amount" radius={[8, 8, 8, 8]} barSize={24} stroke="rgba(0,0,0,0.10)" strokeWidth={1}>
                 {data.map((entry) => <Cell key={entry.id} fill={entry.color} />)}
               </Bar>

@@ -58,13 +58,13 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-200 bg-amber-50 px-6 py-2 text-xs text-amber-800"
+            className="flex items-center justify-between border-b border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-6 py-2 text-xs text-amber-800 dark:text-amber-200"
           >
             <span>{t("quests.deleted")}</span>
             <button
               type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-semibold text-amber-900 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-semibold text-amber-900 dark:text-amber-300 underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("quests.undo")}
             </button>
@@ -94,23 +94,23 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
                 >
                   <motion.div whileTap={{ scale: 0.85 }}>
                     {quest.done ? (
-                      <CheckCircle size={20} weight="fill" className="text-emerald-600" />
+                      <CheckCircle size={20} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
                     ) : (
-                      <Circle size={20} weight="duotone" className="text-zinc-400" />
+                      <Circle size={20} weight="duotone" className="text-zinc-400 dark:text-zinc-500" />
                     )}
                   </motion.div>
                   <div>
-                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-zinc-400 line-through" : "text-[var(--color-ink)]"}`}>{quest.title}</span>
+                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-zinc-400 dark:text-zinc-500 line-through" : "text-[var(--color-ink)]"}`}>{quest.title}</span>
                     <span className="block font-mono text-[10px] text-[var(--color-ink-soft)]">{quest.date}</span>
                   </div>
                 </button>
 
                 <div className="flex items-center gap-2 pl-2">
-                  <span className="font-mono text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">+{quest.xp}</span>
+                  <span className="font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">+{quest.xp}</span>
                   <button
                     type="button"
                     onClick={() => deleteQuest(quest)}
-                    className="rounded-md p-1 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
+                    className="rounded-md p-1 text-zinc-400 dark:text-zinc-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400"
                     aria-label={t("quests.delete")}
                   >
                     <Trash size={14} />
@@ -127,7 +127,7 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
         <button
           type="button"
           onClick={addQuest}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-zinc-100 shadow-xs"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-surface-subtle)] shadow-xs"
         >
           <Plus size={14} weight="bold" /> {t("quests.add")}
         </button>

@@ -113,6 +113,9 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
             transition={{ type: "spring", stiffness: 350, damping: 28 }}
             className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-2xl z-10"
           >
+            {/* 1px Inner Liquid Glass Highlight */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40 dark:bg-white/10" />
+
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-4">
               <div>
@@ -143,7 +146,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   }}
                   className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition ${
                     type === "expense"
-                      ? "bg-rose-500/10 text-rose-700 border border-rose-500/20 shadow-xs"
+                      ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 shadow-xs"
                       : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
                   }`}
                 >
@@ -158,7 +161,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   }}
                   className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition ${
                     type === "income"
-                      ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 shadow-xs"
+                      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shadow-xs"
                       : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
                   }`}
                 >
@@ -237,7 +240,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                           onClick={() => setCategory(cat)}
                           className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
                             isSelected
-                              ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold shadow-xs"
+                              ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-semibold shadow-xs"
                               : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
                           }`}
                         >
@@ -285,7 +288,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
               </div>
 
               {error && (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+                <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 text-xs font-medium text-rose-700 dark:text-rose-300">
                   {error}
                 </div>
               )}
@@ -301,9 +304,9 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-zinc-800 active:scale-[0.98]"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 dark:bg-emerald-500 px-4 py-2 text-xs font-semibold text-white dark:text-zinc-950 shadow-xs transition hover:bg-zinc-800 dark:hover:bg-emerald-400 active:scale-[0.98]"
                 >
-                  <Sparkle size={15} weight="fill" className="text-emerald-400" />
+                  <Sparkle size={15} weight="fill" className="text-emerald-400 dark:text-zinc-950" />
                   <span>{t("quickAdd.submit", { xp: 15 })}</span>
                 </button>
               </div>

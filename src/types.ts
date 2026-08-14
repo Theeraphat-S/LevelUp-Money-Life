@@ -98,3 +98,7 @@ export type ViewTab = "dashboard" | "ledger" | "budget" | "analytics" | "quests"
 
 export type SortField = "date" | "amount" | "name" | "category";
 export type SortOrder = "asc" | "desc";
+
+export type ThemeMode = "system" | "light" | "dark";
+export type EffectiveTheme = "light" | "dark";
+

@@ -69,13 +69,13 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={addExpenseRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-800 shadow-xs"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 transition hover:bg-zinc-800 dark:hover:bg-emerald-400 shadow-xs"
           >
             <Plus size={14} weight="bold" /> {t("expense.addExpense")}
           </button>
           <button
             onClick={addIncomeRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-zinc-100 shadow-xs"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-surface)] shadow-xs"
           >
             <Plus size={14} weight="bold" /> {t("expense.addIncome")}
           </button>
@@ -88,12 +88,12 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-200/60 bg-amber-50 px-6 py-2.5 text-xs text-amber-900"
+            className="flex items-center justify-between border-b border-amber-200/60 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-6 py-2.5 text-xs text-amber-900 dark:text-amber-200"
           >
             <span>{t("expense.deleted")}</span>
             <button
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-semibold text-amber-950 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-semibold text-amber-950 dark:text-amber-300 underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("expense.undo")}
             </button>
@@ -170,7 +170,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                           type="button"
                           onClick={() => toggleRowType(row, false)}
                           aria-pressed={!positive}
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${!positive ? "bg-rose-100 text-rose-800" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${!positive ? "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
                         >
                           {t("expense.expenseType")}
                         </button>
@@ -178,7 +178,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                           type="button"
                           onClick={() => toggleRowType(row, true)}
                           aria-pressed={positive}
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${positive ? "bg-emerald-100 text-emerald-800" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${positive ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
                         >
                           {t("expense.incomeType")}
                         </button>
@@ -187,7 +187,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1">
-                          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300" : "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300"}`}>
                             {positive ? "+฿" : "-฿"}
                           </span>
                           <input
@@ -199,7 +199,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                               updateRow(row.id, { amount: positive ? val : -val });
                             }}
                             aria-label={t("expense.amountFor", { name: row.name || "entry" })}
-                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-emerald-700" : "text-rose-600"}`}
+                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
                           />
                         </div>
                       </div>
@@ -215,7 +215,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {positive ? (
-                        <span className="whitespace-nowrap inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                        <span className="whitespace-nowrap inline-flex rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
                           {t("category.Income")}
                         </span>
                       ) : (
@@ -242,7 +242,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                       <button
                         type="button"
                         onClick={() => deleteRow(row)}
-                        className="rounded-lg p-2 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
+                        className="rounded-lg p-2 text-zinc-400 dark:text-zinc-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
                         aria-label={t("expense.delete")}
                       >
                         <Trash size={16} />
@@ -262,7 +262,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
               <button
                 type="button"
                 onClick={addExpenseRow}
-                className="rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white hover:bg-zinc-800"
+                className="rounded-full bg-zinc-950 dark:bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-emerald-400"
               >
                 {t("expense.addExpense")}
               </button>

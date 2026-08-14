@@ -13,23 +13,23 @@ interface MetricTileProps {
 
 const TONE_STYLES = {
   emerald: {
-    iconBg: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-    valueText: "text-emerald-700",
+    iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    valueText: "text-emerald-700 dark:text-emerald-400",
   },
   rose: {
-    iconBg: "bg-rose-500/10 text-rose-600 border-rose-500/20",
-    valueText: "text-rose-600",
+    iconBg: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+    valueText: "text-rose-600 dark:text-rose-400",
   },
   indigo: {
-    iconBg: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-    valueText: "text-indigo-700",
+    iconBg: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+    valueText: "text-indigo-700 dark:text-indigo-400",
   },
   amber: {
-    iconBg: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-    valueText: "text-amber-700",
+    iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    valueText: "text-amber-700 dark:text-amber-400",
   },
   neutral: {
-    iconBg: "bg-zinc-500/10 text-zinc-600 border-zinc-500/20",
+    iconBg: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20",
     valueText: "text-[var(--color-ink)]",
   },
 };

@@ -158,9 +158,9 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
                 key={i}
                 className={`rounded-xl border p-3.5 text-xs font-medium leading-relaxed ${
                   ins.type === "positive"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-900"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200"
                     : ins.type === "warning"
-                    ? "border-amber-500/30 bg-amber-500/10 text-amber-900"
+                    ? "border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200"
                     : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-[var(--color-ink)]"
                 }`}
               >
@@ -249,9 +249,13 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
                         borderRadius: "12px",
                         border: "1px solid var(--color-line)",
                         background: "var(--color-surface)",
+                        color: "var(--color-ink)",
                         fontSize: 12,
                         fontFamily: "var(--font-mono)",
+                        boxShadow: "var(--shadow-tile)",
                       }}
+                      itemStyle={{ color: "var(--color-ink)" }}
+                      labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
                     />
                   </PieChart>
                 ) : (
@@ -269,9 +273,13 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
                         borderRadius: "12px",
                         border: "1px solid var(--color-line)",
                         background: "var(--color-surface)",
+                        color: "var(--color-ink)",
                         fontSize: 12,
                         fontFamily: "var(--font-mono)",
+                        boxShadow: "var(--shadow-tile)",
                       }}
+                      itemStyle={{ color: "var(--color-ink)" }}
+                      labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
                     />
                     <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                       {breakdown.map((entry) => (

@@ -6,6 +6,7 @@ import { HeaderCommandDeck } from "./components/HeaderCommandDeck";
 import { QuickAddModal } from "./components/QuickAddModal";
 import { DataManagerModal } from "./components/DataManagerModal";
 import { LevelUpCelebration } from "./components/LevelUpCelebration";
+import { useTheme } from "./hooks/useTheme";
 
 // Views
 import { DashboardOverview } from "./components/views/DashboardOverview";
@@ -67,6 +68,7 @@ const sampleQuests: Quest[] = [
 
 export default function App() {
   const { t } = useTranslation();
+  const { themeMode, setThemeMode } = useTheme();
   const [loading, setLoading] = useState(true);
 
   // Core Financial Data
@@ -326,6 +328,8 @@ export default function App() {
           setActiveTab={setActiveTab}
           onOpenQuickAdd={() => setIsQuickAddOpen(true)}
           onOpenDataManager={() => setIsDataManagerOpen(true)}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
         />
 
         {/* Dynamic View Transitions */}

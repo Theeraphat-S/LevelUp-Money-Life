@@ -235,6 +235,12 @@ const resources = {
         Savings: "Savings & Investments",
       },
       lang: { toggle: "Switch Language", en: "EN", th: "TH" },
+      theme: {
+        title: "Theme Mode",
+        system: "System",
+        light: "Light",
+        dark: "Dark",
+      },
     },
   },
   th: {
@@ -455,6 +461,12 @@ const resources = {
         Savings: "เงินออมและการลงทุน",
       },
       lang: { toggle: "เปลี่ยนภาษา", en: "EN", th: "TH" },
+      theme: {
+        title: "โหมดธีม",
+        system: "ตามระบบ",
+        light: "สว่าง",
+        dark: "มืด",
+      },
     },
   },
 } as const;

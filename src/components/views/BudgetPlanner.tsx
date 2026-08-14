@@ -137,7 +137,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                 {t("plan.incomeLabel")}:
               </label>
               <div className="flex items-center gap-1">
-                <span className="font-mono text-sm font-bold text-emerald-700">฿</span>
+                <span className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-400">฿</span>
                 <input
                   type="number"
                   min="0"
@@ -154,7 +154,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
               onClick={apply503020}
               className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-surface-subtle)] transition shadow-xs"
             >
-              <MagicWand size={15} weight="duotone" className="text-emerald-600" />
+              <MagicWand size={15} weight="duotone" className="text-emerald-600 dark:text-emerald-400" />
               <span>{t("plan.preset503020")}</span>
             </button>
 
@@ -162,7 +162,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
               <button
                 type="button"
                 onClick={autoBalance}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3 py-2 text-xs font-semibold text-white hover:bg-zinc-800 transition shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 dark:bg-emerald-500 px-3 py-2 text-xs font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-emerald-400 transition shadow-xs"
               >
                 <Scales size={15} />
                 <span>{t("plan.autoBalance")}</span>
@@ -175,12 +175,12 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
         <div className="mt-4 flex items-center justify-between border-t border-[var(--color-line)] pt-3 text-xs">
           <div className="flex items-center gap-2">
             {isBalanced ? (
-              <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700">
+              <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
                 <CheckCircle size={16} weight="fill" />
                 {t("plan.balanced")}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 font-semibold text-rose-600">
+              <span className="inline-flex items-center gap-1.5 font-semibold text-rose-600 dark:text-rose-400">
                 <WarningCircle size={16} weight="fill" />
                 {t("plan.unbalanced", { total: totalPercent })}
               </span>
@@ -260,7 +260,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                 <div className="rounded-xl border border-[var(--color-line)] p-3 bg-[var(--color-surface-subtle)]">
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="text-[var(--color-ink-soft)]">{t("plan.actualSpent")}:</span>
-                    <span className={`font-mono font-bold ${isOver ? "text-rose-600" : "text-[var(--color-ink)]"}`}>
+                    <span className={`font-mono font-bold ${isOver ? "text-rose-600 dark:text-rose-400" : "text-[var(--color-ink)]"}`}>
                       ฿{thb.format(actualSpent)}
                     </span>
                   </div>
@@ -284,7 +284,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                     <span className="text-[var(--color-ink-soft)]">{consumedPct}% of budget</span>
                     <span
                       className={`font-semibold ${
-                        isOver ? "text-rose-600" : "text-emerald-700"
+                        isOver ? "text-rose-600 dark:text-rose-400" : "text-emerald-700 dark:text-emerald-400"
                       }`}
                     >
                       {isOver
@@ -355,13 +355,17 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                   borderRadius: "12px",
                   border: "1px solid var(--color-line)",
                   background: "var(--color-surface)",
+                  color: "var(--color-ink)",
                   fontSize: 12,
                   fontFamily: "var(--font-mono)",
+                  boxShadow: "var(--shadow-tile)",
                 }}
+                itemStyle={{ color: "var(--color-ink)" }}
+                labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
               />
               <Legend />
-              <Bar dataKey="Planned" fill="#a1a1aa" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="Actual" fill="#10b981" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Planned" fill="var(--color-ink-faint)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Actual" fill="var(--color-accent)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

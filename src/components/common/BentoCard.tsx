@@ -27,7 +27,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
       {...motionProps}
     >
       {/* 1px Inner Refraction Top Border */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40 dark:bg-white/10" />
 
       {header && (
         <div className="border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-5 py-3.5 sm:px-6 sm:py-4">

@@ -72,9 +72,9 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label={t("summary.income")} value={`+฿${thb.format(income)}`} tone="text-emerald-700" />
-        <Stat label={t("summary.expenses")} value={`-฿${thb.format(expenses)}`} tone="text-rose-600" />
-        <Stat label={t("summary.net")} value={`${net >= 0 ? "+" : ""}฿${thb.format(net)}`} tone={net >= 0 ? "text-emerald-700" : "text-rose-600"} />
+        <Stat label={t("summary.income")} value={`+฿${thb.format(income)}`} tone="text-emerald-700 dark:text-emerald-400" />
+        <Stat label={t("summary.expenses")} value={`-฿${thb.format(expenses)}`} tone="text-rose-600 dark:text-rose-400" />
+        <Stat label={t("summary.net")} value={`${net >= 0 ? "+" : ""}฿${thb.format(net)}`} tone={net >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"} />
       </div>
 
       {topCategory && (
@@ -99,7 +99,17 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
                 </Pie>
                 <Tooltip
                   formatter={(value, name) => [`฿${thb.format(Number(value))}`, t(`category.${name}`)]}
-                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid var(--color-line)",
+                    background: "var(--color-surface)",
+                    color: "var(--color-ink)",
+                    fontSize: 12,
+                    fontFamily: "var(--font-mono)",
+                    boxShadow: "var(--shadow-tile)",
+                  }}
+                  itemStyle={{ color: "var(--color-ink)" }}
+                  labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
                 />
               </PieChart>
             ) : (
@@ -108,7 +118,17 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
                 <YAxis stroke="var(--color-ink-soft)" fontSize={10} tickLine={false} tickFormatter={(v) => `฿${v}`} />
                 <Tooltip
                   formatter={(value, name) => [`฿${thb.format(Number(value))}`, t(`category.${name}`)]}
-                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-line)", background: "var(--color-surface)", fontSize: 12, fontFamily: "var(--font-mono)" }}
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid var(--color-line)",
+                    background: "var(--color-surface)",
+                    color: "var(--color-ink)",
+                    fontSize: 12,
+                    fontFamily: "var(--font-mono)",
+                    boxShadow: "var(--shadow-tile)",
+                  }}
+                  itemStyle={{ color: "var(--color-ink)" }}
+                  labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
                 />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                   {breakdown.map((entry) => (
