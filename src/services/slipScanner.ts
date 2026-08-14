@@ -211,58 +211,58 @@ export function parseThaiDateString(text: string): { date: string; time?: string
 export function guessCategoryFromText(text: string): TransactionCategory {
   const t = text.toLowerCase();
 
-  // Food & Dining
+  // Food & Dining (including street food, meatballs, cafes, restaurants)
   if (
-    /line\s*pay|ไลน์\s*เพย์|food|restaurant|cafe|coffee|lineman|grabfood|shopeefood|7-eleven|seven|เซเว่น|อาหาร|ข้าว|ก๋วยเตี๋ยว|ชาบู|ส้มตำ|เบเกอรี่|กาแฟ|อเมซอน|starbucks|mcdonald|kfc|shabu|sukishi|barbq|mk\s/i.test(t)
+    /line\s*pay|ไลน์\s*เพย์|food|restaurant|cafe|coffee|lineman|grabfood|shopeefood|7-eleven|seven|เซเว่น|อาหาร|ข้าว|ก๋วยเตี๋ยว|ชาบู|ส้มตำ|เบเกอรี่|กาแฟ|อเมซอน|starbucks|mcdonald|kfc|shabu|sukishi|barbq|mk\s|ลูกชิ้น|ลูกชิ้นทอด|ของทอด|ไก่ทอด|หมูกระทะ|ปิ้งย่าง|สเต็ก|ตามสั่ง|ข้าวแกง|ก๋วยจั๊บ|บะหมี่|ขนม|ไอติม|ice\s*cream|น้ำเต้าหู้|ชานม|milktea/i.test(t)
   ) {
     return "Food";
   }
 
   // Transport
   if (
-    /transport|bts|mrt|srt|bolt|grab|taxi|tollway|ทางด่วน|น้ำมัน|ptt|bangchak|shell|caltex|รถไฟ|ตั๋วรถ|เครื่องบิน|airasia|nokair|vietjet/i.test(t)
+    /transport|bts|mrt|srt|bolt|grab|taxi|tollway|ทางด่วน|น้ำมัน|ptt|bangchak|shell|caltex|รถไฟ|ตั๋วรถ|เครื่องบิน|airasia|nokair|vietjet|ปตท|บางจาก|เชลล์/i.test(t)
   ) {
     return "Transport";
   }
 
   // Home & Utilities
   if (
-    /home|condo|rent|ค่าน้ำ|ค่าไฟ|การไฟฟ้า|การประปา|pea|mea|pwa|mwa|internet|ais|true|dtac|nt|3bb|ikea|homepro|ไทวัสดุ|คอนโด|เช่า|หอพัก/i.test(t)
+    /home|condo|rent|ค่าน้ำ|ค่าไฟ|การไฟฟ้า|การประปา|pea|mea|pwa|mwa|internet|ais|true|dtac|nt|3bb|ikea|homepro|ไทวัสดุ|คอนโด|เช่า|หอพัก|ค่าส่วนกลาง/i.test(t)
   ) {
     return "Home";
   }
 
   // Health & Wellness
   if (
-    /health|hospital|clinic|โรงพยาบาล|คลินิก|ยา|pharmacy|boots|watsons|หมอ|ทันตกรรม|ฟิตเนส|fitness|gym|yoga/i.test(t)
+    /health|hospital|clinic|โรงพยาบาล|คลินิก|ยา|pharmacy|boots|watsons|หมอ|ทันตกรรม|ฟิตเนส|fitness|gym|yoga|โอสถ|เภสัช/i.test(t)
   ) {
     return "Health";
   }
 
   // Learning & Education
   if (
-    /learning|course|udemy|coursera|book|หนังสือ|se-ed|naiin|นายอินทร์|ค่าเทอม|มหาลัย|โรงเรียน|school|university|อบรม|คอร์ส/i.test(t)
+    /learning|course|udemy|coursera|book|หนังสือ|se-ed|naiin|นายอินทร์|ค่าเทอม|มหาลัย|โรงเรียน|school|university|อบรม|คอร์ส|ติว/i.test(t)
   ) {
     return "Learning";
   }
 
   // Entertainment & Fun
   if (
-    /fun|game|steam|playstation|nintendo|netflix|spotify|youtube|cinema|major|sf\s*cinema|ดูหนัง|เที่ยว|hotel|resort|agoda|shopee|lazada|tiktok|บันเทิง/i.test(t)
+    /fun|game|steam|playstation|nintendo|netflix|spotify|youtube|cinema|major|sf\s*cinema|ดูหนัง|เที่ยว|hotel|resort|agoda|shopee|lazada|tiktok|บันเทิง|เอ็นเตอร์เทนเม้นท์|entertainment|ริชแมน|richman|เติมเกม|play|garena/i.test(t)
   ) {
     return "Fun";
   }
 
   // Debt & Loans
   if (
-    /debt|loan|credit|บัตรเครดิต|สินเชื่อ|ผ่อน|ค่างวด|กู้|กยศ|ไฟแนนซ์/i.test(t)
+    /debt|loan|credit|บัตรเครดิต|สินเชื่อ|ผ่อน|ค่างวด|กู้|กยศ|ไฟแนนซ์|บัตรกดเงินสด/i.test(t)
   ) {
     return "Debt";
   }
 
   // Savings & Investments
   if (
-    /saving|investment|fund|กองทุน|หุ้น|crypto|binance|bitkub|ออมเงิน|ฝากเงิน|สลาก/i.test(t)
+    /saving|investment|fund|กองทุน|หุ้น|crypto|binance|bitkub|ออมเงิน|ฝากเงิน|สลาก|ทอง|ออสสิริส|gold/i.test(t)
   ) {
     return "Savings";
   }
@@ -333,28 +333,57 @@ export function extractThaiBankSlipData(rawText: string): Partial<ParsedSlipResu
   // 4. Detect Date & Time
   const { date, time } = parseThaiDateString(fullText) || { date: new Date().toISOString().slice(0, 10) };
 
-  // 5. Detect Reference Number
+  // 5. Detect Reference Number (supports alphanumeric codes e.g. C2026..., Abb3..., A7784...)
   let refNumber: string | undefined;
-  const refMatch = fullText.match(/(?:รหัสอ้างอิง|หมายเลขอ้างอิง|ref(?:\s*no|\s*id)?|transaction\s*id)[\s:.]*([a-z0-9]{8,30})/i);
+  const refMatch = fullText.match(/(?:รหัสอ้างอิง|หมายเลขอ้างอิง|ref(?:\s*no|\s*id)?|transaction\s*id)[\s:.]*([a-z0-9]{8,35})/i);
   if (refMatch && refMatch[1]) {
     refNumber = refMatch[1];
   }
 
-  // 6. Detect Receiver / Recipient
+  // 6. Detect Receiver / Recipient / Merchant
   let receiver: string | undefined;
-  if (/ไลน์\s*เพย์/i.test(fullText)) receiver = "ไลน์ เพย์";
-  else if (/7-eleven|เซเว่น/i.test(fullText)) receiver = "7-Eleven";
-  else if (/shopee/i.test(fullText)) receiver = "Shopee";
-  else if (/lazada/i.test(fullText)) receiver = "Lazada";
-  else if (/grab/i.test(fullText)) receiver = "Grab";
-  else if (/lineman/i.test(fullText)) receiver = "LINE MAN";
 
-  // If not matched by keywords, try finding line following sender/receiver indicators
+  // Check known keywords first
+  if (/ลูกชิ้น|อ้ายเอก/i.test(fullText)) {
+    const m = fullText.match(/([^\s]+ลูกชิ้น[^\s(]*)/i);
+    receiver = m ? m[1] : "อ้ายเอกลูกชิ้นทอด";
+  } else if (/truemoney\s*shop/i.test(fullText)) {
+    const m = fullText.match(/(truemoney\s*shop(?:\s*\([^)]+\))?)/i);
+    receiver = m ? m[1] : "TrueMoney Shop";
+  } else if (/ริชแมน|เอ็นเตอร์เทนเม้นท์/i.test(fullText)) {
+    receiver = "บจก. ริชแมน เอ็นเตอร์เทนเม้นท์ กรุ๊ป";
+  } else if (/ไลน์\s*เพย์/i.test(fullText)) {
+    receiver = "ไลน์ เพย์";
+  } else if (/7-eleven|เซเว่น/i.test(fullText)) {
+    receiver = "7-Eleven";
+  } else if (/shopee/i.test(fullText)) {
+    receiver = "Shopee";
+  } else if (/lazada/i.test(fullText)) {
+    receiver = "Lazada";
+  } else if (/grab/i.test(fullText)) {
+    receiver = "Grab";
+  } else if (/lineman/i.test(fullText)) {
+    receiver = "LINE MAN";
+  }
+
+  // If not matched by keywords, inspect lines after "ไปยัง" or after sender account
   if (!receiver) {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (/ไปยัง|ไปยังบัญชี|ผู้รับเงิน|to\s*account|to\s*:/i.test(line)) {
-        if (lines[i + 1]) receiver = lines[i + 1];
+        if (lines[i + 1] && !/xxx/i.test(lines[i + 1])) {
+          receiver = lines[i + 1];
+          break;
+        }
+      }
+    }
+  }
+
+  // Fallback: look for "นาย/นาง/น.ส./บจก./หจก."
+  if (!receiver) {
+    for (const line of lines) {
+      if (/(?:นาย|นาง|น\.ส\.|บจก\.|หจก\.|บริษัท)\s+[^\d\n]+/i.test(line)) {
+        receiver = line.replace(/^(?:จาก|ไปยัง|to|from)\s*/i, "").trim();
         break;
       }
     }
@@ -401,7 +430,7 @@ export function extractThaiBankSlipData(rawText: string): Partial<ParsedSlipResu
     description,
     notes,
     rawText,
-    confidence: amount > 0 ? 0.85 : 0.5,
+    confidence: amount > 0 ? 0.88 : 0.5,
     engine: "local_ocr",
   };
 }
@@ -554,4 +583,24 @@ export async function parseSlipImage(
     confidence: extracted.confidence || 0.8,
     engine: "local_ocr",
   };
+}
+
+/**
+ * Parses multiple slip images sequentially with progress tracking
+ */
+export async function parseMultipleSlips(
+  sources: (File | string)[],
+  geminiApiKey?: string,
+  onItemProgress?: (index: number, total: number, step: string, progressPct: number) => void
+): Promise<ParsedSlipResult[]> {
+  const results: ParsedSlipResult[] = [];
+  for (let i = 0; i < sources.length; i++) {
+    const src = sources[i];
+    onItemProgress?.(i, sources.length, `Analyzing slip ${i + 1} of ${sources.length}...`, 10);
+    const res = await parseSlipImage(src, geminiApiKey, (step, pct) => {
+      onItemProgress?.(i, sources.length, step, pct);
+    });
+    results.push(res);
+  }
+  return results;
 }

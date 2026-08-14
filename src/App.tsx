@@ -89,7 +89,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<ViewTab>("dashboard");
   const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
   const [isSlipScanOpen, setIsSlipScanOpen] = useState<boolean>(false);
-  const [slipInitialFileOrUrl, setSlipInitialFileOrUrl] = useState<File | string | null>(null);
+  const [slipInitialFiles, setSlipInitialFiles] = useState<(File | string)[]>([]);
   const [isDataManagerOpen, setIsDataManagerOpen] = useState<boolean>(false);
   const [toastNotice, setToastNotice] = useState<{ message: string; visible: boolean }>({
     message: "",
@@ -105,30 +105,37 @@ export default function App() {
     rankKey: "rank.novice",
   });
 
-  // Global Clipboard Paste & Drag-and-Drop listener for Bank Slips
+  // Global Clipboard Paste & Drag-and-Drop listener for Bank Slips (Single & Batch)
   useEffect(() => {
     const handleGlobalPaste = (e: ClipboardEvent) => {
       const items = e.clipboardData?.items;
       if (!items) return;
+      const files: File[] = [];
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf("image") !== -1) {
           const file = items[i].getAsFile();
-          if (file) {
-            e.preventDefault();
-            setSlipInitialFileOrUrl(file);
-            setIsSlipScanOpen(true);
-            break;
-          }
+          if (file) files.push(file);
         }
+      }
+      if (files.length > 0) {
+        e.preventDefault();
+        setSlipInitialFiles(files);
+        setIsSlipScanOpen(true);
       }
     };
 
     const handleGlobalDrop = (e: DragEvent) => {
       if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (file.type.startsWith("image/")) {
+        const imageFiles: File[] = [];
+        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+          const f = e.dataTransfer.files[i];
+          if (f.type.startsWith("image/")) {
+            imageFiles.push(f);
+          }
+        }
+        if (imageFiles.length > 0) {
           e.preventDefault();
-          setSlipInitialFileOrUrl(file);
+          setSlipInitialFiles(imageFiles);
           setIsSlipScanOpen(true);
         }
       }
@@ -348,6 +355,50 @@ export default function App() {
     }, 4000);
   };
 
+  // Handle Batch Slip Save (Awards cumulative XP + batch combo)
+  const handleSaveBatchSlipTransactions = (newTxs: Transaction[], totalXpBonus: number) => {
+    if (!newTxs || newTxs.length === 0) return;
+    setTransactions((prev) => [...newTxs, ...prev]);
+    addXp(totalXpBonus);
+
+    // Auto-complete daily logging quest if active
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id === "q1" && !q.done) {
+          addXp(q.xp);
+          return { ...q, done: true };
+        }
+        return q;
+      })
+    );
+
+    // Check newly unlocked achievements
+    const { newlyUnlocked, bonusXp } = evaluateAchievements(
+      [...newTxs, ...transactions],
+      quests,
+      allocations,
+      streakDays,
+      unlockedAchievementIds
+    );
+
+    if (newlyUnlocked.length > 0) {
+      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
+      setUnlockedAchievementIds(newIds);
+      saveSetting("unlockedAchievements", newIds).catch(console.error);
+      if (bonusXp > 0) {
+        addXp(bonusXp);
+      }
+    }
+
+    setToastNotice({
+      message: t("slipScanner.batchToastSuccess", { count: newTxs.length, xp: totalXpBonus }),
+      visible: true,
+    });
+    setTimeout(() => {
+      setToastNotice((prev) => ({ ...prev, visible: false }));
+    }, 4500);
+  };
+
   // Handle Quest Toggle
   const handleToggleQuest = (id: string) => {
     setQuests((prev) =>
@@ -423,7 +474,7 @@ export default function App() {
           setActiveTab={setActiveTab}
           onOpenQuickAdd={() => setIsQuickAddOpen(true)}
           onOpenScanSlip={() => {
-            setSlipInitialFileOrUrl(null);
+            setSlipInitialFiles([]);
             setIsSlipScanOpen(true);
           }}
           onOpenDataManager={() => setIsDataManagerOpen(true)}
@@ -538,7 +589,7 @@ export default function App() {
           onClose={() => setIsQuickAddOpen(false)}
           onSave={handleSaveQuickTransaction}
           onOpenScanSlip={() => {
-            setSlipInitialFileOrUrl(null);
+            setSlipInitialFiles([]);
             setIsSlipScanOpen(true);
           }}
           defaultDate={today}
@@ -548,10 +599,11 @@ export default function App() {
           isOpen={isSlipScanOpen}
           onClose={() => {
             setIsSlipScanOpen(false);
-            setSlipInitialFileOrUrl(null);
+            setSlipInitialFiles([]);
           }}
           onSave={handleSaveSlipTransaction}
-          initialFileOrUrl={slipInitialFileOrUrl}
+          onSaveBatch={handleSaveBatchSlipTransactions}
+          initialFiles={slipInitialFiles}
         />
 
         <DataManagerModal
