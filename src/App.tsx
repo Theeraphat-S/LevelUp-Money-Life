@@ -1,9 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDots } from "@phosphor-icons/react";
+import { CalendarDots, Sparkle } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { HeaderCommandDeck } from "./components/HeaderCommandDeck";
 import { QuickAddModal } from "./components/QuickAddModal";
+import { SlipScanModal } from "./components/SlipScanModal";
 import { DataManagerModal } from "./components/DataManagerModal";
 import { LevelUpCelebration } from "./components/LevelUpCelebration";
 import { useTheme } from "./hooks/useTheme";
@@ -87,7 +88,13 @@ export default function App() {
   const [activeMonth, setActiveMonth] = useState<string>(currentMonthISO);
   const [activeTab, setActiveTab] = useState<ViewTab>("dashboard");
   const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
+  const [isSlipScanOpen, setIsSlipScanOpen] = useState<boolean>(false);
+  const [slipInitialFileOrUrl, setSlipInitialFileOrUrl] = useState<File | string | null>(null);
   const [isDataManagerOpen, setIsDataManagerOpen] = useState<boolean>(false);
+  const [toastNotice, setToastNotice] = useState<{ message: string; visible: boolean }>({
+    message: "",
+    visible: false,
+  });
   const [levelUpModal, setLevelUpModal] = useState<{
     isOpen: boolean;
     level: number;
@@ -97,6 +104,51 @@ export default function App() {
     level: 1,
     rankKey: "rank.novice",
   });
+
+  // Global Clipboard Paste & Drag-and-Drop listener for Bank Slips
+  useEffect(() => {
+    const handleGlobalPaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const file = items[i].getAsFile();
+          if (file) {
+            e.preventDefault();
+            setSlipInitialFileOrUrl(file);
+            setIsSlipScanOpen(true);
+            break;
+          }
+        }
+      }
+    };
+
+    const handleGlobalDrop = (e: DragEvent) => {
+      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file.type.startsWith("image/")) {
+          e.preventDefault();
+          setSlipInitialFileOrUrl(file);
+          setIsSlipScanOpen(true);
+        }
+      }
+    };
+
+    const handleGlobalDragOver = (e: DragEvent) => {
+      if (e.dataTransfer?.types?.includes("Files")) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("paste", handleGlobalPaste);
+    window.addEventListener("drop", handleGlobalDrop);
+    window.addEventListener("dragover", handleGlobalDragOver);
+    return () => {
+      window.removeEventListener("paste", handleGlobalPaste);
+      window.removeEventListener("drop", handleGlobalDrop);
+      window.removeEventListener("dragover", handleGlobalDragOver);
+    };
+  }, []);
 
   // Calculate Level and Progression
   const gamification: GamificationState = useMemo(() => {
@@ -253,6 +305,49 @@ export default function App() {
     }
   };
 
+  // Handle Slip Scan Save (Awards +25 XP bonus + triggers daily quest check)
+  const handleSaveSlipTransaction = (newTx: Transaction, xpBonus: number = 25) => {
+    setTransactions((prev) => [newTx, ...prev]);
+    addXp(xpBonus);
+
+    // Auto-complete daily logging quest if active
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id === "q1" && !q.done) {
+          addXp(q.xp);
+          return { ...q, done: true };
+        }
+        return q;
+      })
+    );
+
+    // Check newly unlocked achievements
+    const { newlyUnlocked, bonusXp } = evaluateAchievements(
+      [newTx, ...transactions],
+      quests,
+      allocations,
+      streakDays,
+      unlockedAchievementIds
+    );
+
+    if (newlyUnlocked.length > 0) {
+      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
+      setUnlockedAchievementIds(newIds);
+      saveSetting("unlockedAchievements", newIds).catch(console.error);
+      if (bonusXp > 0) {
+        addXp(bonusXp);
+      }
+    }
+
+    setToastNotice({
+      message: t("slipScanner.toastSuccess", { xp: xpBonus }),
+      visible: true,
+    });
+    setTimeout(() => {
+      setToastNotice((prev) => ({ ...prev, visible: false }));
+    }, 4000);
+  };
+
   // Handle Quest Toggle
   const handleToggleQuest = (id: string) => {
     setQuests((prev) =>
@@ -327,6 +422,10 @@ export default function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+          onOpenScanSlip={() => {
+            setSlipInitialFileOrUrl(null);
+            setIsSlipScanOpen(true);
+          }}
           onOpenDataManager={() => setIsDataManagerOpen(true)}
           themeMode={themeMode}
           setThemeMode={setThemeMode}
@@ -438,7 +537,21 @@ export default function App() {
           isOpen={isQuickAddOpen}
           onClose={() => setIsQuickAddOpen(false)}
           onSave={handleSaveQuickTransaction}
+          onOpenScanSlip={() => {
+            setSlipInitialFileOrUrl(null);
+            setIsSlipScanOpen(true);
+          }}
           defaultDate={today}
+        />
+
+        <SlipScanModal
+          isOpen={isSlipScanOpen}
+          onClose={() => {
+            setIsSlipScanOpen(false);
+            setSlipInitialFileOrUrl(null);
+          }}
+          onSave={handleSaveSlipTransaction}
+          initialFileOrUrl={slipInitialFileOrUrl}
         />
 
         <DataManagerModal
@@ -460,6 +573,26 @@ export default function App() {
           rankKey={levelUpModal.rankKey}
           onClose={() => setLevelUpModal((prev) => ({ ...prev, isOpen: false }))}
         />
+
+        {/* Global Toast Notification */}
+        <AnimatePresence>
+          {toastNotice.visible && (
+            <motion.aside
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 15, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-2xl border border-emerald-500/30 bg-[var(--color-surface)] px-4 py-3 shadow-xl backdrop-blur-md"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                <Sparkle size={16} weight="fill" className="text-emerald-500" />
+              </div>
+              <span className="text-xs font-semibold text-[var(--color-ink)]">
+                {toastNotice.message}
+              </span>
+            </motion.aside>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );

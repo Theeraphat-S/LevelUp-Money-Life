@@ -8,6 +8,8 @@ import {
   Fire,
   Moon,
   Plus,
+  Receipt,
+  Sparkle,
   Sun,
   Trophy,
 } from "@phosphor-icons/react";
@@ -21,6 +23,7 @@ interface HeaderCommandDeckProps {
   activeTab: ViewTab;
   setActiveTab: (tab: ViewTab) => void;
   onOpenQuickAdd: () => void;
+  onOpenScanSlip: () => void;
   onOpenDataManager: () => void;
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
@@ -33,6 +36,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
   activeTab,
   setActiveTab,
   onOpenQuickAdd,
+  onOpenScanSlip,
   onOpenDataManager,
   themeMode,
   setThemeMode,
@@ -251,6 +255,21 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
           >
             <Database size={15} weight="duotone" />
             <span className="hidden sm:inline">{t("header.dataManager")}</span>
+          </button>
+
+          {/* Scan Slip Button */}
+          <button
+            type="button"
+            onClick={onOpenScanSlip}
+            title={t("header.scanSlipTip")}
+            aria-label={t("header.scanSlip")}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300 transition hover:bg-emerald-500/20 active:scale-[0.98] shadow-xs"
+          >
+            <Receipt size={15} weight="duotone" className="text-emerald-600 dark:text-emerald-400" />
+            <span>{t("header.scanSlip")}</span>
+            <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 opacity-80">
+              +25 XP
+            </span>
           </button>
 
           {/* Quick Add Button */}

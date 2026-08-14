@@ -19,6 +19,7 @@ interface QuickAddModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (tx: Transaction) => void;
+  onOpenScanSlip?: () => void;
   defaultDate?: string;
 }
 
@@ -26,6 +27,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  onOpenScanSlip,
   defaultDate,
 }) => {
   const { t } = useTranslation();
@@ -136,6 +138,27 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {/* Slip Scan Shortcut Trigger */}
+              {onOpenScanSlip && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenScanSlip();
+                  }}
+                  className="w-full flex items-center justify-between rounded-xl border border-dashed border-emerald-500/40 bg-emerald-500/5 hover:bg-emerald-500/10 px-3.5 py-2 text-xs text-emerald-800 dark:text-emerald-300 transition group cursor-pointer"
+                >
+                  <span className="flex items-center gap-2 font-bold">
+                    <Receipt size={16} weight="duotone" className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition" />
+                    <span>{t("quickAdd.scanSlipTab")}</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                    <Sparkle size={12} weight="fill" className="text-emerald-500" />
+                    <span>Auto-fill from image</span>
+                  </span>
+                </button>
+              )}
+
               {/* Type Switcher */}
               <div className="grid grid-cols-2 gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] p-1">
                 <button
