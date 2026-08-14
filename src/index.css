@@ -4,22 +4,31 @@
   --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Refined EasyLife SaaS surface tokens */
-  --color-ink: oklch(20% 0.015 260);
-  --color-ink-soft: oklch(42% 0.015 260);
+  /* Refined FinTech Command Center Bento Tokens */
+  --color-ink: oklch(18% 0.015 260);
+  --color-ink-soft: oklch(44% 0.015 260);
+  --color-ink-faint: oklch(62% 0.01 260);
   --color-line: oklch(90% 0.008 260);
+  --color-line-subtle: oklch(93% 0.006 260);
   --color-surface: oklch(100% 0 0);
-  --color-surface-subtle: oklch(97.5% 0.005 260);
-  --color-base: oklch(96.5% 0.005 260);
+  --color-surface-subtle: oklch(98% 0.005 260);
+  --color-base: oklch(96% 0.005 260);
 
-  --color-accent: oklch(58% 0.14 165);
-  --color-accent-soft: oklch(95% 0.03 165);
-  --color-accent-ink: oklch(32% 0.1 165);
+  /* Curated OKLCH Accents */
+  --color-accent: oklch(58% 0.15 160);       /* Emerald Core */
+  --color-accent-soft: oklch(95% 0.03 160);  /* Soft Emerald Tint */
+  --color-accent-ink: oklch(30% 0.12 160);  /* Deep Emerald Text */
 
-  --shadow-diffuse: 0 20px 40px -20px oklch(20% 0.02 260 / 0.12);
-  --shadow-tile: 0 1px 3px 0 oklch(20% 0.02 260 / 0.06), 0 1px 2px -1px oklch(20% 0.02 260 / 0.06);
+  --color-rose-core: oklch(58% 0.18 20);     /* Rose Red */
+  --color-rose-soft: oklch(96% 0.03 20);     /* Soft Rose Tint */
+  --color-amber-core: oklch(65% 0.16 75);    /* Amber Gold */
+  --color-indigo-core: oklch(55% 0.16 260);  /* Indigo Blue */
+
+  --shadow-diffuse: 0 20px 40px -15px oklch(20% 0.02 260 / 0.08);
+  --shadow-tile: 0 1px 3px 0 oklch(20% 0.02 260 / 0.05), 0 1px 2px -1px oklch(20% 0.02 260 / 0.05);
   --shadow-press: 0 1px 2px oklch(20% 0.02 260 / 0.08);
-  --ring-accent: 0 0 0 3px oklch(58% 0.14 165 / 0.25);
+  --shadow-glow-emerald: 0 0 24px -4px oklch(58% 0.15 160 / 0.25);
+  --ring-accent: 0 0 0 3px oklch(58% 0.15 160 / 0.25);
 }
 
 @layer base {
@@ -39,11 +48,12 @@
 
   body {
     margin: 0;
-    min-height: 100vh;
+    min-height: 100dvh;
     background:
-      radial-gradient(50rem 50rem at 0% 0%, oklch(96% 0.03 165 / 0.5), transparent 50%),
-      radial-gradient(40rem 40rem at 100% 100%, oklch(95% 0.02 220 / 0.4), transparent 50%),
+      radial-gradient(60rem 50rem at 0% 0%, oklch(96% 0.035 160 / 0.45), transparent 60%),
+      radial-gradient(50rem 45rem at 100% 100%, oklch(95% 0.03 240 / 0.35), transparent 55%),
       var(--color-base);
+    overflow-x: hidden;
   }
 
   button,
@@ -60,9 +70,26 @@
 }
 
 ::selection {
-  background: oklch(58% 0.13 165 / 0.22);
+  background: oklch(58% 0.15 160 / 0.25);
 }
 
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(80% 0.01 260);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(65% 0.01 260);
+}
+
+/* Slider Controls */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -75,8 +102,8 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   background: var(--color-surface);
   border: 2.5px solid var(--color-accent);
@@ -86,16 +113,16 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 0 6px oklch(58% 0.13 165 / 0.12), var(--shadow-tile);
+  box-shadow: 0 0 0 6px oklch(58% 0.15 160 / 0.14), var(--shadow-tile);
 }
 input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
   transform: scale(1.05);
-  box-shadow: 0 0 0 8px oklch(58% 0.13 165 / 0.16), var(--shadow-tile);
+  box-shadow: 0 0 0 8px oklch(58% 0.15 160 / 0.2), var(--shadow-tile);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   background: var(--color-surface);
   border: 2.5px solid var(--color-accent);

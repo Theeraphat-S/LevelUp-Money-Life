@@ -1,11 +1,20 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { CalendarDots, ChartLineUp, Coins, ShieldCheck, Trophy } from "@phosphor-icons/react";
+import { useEffect, useState, useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { CalendarDots } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
-import { DailyQuests } from "./components/DailyQuests";
-import { ExpenseTable } from "./components/ExpenseTable";
-import { FinancialPlan } from "./components/FinancialPlan";
-import { SummaryStats } from "./components/SummaryStats";
+import { HeaderCommandDeck } from "./components/HeaderCommandDeck";
+import { QuickAddModal } from "./components/QuickAddModal";
+import { DataManagerModal } from "./components/DataManagerModal";
+import { LevelUpCelebration } from "./components/LevelUpCelebration";
+
+// Views
+import { DashboardOverview } from "./components/views/DashboardOverview";
+import { TransactionLedger } from "./components/views/TransactionLedger";
+import { BudgetPlanner } from "./components/views/BudgetPlanner";
+import { AnalyticsHub } from "./components/views/AnalyticsHub";
+import { QuestsGrowth } from "./components/views/QuestsGrowth";
+
+// Services & Types
 import {
   getTransactions,
   saveAllTransactions,
@@ -16,87 +25,149 @@ import {
   getSetting,
   saveSetting,
 } from "./services/db";
-import type { Allocation, Quest, Transaction } from "./types";
+import {
+  calculateLevelFromTotalXp,
+  evaluateAchievements,
+  updateStreak,
+} from "./services/gamification";
+import type { BackupData } from "./services/exportImport";
+import type {
+  Allocation,
+  GamificationState,
+  Quest,
+  Transaction,
+  ViewTab,
+} from "./types";
 
 const today = new Date().toISOString().slice(0, 10);
-const month = today.slice(0, 7);
+const currentMonthISO = today.slice(0, 7);
 
 const sampleTransactions: Transaction[] = [
-  { id: "t1", name: "Salary", amount: 42000, date: `${month}-01`, category: "Income", cleared: true },
-  { id: "t2", name: "Lunch — Saneh Jaan", amount: -185, date: today, category: "Food", cleared: true },
-  { id: "t3", name: "BTS commute", amount: -74, date: today, category: "Transport", cleared: true },
-  { id: "t4", name: "DataCamp subscription", amount: -990, date: `${month}-08`, category: "Learning", cleared: false },
-  { id: "t5", name: "Emergency fund", amount: -4200, date: `${month}-10`, category: "Savings", cleared: true },
-  { id: "t6", name: "Groceries — Tops", amount: -843, date: `${month}-12`, category: "Food", cleared: true },
+  { id: "t1", name: "Monthly Salary", amount: 48000, date: `${currentMonthISO}-01`, category: "Income", cleared: true, notes: "Direct bank deposit" },
+  { id: "t2", name: "Condo Rent & Maintenance", amount: -12500, date: `${currentMonthISO}-02`, category: "Home", cleared: true, notes: "Auto-debit" },
+  { id: "t3", name: "Groceries — Tops Market", amount: -1420, date: `${currentMonthISO}-04`, category: "Food", cleared: true, notes: "Weekly pantry restock" },
+  { id: "t4", name: "BTS Rabbit Card Top-up", amount: -500, date: `${currentMonthISO}-05`, category: "Transport", cleared: true },
+  { id: "t5", name: "Data Science Specialization", amount: -1200, date: `${currentMonthISO}-07`, category: "Learning", cleared: true, notes: "Online certificate" },
+  { id: "t6", name: "Dinner & Cafe — Thonglor", amount: -680, date: `${currentMonthISO}-09`, category: "Fun", cleared: false },
+  { id: "t7", name: "Emergency Fund Allocation", amount: -5000, date: `${currentMonthISO}-10`, category: "Savings", cleared: true, notes: "High yield savings" },
+  { id: "t8", name: "Fitness Membership", amount: -1500, date: `${currentMonthISO}-12`, category: "Health", cleared: true },
 ];
 
 const sampleAllocations: Allocation[] = [
   { id: "needs", label: "Needs", percent: 50, color: "oklch(58% 0.13 165)" },
   { id: "wants", label: "Wants", percent: 30, color: "oklch(62% 0.11 230)" },
-  { id: "savings", label: "Savings", percent: 20, color: "oklch(70% 0.12 80)" },
+  { id: "savings", label: "Savings", percent: 20, color: "oklch(70% 0.13 80)" },
 ];
 
 const sampleQuests: Quest[] = [
-  { id: "q1", title: "Log every transaction today", date: today, xp: 10, done: false },
-  { id: "q2", title: "Skip one impulse purchase", date: today, xp: 20, done: false },
-  { id: "q3", title: "Review the monthly budget plan", date: today, xp: 15, done: true },
+  { id: "q1", title: "Log every daily expense today", date: today, xp: 15, done: false },
+  { id: "q2", title: "Review monthly 50/30/20 budget allocations", date: today, xp: 20, done: true },
+  { id: "q3", title: "Transfer 500 THB to emergency savings", date: today, xp: 25, done: false },
 ];
-
-const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
-
-function tile(delay: number) {
-  return {
-    initial: { opacity: 0, y: 14 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] as const },
-  };
-}
 
 export default function App() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+
+  // Core Financial Data
   const [transactions, setTransactionsState] = useState<Transaction[]>([]);
   const [allocations, setAllocationsState] = useState<Allocation[]>([]);
-  const [income, setIncomeState] = useState<number>(42000);
+  const [income, setIncomeState] = useState<number>(48000);
   const [quests, setQuestsState] = useState<Quest[]>([]);
 
+  // Gamification & Streak State
+  const [totalXp, setTotalXp] = useState<number>(180);
+  const [streakDays, setStreakDays] = useState<number>(1);
+  const [lastActiveDate, setLastActiveDate] = useState<string>(today);
+  const [unlockedAchievementIds, setUnlockedAchievementIds] = useState<string[]>([]);
+
+  // Navigation & Modals
+  const [activeMonth, setActiveMonth] = useState<string>(currentMonthISO);
+  const [activeTab, setActiveTab] = useState<ViewTab>("dashboard");
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
+  const [isDataManagerOpen, setIsDataManagerOpen] = useState<boolean>(false);
+  const [levelUpModal, setLevelUpModal] = useState<{
+    isOpen: boolean;
+    level: number;
+    rankKey: string;
+  }>({
+    isOpen: false,
+    level: 1,
+    rankKey: "rank.novice",
+  });
+
+  // Calculate Level and Progression
+  const gamification: GamificationState = useMemo(() => {
+    const levelStats = calculateLevelFromTotalXp(totalXp);
+    return {
+      level: levelStats.level,
+      currentLevelXp: levelStats.currentLevelXp,
+      xpForNextLevel: levelStats.xpForNextLevel,
+      totalXp,
+      streakDays,
+      lastActiveDate,
+      titleRankKey: levelStats.titleRankKey,
+      unlockedAchievementIds,
+    };
+  }, [totalXp, streakDays, lastActiveDate, unlockedAchievementIds]);
+
+  // Evaluate Achievements
+  const { allAchievements } = useMemo(() => {
+    return evaluateAchievements(
+      transactions,
+      quests,
+      allocations,
+      streakDays,
+      unlockedAchievementIds
+    );
+  }, [transactions, quests, allocations, streakDays, unlockedAchievementIds]);
+
+  // Initial Load from DB / Storage
   useEffect(() => {
     async function loadData() {
       try {
         let txs = await getTransactions();
         if (txs.length === 0) {
-          const localTxs = localStorage.getItem("levelup.transactions");
-          txs = localTxs ? JSON.parse(localTxs) : sampleTransactions;
+          txs = sampleTransactions;
           await saveAllTransactions(txs);
         }
 
         let allocs = await getAllocations();
         if (allocs.length === 0) {
-          const localAllocs = localStorage.getItem("levelup.allocations");
-          allocs = localAllocs ? JSON.parse(localAllocs) : sampleAllocations;
+          allocs = sampleAllocations;
           await saveAllocations(allocs);
         }
 
         let qsts = await getQuests();
         if (qsts.length === 0) {
-          const localQuests = localStorage.getItem("levelup.quests");
-          qsts = localQuests ? JSON.parse(localQuests) : sampleQuests;
+          qsts = sampleQuests;
           await saveAllQuests(qsts);
         }
 
-        const localInc = localStorage.getItem("levelup.income");
-        const defaultInc = localInc ? JSON.parse(localInc) : 42000;
-        const inc = await getSetting<number>("income", defaultInc);
-        if (localInc) {
-          await saveSetting("income", inc);
-        }
+        const inc = await getSetting<number>("income", 48000);
+        const savedXp = await getSetting<number>("totalXp", 180);
+        const savedStreak = await getSetting<number>("streakDays", 1);
+        const savedLastDate = await getSetting<string>("lastActiveDate", today);
+        const savedAchievements = await getSetting<string[]>("unlockedAchievements", [
+          "first_log",
+        ]);
+
+        // Update streak based on current date
+        const { newStreak, today: curToday } = updateStreak(savedLastDate, savedStreak);
 
         setTransactionsState(txs);
         setAllocationsState(allocs);
         setQuestsState(qsts);
         setIncomeState(inc);
+        setTotalXp(savedXp);
+        setStreakDays(newStreak);
+        setLastActiveDate(curToday);
+        setUnlockedAchievementIds(savedAchievements);
+
+        await saveSetting("streakDays", newStreak);
+        await saveSetting("lastActiveDate", curToday);
       } catch (err) {
-        console.error("Failed loading data from SQLite, fallback to local state", err);
+        console.error("Database initialization failed, fallback loaded:", err);
       } finally {
         setLoading(false);
       }
@@ -104,6 +175,26 @@ export default function App() {
     loadData();
   }, []);
 
+  // Award XP and check Level Up
+  const addXp = (amount: number) => {
+    const prevStats = calculateLevelFromTotalXp(totalXp);
+    const newTotalXp = totalXp + amount;
+    const nextStats = calculateLevelFromTotalXp(newTotalXp);
+
+    setTotalXp(newTotalXp);
+    saveSetting("totalXp", newTotalXp).catch(console.error);
+
+    // Trigger Level Up Celebration if level increased
+    if (nextStats.level > prevStats.level) {
+      setLevelUpModal({
+        isOpen: true,
+        level: nextStats.level,
+        rankKey: nextStats.titleRankKey,
+      });
+    }
+  };
+
+  // State Updaters with Database Sync
   const setTransactions = (value: Transaction[] | ((prev: Transaction[]) => Transaction[])) => {
     setTransactionsState((prev) => {
       const next = typeof value === "function" ? value(prev) : value;
@@ -136,22 +227,86 @@ export default function App() {
     });
   };
 
-  const monthRows = transactions.filter((row) => row.date.startsWith(month));
-  const monthIncome = monthRows.filter((row) => row.amount > 0).reduce((sum, row) => sum + row.amount, 0);
-  const expenses = Math.abs(
-    monthRows
-      .filter((row) => row.amount < 0)
-      .reduce((sum, row) => sum + row.amount, 0)
-  );
-  const actualNet = monthIncome - expenses;
-  const cleared = transactions.filter((row) => row.cleared).length;
-  const xpEarned = quests.filter((q) => q.done).reduce((s, q) => s + q.xp, 0);
-  const xpGoal = 200;
-  const levelPct = Math.min(100, Math.round((xpEarned / xpGoal) * 100));
+  // Handle Quick Add Save
+  const handleSaveQuickTransaction = (newTx: Transaction) => {
+    setTransactions((prev) => [newTx, ...prev]);
+    addXp(15);
+
+    // Check newly unlocked achievements
+    const { newlyUnlocked, bonusXp } = evaluateAchievements(
+      [newTx, ...transactions],
+      quests,
+      allocations,
+      streakDays,
+      unlockedAchievementIds
+    );
+
+    if (newlyUnlocked.length > 0) {
+      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
+      setUnlockedAchievementIds(newIds);
+      saveSetting("unlockedAchievements", newIds).catch(console.error);
+      if (bonusXp > 0) {
+        addXp(bonusXp);
+      }
+    }
+  };
+
+  // Handle Quest Toggle
+  const handleToggleQuest = (id: string) => {
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id === id) {
+          const nextDone = !q.done;
+          if (nextDone) {
+            addXp(q.xp);
+          }
+          return { ...q, done: nextDone };
+        }
+        return q;
+      })
+    );
+  };
+
+  // Restore Complete Backup
+  const handleRestoreBackup = (backup: BackupData) => {
+    if (backup.transactions) setTransactions(backup.transactions);
+    if (backup.allocations) setAllocations(backup.allocations);
+    if (backup.quests) setQuests(backup.quests);
+    if (typeof backup.income === "number") setIncome(backup.income);
+    if (backup.gamification?.totalXp) {
+      setTotalXp(backup.gamification.totalXp);
+      saveSetting("totalXp", backup.gamification.totalXp);
+    }
+  };
+
+  // Import CSV Transactions
+  const handleImportTransactions = (imported: Transaction[]) => {
+    setTransactions((prev) => [...imported, ...prev]);
+    addXp(imported.length * 10);
+  };
+
+  // Reset to Sample Data
+  const handleResetData = async () => {
+    await saveAllTransactions(sampleTransactions);
+    await saveAllocations(sampleAllocations);
+    await saveAllQuests(sampleQuests);
+    await saveSetting("income", 48000);
+    await saveSetting("totalXp", 180);
+    await saveSetting("streakDays", 1);
+    await saveSetting("unlockedAchievements", ["first_log"]);
+
+    setTransactionsState(sampleTransactions);
+    setAllocationsState(sampleAllocations);
+    setQuestsState(sampleQuests);
+    setIncomeState(48000);
+    setTotalXp(180);
+    setStreakDays(1);
+    setUnlockedAchievementIds(["first_log"]);
+  };
 
   if (loading) {
     return (
-      <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-bg)]">
+      <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-base)]">
         <div className="text-center font-mono text-sm text-[var(--color-ink-soft)]">
           {t("app.loading")}
         </div>
@@ -162,168 +317,146 @@ export default function App() {
   return (
     <main className="min-h-[100dvh] px-4 py-6 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-[1400px]">
-        <motion.header
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-7 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 sm:p-6 shadow-[var(--shadow-tile)]"
-        >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex-1">
-              <div className="mb-3 flex items-center justify-between gap-4">
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 text-xs font-semibold tracking-wide text-emerald-800 shadow-xs">
-                  <Trophy size={15} weight="fill" className="text-emerald-600" />
-                  {t("level", { level: 12 })}
-                  <span className="font-mono text-emerald-700/80">{t("xp", { earned: xpEarned, goal: xpGoal })}</span>
-                </div>
-                <LanguageToggle />
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">
-                {t("app.title")}
-              </h1>
-              <p className="mt-1 max-w-xl text-sm leading-relaxed text-[var(--color-ink-soft)]">
-                {t("app.subtitle")}
-              </p>
-              <div className="mt-3.5 h-2 w-full max-w-md overflow-hidden rounded-full bg-[var(--color-line)]">
-                <motion.div
-                  className="h-full rounded-full bg-[var(--color-accent)]"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${levelPct}%` }}
-                  transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                />
-              </div>
-            </div>
+        {/* Top Header Command Deck */}
+        <HeaderCommandDeck
+          gamification={gamification}
+          activeMonth={activeMonth}
+          setActiveMonth={setActiveMonth}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+          onOpenDataManager={() => setIsDataManagerOpen(true)}
+        />
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:w-[32rem]">
-              <Metric icon={<Coins size={18} weight="duotone" />} label={t("metric.spent")} value={`฿${thb.format(expenses)}`} />
-              <Metric icon={<ShieldCheck size={18} weight="duotone" />} label={t("metric.cleared")} value={`${cleared}/${transactions.length}`} />
-              <Metric icon={<ChartLineUp size={18} weight="duotone" />} label={t("metric.net")} value={`${actualNet >= 0 ? "+" : ""}฿${thb.format(actualNet)}`} />
-            </div>
-          </div>
-        </motion.header>
+        {/* Dynamic View Transitions */}
+        <AnimatePresence mode="wait">
+          {activeTab === "dashboard" && (
+            <motion.div
+              key="dashboard"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <DashboardOverview
+                transactions={transactions}
+                allocations={allocations}
+                quests={quests}
+                income={income}
+                activeMonth={activeMonth}
+                setActiveTab={setActiveTab}
+                onToggleQuest={handleToggleQuest}
+                onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+              />
+            </motion.div>
+          )}
 
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
-          <div className="space-y-5 xl:col-span-8">
-            <motion.div {...tile(0.05)}>
-              <ExpenseTable transactions={transactions} setTransactions={setTransactions} />
+          {activeTab === "ledger" && (
+            <motion.div
+              key="ledger"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <TransactionLedger
+                transactions={transactions}
+                setTransactions={setTransactions}
+                activeMonth={activeMonth}
+                onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+              />
             </motion.div>
-            <motion.div {...tile(0.15)}>
-              <FinancialPlan income={income} setIncome={setIncome} allocations={allocations} setAllocations={setAllocations} />
-            </motion.div>
-            <motion.div {...tile(0.25)}>
-              <SummaryStats transactions={transactions} month={month} />
-            </motion.div>
-          </div>
-          <div className="space-y-5 xl:col-span-4">
-            <motion.div {...tile(0.1)}>
-              <DailyQuests quests={quests} setQuests={setQuests} />
-            </motion.div>
-            <motion.div {...tile(0.2)}>
-              <NextMonthPrep />
-            </motion.div>
-          </div>
-        </div>
+          )}
 
-        <footer className="mt-8 flex items-center justify-between text-xs text-[var(--color-ink-soft)]">
-          <span className="font-mono">v0.2.0 · local-first (SQLite)</span>
-          <span className="inline-flex items-center gap-1.5"><CalendarDots size={13} /> {today}</span>
+          {activeTab === "budget" && (
+            <motion.div
+              key="budget"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <BudgetPlanner
+                income={income}
+                setIncome={setIncome}
+                allocations={allocations}
+                setAllocations={setAllocations}
+                transactions={transactions}
+                activeMonth={activeMonth}
+              />
+            </motion.div>
+          )}
+
+          {activeTab === "analytics" && (
+            <motion.div
+              key="analytics"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <AnalyticsHub
+                transactions={transactions}
+                activeMonth={activeMonth}
+              />
+            </motion.div>
+          )}
+
+          {activeTab === "quests" && (
+            <motion.div
+              key="quests"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <QuestsGrowth
+                quests={quests}
+                setQuests={setQuests}
+                gamification={gamification}
+                achievements={allAchievements}
+                onToggleQuest={handleToggleQuest}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Footer */}
+        <footer className="mt-10 flex flex-wrap items-center justify-between border-t border-[var(--color-line)] pt-4 text-xs text-[var(--color-ink-soft)]">
+          <span className="font-mono">LevelUp Money Life · v0.3.0 Pro · Local-First (SQLite)</span>
+          <span className="inline-flex items-center gap-1.5 font-mono">
+            <CalendarDots size={14} /> {today}
+          </span>
         </footer>
+
+        {/* Modals */}
+        <QuickAddModal
+          isOpen={isQuickAddOpen}
+          onClose={() => setIsQuickAddOpen(false)}
+          onSave={handleSaveQuickTransaction}
+          defaultDate={today}
+        />
+
+        <DataManagerModal
+          isOpen={isDataManagerOpen}
+          onClose={() => setIsDataManagerOpen(false)}
+          transactions={transactions}
+          allocations={allocations}
+          quests={quests}
+          income={income}
+          gamification={gamification}
+          onRestoreBackup={handleRestoreBackup}
+          onImportTransactions={handleImportTransactions}
+          onResetData={handleResetData}
+        />
+
+        <LevelUpCelebration
+          isOpen={levelUpModal.isOpen}
+          level={levelUpModal.level}
+          rankKey={levelUpModal.rankKey}
+          onClose={() => setLevelUpModal((prev) => ({ ...prev, isOpen: false }))}
+        />
       </div>
     </main>
-  );
-}
-
-function LanguageToggle() {
-  const { t, i18n } = useTranslation();
-  const current = i18n.language?.startsWith("th") ? "th" : "en";
-  return (
-    <div className="inline-flex items-center self-end rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 shadow-[var(--shadow-tile)]" role="group" aria-label={t("lang.toggle")}>
-      {(["en", "th"] as const).map((lng) => (
-        <button
-          key={lng}
-          type="button"
-          onClick={() => i18n.changeLanguage(lng)}
-          aria-pressed={current === lng}
-          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${current === lng ? "bg-zinc-950 text-white" : "text-zinc-500 hover:text-zinc-900"}`}
-        >
-          {t(`lang.${lng}`)}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-3 shadow-[var(--shadow-tile)]">
-      <div className="flex items-center gap-1.5 text-[var(--color-accent)]">
-        <span className="shrink-0">{icon}</span>
-        <span className="whitespace-nowrap text-[10px] font-medium uppercase tracking-wider text-[var(--color-ink-soft)] sm:text-[11px]">{label}</span>
-      </div>
-      <div className="mt-1.5 font-mono text-xl font-semibold tracking-tight text-[var(--color-ink)] whitespace-nowrap">{value}</div>
-    </div>
-  );
-}
-
-function NextMonthPrep() {
-  const { t } = useTranslation();
-  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({ i1: false, i2: false, i3: false });
-
-  useEffect(() => {
-    getSetting<Record<string, boolean>>("prepChecked", { i1: false, i2: false, i3: false }).then(setCheckedItems);
-  }, []);
-
-  const toggleItem = (key: string) => {
-    setCheckedItems((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      saveSetting("prepChecked", next).catch(console.error);
-      return next;
-    });
-  };
-
-  const completedCount = Object.values(checkedItems).filter(Boolean).length;
-
-  return (
-    <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200">
-            <CalendarDots size={20} weight="duotone" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("prep.title")}</h2>
-            <p className="text-xs text-[var(--color-ink-soft)]">{t("prep.subtitle")}</p>
-          </div>
-        </div>
-        <span className="font-mono text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-          {completedCount}/3
-        </span>
-      </div>
-      <div className="p-5">
-        <ul className="space-y-2 text-sm">
-          {(["i1", "i2", "i3"] as const).map((key) => {
-            const isDone = !!checkedItems[key];
-            return (
-              <li key={key}>
-                <button
-                  type="button"
-                  onClick={() => toggleItem(key)}
-                  aria-pressed={isDone}
-                  aria-label={t("prep.toggle", { item: t(`prep.${key}`) })}
-                  className={`flex w-full cursor-pointer items-center justify-between rounded-xl border px-3.5 py-2.5 text-left transition ${isDone ? "border-emerald-200 bg-emerald-50/50 text-emerald-900" : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] hover:bg-[var(--color-surface-subtle)]"}`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className={`h-4 w-4 rounded-md border flex items-center justify-center text-xs transition ${isDone ? "border-emerald-600 bg-emerald-600 text-white font-bold" : "border-zinc-300 bg-transparent text-transparent"}`}>
-                      ✓
-                    </span>
-                    <span className={isDone ? "line-through text-emerald-700/70" : "text-[var(--color-ink)]"}>{t(`prep.${key}`)}</span>
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </section>
   );
 }
