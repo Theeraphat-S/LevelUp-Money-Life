@@ -14,6 +14,7 @@ import {
   Trophy,
 } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
+import { AppLogo } from "./AppLogo";
 import type { GamificationState, ThemeMode, ViewTab } from "../types";
 
 interface HeaderCommandDeckProps {
@@ -123,10 +124,8 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                {t("app.title")}
-              </h1>
-              <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+              <AppLogo size="md" variant="full" animated={true} />
+              <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
                 {t("app.subtitle")}
               </p>
             </div>
