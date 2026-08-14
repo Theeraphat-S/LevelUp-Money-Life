@@ -112,6 +112,7 @@ const resources = {
         scanNewSlip: "Scan Another Slip",
         addMore: "Add More Slips",
         removeSlip: "Remove Slip",
+        queueTitle: "Slip Queue",
         batchQueueTitle: "Slip Queue ({{count}} Slips)",
         slipIndex: "Slip {{current}} of {{total}}",
         batchCombo: "Batch Combo Active! +{{xp}} XP Total",
@@ -120,6 +121,8 @@ const resources = {
         tryAgain: "Try Another Image",
         toastSuccess: "Slip logged! Earned +{{xp}} XP",
         batchToastSuccess: "Successfully recorded {{count}} slips! +{{xp}} XP earned",
+        dateNotDetected: "Date could not be detected from slip. Defaulted to today—please verify.",
+        dateWarningBadge: "Check Date",
         pasteHint: "Tip: Copy any slip image and press Ctrl+V anywhere in LevelUp to scan instantly!",
       },
       expense: {
@@ -386,6 +389,7 @@ const resources = {
         scanNewSlip: "สแกนสลิปใบใหม่",
         addMore: "เพิ่มสลิปอีก",
         removeSlip: "ลบสลิปนี้",
+        queueTitle: "คิวสลิป",
         batchQueueTitle: "คิวสลิปทั้งหมด ({{count}} สลิป)",
         slipIndex: "สลิปที่ {{current}} จาก {{total}}",
         batchCombo: "เปิดใช้งาน Batch Combo! +{{xp}} XP รวม",
@@ -394,6 +398,8 @@ const resources = {
         tryAgain: "เลือกรูปใหม่อีกครั้ง",
         toastSuccess: "บันทึกรายการจากสลิปเรียบร้อยแล้ว! ได้รับ +{{xp}} XP",
         batchToastSuccess: "บันทึกสลิปสำเร็จครบทั้ง {{count}} รายการ! ได้รับ +{{xp}} XP",
+        dateNotDetected: "ไม่สามารถอ่านวันที่จากสลิปได้ ระบบใส่วันที่ปัจจุบันให้ชั่วคราว โปรดตรวจสอบ/แก้ไข",
+        dateWarningBadge: "ตรวจทานวันที่",
         pasteHint: "เกร็ดความรู้: สามารถคัดลอกรูปสลิปแล้วกด Ctrl+V ได้ทุกหน้าจอเพื่อสแกนทันที!",
       },
       expense: {

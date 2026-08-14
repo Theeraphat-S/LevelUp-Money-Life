@@ -131,14 +131,14 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold tracking-tight text-[var(--color-ink)]">
+              <h2 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
                 {t("expense.title")}
               </h2>
-              <span className="rounded-full bg-[var(--color-line)] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--color-ink-soft)]">
+              <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
                 {t("expense.totalEntries", { count: sorted.length })}
               </span>
             </div>
-            <p className="text-xs text-[var(--color-ink-soft)]">
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
               {t("expense.subtitle")}
             </p>
           </div>
@@ -195,13 +195,13 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-3">
         {/* Search */}
         <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 shadow-xs focus-within:border-[var(--color-accent)]">
-          <MagnifyingGlass size={15} className="text-[var(--color-ink-soft)]" />
+          <MagnifyingGlass size={15} className="text-zinc-500 dark:text-zinc-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("expense.searchPlaceholder")}
-            className="w-full bg-transparent text-xs text-[var(--color-ink)] outline-none"
+            className="w-full bg-transparent text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none"
           />
         </div>
 
@@ -330,10 +330,10 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                           type="text"
                           value={row.name}
                           onChange={(e) => updateRow(row.id, { name: e.target.value })}
-                          className="w-full bg-transparent font-medium text-[var(--color-ink)] outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1.5 focus:py-0.5 focus:ring-1 focus:ring-emerald-500"
+                          className="w-full bg-transparent font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1.5 focus:py-0.5 focus:ring-1 focus:ring-emerald-500"
                         />
                         {row.notes && (
-                          <div className="text-[10px] text-[var(--color-ink-soft)]">
+                          <div className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
                             {row.notes}
                           </div>
                         )}
@@ -370,7 +370,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                         type="date"
                         value={row.date}
                         onChange={(e) => updateRow(row.id, { date: e.target.value })}
-                        className="rounded-md bg-transparent font-mono text-xs text-[var(--color-ink-soft)] outline-none focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-emerald-500"
+                        className="rounded-md bg-transparent font-mono text-xs text-zinc-600 dark:text-zinc-300 outline-none focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-emerald-500"
                       />
                     </td>
 
@@ -427,7 +427,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                       <button
                         type="button"
                         onClick={() => deleteRow(row)}
-                        className="rounded-lg p-1.5 text-zinc-400 dark:text-zinc-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400"
+                        className="rounded-lg p-1.5 text-zinc-500 dark:text-zinc-400 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400"
                         aria-label={t("expense.delete")}
                       >
                         <Trash size={15} />

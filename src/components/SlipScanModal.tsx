@@ -15,6 +15,7 @@ import {
   Sparkle,
   Trash,
   UploadSimple,
+  Warning,
   WarningCircle,
   X,
 } from "@phosphor-icons/react";
@@ -42,6 +43,7 @@ export interface SlipQueueItem {
   name: string;
   amountStr: string;
   date: string;
+  hasDetectedDate: boolean;
   category: TransactionCategory;
   cleared: boolean;
   notes: string;
@@ -119,6 +121,7 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                 name: result.description,
                 amountStr: result.amount > 0 ? result.amount.toFixed(2) : "",
                 date: result.date,
+                hasDetectedDate: result.hasDetectedDate ?? true,
                 category: result.suggestedCategory,
                 notes: result.notes || "",
                 cleared: true,
@@ -170,6 +173,7 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
           name: "",
           amountStr: "",
           date: today,
+          hasDetectedDate: true,
           category: "Food",
           cleared: true,
           notes: "",
@@ -428,7 +432,7 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-sm sm:text-base font-bold tracking-tight text-[var(--color-ink)]">
+                    <h2 className="text-sm sm:text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
                       {totalSlips > 1
                         ? t("slipScanner.batchQueueTitle", { count: totalSlips })
                         : t("slipScanner.title")}
@@ -438,7 +442,7 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                       +{totalSlips > 1 ? unsavedCount * 25 : 25} XP
                     </span>
                   </div>
-                  <p className="text-[11px] text-[var(--color-ink-soft)] truncate max-w-[260px] sm:max-w-md">
+                  <p className="text-[11px] text-zinc-600 dark:text-zinc-400 truncate max-w-[260px] sm:max-w-md mt-0.5">
                     {totalSlips > 1
                       ? t("slipScanner.batchCombo", { xp: unsavedCount * 25 })
                       : t("slipScanner.subtitle")}
@@ -571,9 +575,14 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                               {item.progress}%
                             </span>
                           )}
-                          {item.status === "ready" && (
+                          {item.status === "ready" && !item.hasDetectedDate && (
+                            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-0.5" title={t("slipScanner.dateNotDetected")}>
+                              <Warning size={10} weight="fill" /> {t("slipScanner.dateWarningBadge")}
+                            </span>
+                          )}
+                          {item.status === "ready" && item.hasDetectedDate && (
                             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
-                              <Check size={10} weight="bold" /> {item.result?.bankName ? "Ready" : "Ready"}
+                              <Check size={10} weight="bold" /> Ready
                             </span>
                           )}
                           {item.status === "saved" && (
@@ -656,10 +665,10 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                     <UploadSimple size={32} weight="duotone" />
                   </div>
 
-                  <h3 className="text-sm font-bold text-[var(--color-ink)] mb-1">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 mb-1">
                     {t("slipScanner.dropzoneTitle")}
                   </h3>
-                  <p className="text-xs text-[var(--color-ink-soft)] max-w-sm mb-4">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-sm mb-4">
                     {t("slipScanner.dropzoneHint")}
                   </p>
 
@@ -668,7 +677,7 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                     <span>Browse Slip Images (Single or Multi-select)</span>
                   </div>
 
-                  <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[11px] text-[var(--color-ink-soft)]">
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-[11px] text-zinc-600 dark:text-zinc-400">
                     <span className="flex items-center gap-1">
                       <Check size={12} weight="bold" className="text-emerald-500" />
                       All Thai Banks (Krungthai, KBank, SCB, BBL, etc.)
@@ -863,16 +872,32 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-xs font-semibold text-[var(--color-ink-soft)] mb-1">
-                            {t("quickAdd.dateLabel")}
-                          </label>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="block text-xs font-semibold text-[var(--color-ink-soft)]">
+                              {t("quickAdd.dateLabel")}
+                            </label>
+                            {!currentItem.hasDetectedDate && (
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                                <Warning size={11} weight="fill" /> {t("slipScanner.dateWarningBadge")}
+                              </span>
+                            )}
+                          </div>
                           <input
                             type="date"
                             required
                             value={currentItem.date}
-                            onChange={(e) => updateCurrentItem({ date: e.target.value })}
-                            className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 font-mono text-xs text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)] shadow-xs"
+                            onChange={(e) => updateCurrentItem({ date: e.target.value, hasDetectedDate: true })}
+                            className={`w-full rounded-xl border px-3 py-2 font-mono text-xs text-[var(--color-ink)] outline-none shadow-xs transition ${
+                              !currentItem.hasDetectedDate
+                                ? "border-amber-400 dark:border-amber-600 bg-amber-50/40 dark:bg-amber-950/20 focus:border-amber-500"
+                                : "border-[var(--color-line)] bg-[var(--color-surface)] focus:border-[var(--color-accent)]"
+                            }`}
                           />
+                          {!currentItem.hasDetectedDate && (
+                            <p className="mt-1 text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                              {t("slipScanner.dateNotDetected")}
+                            </p>
+                          )}
                         </div>
                       </div>
 

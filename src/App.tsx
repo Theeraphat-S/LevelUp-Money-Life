@@ -390,13 +390,30 @@ export default function App() {
       }
     }
 
+    // Group transaction count by month (YYYY-MM)
+    const monthCounts: Record<string, number> = {};
+    newTxs.forEach((tx) => {
+      const m = tx.date ? tx.date.slice(0, 7) : "";
+      if (m) {
+        monthCounts[m] = (monthCounts[m] || 0) + 1;
+      }
+    });
+
+    const monthKeys = Object.keys(monthCounts);
+    let monthSummary = "";
+    if (monthKeys.length === 1) {
+      monthSummary = ` · ${monthKeys[0]}`;
+    } else if (monthKeys.length > 1) {
+      monthSummary = ` · (${monthKeys.map((m) => `${m}: ${monthCounts[m]}`).join(", ")})`;
+    }
+
     setToastNotice({
-      message: t("slipScanner.batchToastSuccess", { count: newTxs.length, xp: totalXpBonus }),
+      message: `${t("slipScanner.batchToastSuccess", { count: newTxs.length, xp: totalXpBonus })}${monthSummary}`,
       visible: true,
     });
     setTimeout(() => {
       setToastNotice((prev) => ({ ...prev, visible: false }));
-    }, 4500);
+    }, 5500);
   };
 
   // Handle Quest Toggle

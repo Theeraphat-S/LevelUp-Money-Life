@@ -224,8 +224,8 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               key={quest.id}
               className={`flex items-center justify-between rounded-xl border p-3.5 transition ${
                 quest.done
-                  ? "border-emerald-500/30 bg-emerald-500/5 text-zinc-400 dark:text-zinc-500"
-                  : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] hover:bg-[var(--color-surface-subtle)]"
+                  ? "border-emerald-500/30 bg-emerald-500/5 text-zinc-500 dark:text-zinc-400"
+                  : "border-[var(--color-line)] bg-[var(--color-surface)] text-zinc-900 dark:text-zinc-100 hover:bg-[var(--color-surface-subtle)]"
               }`}
             >
               <button
@@ -241,12 +241,12 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                 <div>
                   <span
                     className={`block text-xs font-semibold ${
-                      quest.done ? "line-through text-zinc-400 dark:text-zinc-500" : "text-[var(--color-ink)]"
+                      quest.done ? "line-through text-zinc-500 dark:text-zinc-400" : "text-zinc-900 dark:text-zinc-100"
                     }`}
                   >
                     {quest.title}
                   </span>
-                  <span className="font-mono text-[10px] text-[var(--color-ink-soft)]">
+                  <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
                     {quest.date}
                   </span>
                 </div>

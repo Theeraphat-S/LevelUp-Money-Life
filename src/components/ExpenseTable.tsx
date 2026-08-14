@@ -63,8 +63,8 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
     <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
       <div className="flex flex-col gap-4 border-b border-[var(--color-line)] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-[var(--color-ink)]">{t("expense.title")}</h2>
-          <p className="text-xs text-[var(--color-ink-soft)]">{t("expense.subtitle")}</p>
+          <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("expense.title")}</h2>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">{t("expense.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button

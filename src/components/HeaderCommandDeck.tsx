@@ -123,10 +123,10 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-ink)]">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
                 {t("app.title")}
               </h1>
-              <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
+              <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
                 {t("app.subtitle")}
               </p>
             </div>
@@ -296,7 +296,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
               className={`relative shrink-0 rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
                 isActive
                   ? "bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 shadow-sm"
-                  : "bg-[var(--color-surface-subtle)] text-[var(--color-ink-soft)] hover:bg-[var(--color-line-subtle)] hover:text-[var(--color-ink)]"
+                  : "bg-zinc-100/90 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-950 dark:hover:text-white border border-zinc-200/60 dark:border-zinc-700/60"
               }`}
             >
               {tab.label}

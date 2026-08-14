@@ -158,10 +158,10 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
                 key={i}
                 className={`rounded-xl border p-3.5 text-xs font-medium leading-relaxed ${
                   ins.type === "positive"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100"
                     : ins.type === "warning"
-                    ? "border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200"
-                    : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-[var(--color-ink)]"
+                    ? "border-amber-500/30 bg-amber-500/10 text-amber-950 dark:text-amber-100"
+                    : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-zinc-900 dark:text-zinc-100"
                 }`}
               >
                 {ins.text}
@@ -292,10 +292,10 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
 
               {chartType === "donut" && (
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     Total Outflow
                   </span>
-                  <span className="font-mono text-base font-bold text-[var(--color-ink)]">
+                  <span className="font-mono text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-50">
                     ฿{thb.format(expenses)}
                   </span>
                 </div>

@@ -100,8 +100,8 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
                     )}
                   </motion.div>
                   <div>
-                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-zinc-400 dark:text-zinc-500 line-through" : "text-[var(--color-ink)]"}`}>{quest.title}</span>
-                    <span className="block font-mono text-[10px] text-[var(--color-ink-soft)]">{quest.date}</span>
+                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-zinc-500 dark:text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-100"}`}>{quest.title}</span>
+                    <span className="block font-mono text-[10px] text-zinc-500 dark:text-zinc-400">{quest.date}</span>
                   </div>
                 </button>
 

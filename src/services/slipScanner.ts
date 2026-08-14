@@ -6,6 +6,7 @@ export interface ParsedSlipResult {
   transactionType: "expense" | "income";
   amount: number;
   date: string; // "YYYY-MM-DD"
+  hasDetectedDate: boolean;
   time?: string;
   sender?: string;
   receiver?: string;
@@ -19,18 +20,18 @@ export interface ParsedSlipResult {
 }
 
 const THAI_MONTHS: Record<string, string> = {
-  "ม.ค.": "01", "มกราคม": "01",
-  "ก.พ.": "02", "กุมภาพันธ์": "02",
-  "มี.ค.": "03", "มีนาคม": "03",
-  "เม.ย.": "04", "เมษายน": "04",
-  "พ.ค.": "05", "พฤษภาคม": "05",
-  "มิ.ย.": "06", "มิถุนายน": "06",
-  "ก.ค.": "07", "กรกฎาคม": "07",
-  "ส.ค.": "08", "สิงหาคม": "08",
-  "ก.ย.": "09", "กันยายน": "09",
-  "ต.ค.": "10", "ตุลาคม": "10",
-  "พ.ย.": "11", "พฤศจิกายน": "11",
-  "ธ.ค.": "12", "ธันวาคม": "12",
+  "ม.ค.": "01", "มค": "01", "มกราคม": "01",
+  "ก.พ.": "02", "กพ": "02", "กุมภาพันธ์": "02",
+  "มี.ค.": "03", "มีค": "03", "มีนาคม": "03",
+  "เม.ย.": "04", "เมย": "04", "เมษายน": "04",
+  "พ.ค.": "05", "พค": "05", "พฤษภาคม": "05",
+  "มิ.ย.": "06", "มิย": "06", "มิถุนายน": "06",
+  "ก.ค.": "07", "กค": "07", "กรกฎาคม": "07",
+  "ส.ค.": "08", "สค": "08", "สิงหาคม": "08",
+  "ก.ย.": "09", "กย": "09", "กันยายน": "09",
+  "ต.ค.": "10", "ตค": "10", "ตุลาคม": "10",
+  "พ.ย.": "11", "พย": "11", "พฤศจิกายน": "11",
+  "ธ.ค.": "12", "ธค": "12", "ธันวาคม": "12",
   "jan": "01", "january": "01",
   "feb": "02", "february": "02",
   "mar": "03", "march": "03",
@@ -39,7 +40,7 @@ const THAI_MONTHS: Record<string, string> = {
   "jun": "06", "june": "06",
   "jul": "07", "july": "07",
   "aug": "08", "august": "08",
-  "sep": "09", "september": "09",
+  "sep": "09", "sept": "09", "september": "09",
   "oct": "10", "october": "10",
   "nov": "11", "november": "11",
   "dec": "12", "december": "12",
@@ -129,80 +130,97 @@ async function getBase64Data(imageSource: string | File): Promise<{ base64: stri
   }
 }
 
-const MONTH_PATTERN = "ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
+const MONTH_PATTERN = "ม\\.?ค\\.?|ก\\.?พ\\.?|มี\\.?ค\\.?|เม\\.?ย\\.?|พ\\.?ค\\.?|มิ\\.?ย\\.?|ก\\.?ค\\.?|ส\\.?ค\\.?|ก\\.?ย\\.?|ต\\.?ค\\.?|พ\\.?ย\\.?|ธ\\.?ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
 
 /**
  * Parses Thai bank date strings and converts Buddhist Era (พ.ศ.) to ISO YYYY-MM-DD.
  */
-export function parseThaiDateString(text: string): { date: string; time?: string } | null {
+export function parseThaiDateString(text: string): { date: string; time?: string; dateDetected: boolean } {
   const today = new Date().toISOString().slice(0, 10);
+  if (!text) return { date: today, dateDetected: false };
 
-  // 1. Look for labeled date e.g. "วันที่ทำรายการ 23 มี.ค. 2569 - 10:38"
-  const labeledRegex = new RegExp(`(?:วันที่(?:ทำรายการ)?|date)[\\s:.]*([0-9]{1,2})\\s*(${MONTH_PATTERN})\\s*([0-9]{2,4})(?:[\\s,-]+([0-9]{1,2}:[0-9]{2}))?`, "i");
-  let match = text.match(labeledRegex);
+  // Normalize text: replace newlines with space, multiple spaces with single space
+  const normalized = text.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ");
 
-  // 2. Fallback to any date containing a valid month token
-  if (!match) {
-    const genericMonthRegex = new RegExp(`([0-9]{1,2})\\s*(${MONTH_PATTERN})\\s*([0-9]{2,4})(?:[\\s,-]+([0-9]{1,2}:[0-9]{2}))?`, "i");
-    match = text.match(genericMonthRegex);
-  }
+  // 1. Thai date patterns with Thai/English month name e.g. "23 มี.ค. 2569", "23มีค69", "23 มี.ค. 69 10:38"
+  const thaiMonthRegex = new RegExp(
+    `(?:(?:วันที่(?:ทำรายการ)?|วันที|ว\\/ด\\/ป|date|trans(?:action)?(?:_date)?)[\\s:.]*)?([0-9]{1,2})[\\s.-]*(${MONTH_PATTERN})[\\s.-]*([0-9]{2,4})(?:[\\s,T-]+([0-9]{1,2}:[0-9]{2})(?::[0-9]{2})?(?:\\s*(?:น\\.|น|hrs?|am|pm))?)?`,
+    "i"
+  );
+  const match = normalized.match(thaiMonthRegex);
 
   if (match) {
     const day = parseInt(match[1], 10);
-    const monthRaw = match[2].trim().toLowerCase();
+    const monthRaw = match[2].trim().toLowerCase().replace(/\./g, "");
     let year = parseInt(match[3], 10);
     const time = match[4];
 
-    // Find month number
-    let monthStr = "01";
+    // Find month number by matching cleaned key
+    let monthStr: string | undefined;
     for (const [k, v] of Object.entries(THAI_MONTHS)) {
-      if (
-        monthRaw.startsWith(k) ||
-        k.startsWith(monthRaw) ||
-        monthRaw.replace(/\./g, "") === k.replace(/\./g, "")
-      ) {
+      const cleanK = k.toLowerCase().replace(/\./g, "");
+      if (monthRaw === cleanK || monthRaw.startsWith(cleanK) || cleanK.startsWith(monthRaw)) {
         monthStr = v;
         break;
       }
     }
 
-    // Convert Buddhist Era to CE
-    if (year >= 2400) {
-      year -= 543;
-    } else if (year >= 50 && year < 100) {
-      // 2-digit BE (e.g. 67, 68, 69)
-      year = (2500 + year) - 543;
-    } else if (year < 50) {
-      // 2-digit CE (e.g. 24, 25, 26)
-      year = 2000 + year;
-    }
+    if (monthStr && day >= 1 && day <= 31) {
+      if (year >= 2400) {
+        year -= 543;
+      } else if (year >= 50 && year < 100) {
+        year = 2500 + year - 543;
+      } else if (year < 50) {
+        year = 2000 + year;
+      }
 
-    const isoDate = `${year}-${monthStr}-${String(day).padStart(2, "0")}`;
-    if (!isNaN(new Date(isoDate).getTime())) {
-      return { date: isoDate, time };
-    }
-  }
-
-  // Pattern: "DD/MM/YYYY" or "YYYY-MM-DD"
-  const slashPattern = /(?:วันที่|date)?[\s:.]*([0-9]{1,2})[\/\.]([0-9]{1,2})[\/\.]([0-9]{2,4})(?:[\s-]+([0-9]{1,2}:[0-9]{2}))?/i;
-  const slashMatch = text.match(slashPattern);
-  if (slashMatch) {
-    const d = parseInt(slashMatch[1], 10);
-    const m = parseInt(slashMatch[2], 10);
-    let y = parseInt(slashMatch[3], 10);
-    const time = slashMatch[4];
-
-    if (y >= 2400) y -= 543;
-    else if (y >= 50 && y < 100) y = (2500 + y) - 543;
-    else if (y < 50) y = 2000 + y;
-
-    const isoDate = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    if (!isNaN(new Date(isoDate).getTime())) {
-      return { date: isoDate, time };
+      const isoDate = `${year}-${monthStr}-${String(day).padStart(2, "0")}`;
+      if (!isNaN(new Date(isoDate).getTime())) {
+        return { date: isoDate, time, dateDetected: true };
+      }
     }
   }
 
-  return { date: today };
+  // 2. ISO format YYYY-MM-DD or YYYY/MM/DD (e.g. 2026-03-23, 2569/03/23)
+  const isoRegex = /\b([0-9]{4})[\/\.-]([0-9]{1,2})[\/\.-]([0-9]{1,2})(?:[\s,T-]+([0-9]{1,2}:[0-9]{2}))?/i;
+  const isoMatch = normalized.match(isoRegex);
+  if (isoMatch) {
+    let y = parseInt(isoMatch[1], 10);
+    const m = parseInt(isoMatch[2], 10);
+    const d = parseInt(isoMatch[3], 10);
+    const time = isoMatch[4];
+
+    if (d >= 1 && d <= 31 && m >= 1 && m <= 12) {
+      if (y >= 2400) y -= 543;
+      const isoDate = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      if (!isNaN(new Date(isoDate).getTime())) {
+        return { date: isoDate, time, dateDetected: true };
+      }
+    }
+  }
+
+  // 3. Numeric date pattern DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+  const ddmmyyyyRegex = /(?:(?:วันที่(?:ทำรายการ)?|วันที|ว\/ด\/ป|date)[\s:.]*)?([0-9]{1,2})[\/\.-]([0-9]{1,2})[\/\.-]([0-9]{2,4})(?:[\s,T-]+([0-9]{1,2}:[0-9]{2}))?/i;
+  const ddmmyyyyMatch = normalized.match(ddmmyyyyRegex);
+  if (ddmmyyyyMatch) {
+    const d = parseInt(ddmmyyyyMatch[1], 10);
+    const m = parseInt(ddmmyyyyMatch[2], 10);
+    let y = parseInt(ddmmyyyyMatch[3], 10);
+    const time = ddmmyyyyMatch[4];
+
+    if (d >= 1 && d <= 31 && m >= 1 && m <= 12) {
+      if (y >= 2400) y -= 543;
+      else if (y >= 50 && y < 100) y = 2500 + y - 543;
+      else if (y < 50) y = 2000 + y;
+
+      const isoDate = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      if (!isNaN(new Date(isoDate).getTime())) {
+        return { date: isoDate, time, dateDetected: true };
+      }
+    }
+  }
+
+  return { date: today, dateDetected: false };
 }
 
 /**
@@ -331,7 +349,7 @@ export function extractThaiBankSlipData(rawText: string): Partial<ParsedSlipResu
   }
 
   // 4. Detect Date & Time
-  const { date, time } = parseThaiDateString(fullText) || { date: new Date().toISOString().slice(0, 10) };
+  const { date, time, dateDetected } = parseThaiDateString(fullText);
 
   // 5. Detect Reference Number (supports alphanumeric codes e.g. C2026..., Abb3..., A7784...)
   let refNumber: string | undefined;
@@ -422,6 +440,7 @@ export function extractThaiBankSlipData(rawText: string): Partial<ParsedSlipResu
     transactionType,
     amount,
     date,
+    hasDetectedDate: dateDetected,
     time,
     sender,
     receiver,
@@ -517,6 +536,7 @@ Analyze this uploaded slip image and return ONLY a valid JSON object strictly ma
     transactionType: parsed.transactionType === "income" ? "income" : "expense",
     amount: typeof parsed.amount === "number" ? Math.abs(parsed.amount) : parseFloat(parsed.amount) || 0,
     date: parsed.date || new Date().toISOString().slice(0, 10),
+    hasDetectedDate: Boolean(parsed.date),
     time: parsed.time,
     sender: parsed.sender,
     receiver: parsed.receiver,
@@ -572,6 +592,7 @@ export async function parseSlipImage(
     transactionType: extracted.transactionType || "expense",
     amount: extracted.amount || 0,
     date: extracted.date || new Date().toISOString().slice(0, 10),
+    hasDetectedDate: extracted.hasDetectedDate ?? false,
     time: extracted.time,
     sender: extracted.sender,
     receiver: extracted.receiver,

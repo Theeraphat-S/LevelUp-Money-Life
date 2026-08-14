@@ -6,92 +6,111 @@
   --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Refined FinTech Command Center Bento Tokens */
-  --color-ink: var(--color-ink);
-  --color-ink-soft: var(--color-ink-soft);
-  --color-ink-faint: var(--color-ink-faint);
-  --color-line: var(--color-line);
-  --color-line-subtle: var(--color-line-subtle);
-  --color-surface: var(--color-surface);
-  --color-surface-subtle: var(--color-surface-subtle);
-  --color-base: var(--color-base);
+  /* Refined FinTech Command Center Bento Tokens mapped to dynamic variables */
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-subtle: var(--line-subtle);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-base: var(--base);
 
-  /* Curated OKLCH Accents */
-  --color-accent: oklch(58% 0.15 160);       /* Emerald Core */
+  /* Curated Accents */
+  --color-accent: #10b981;
   --color-accent-soft: var(--color-accent-soft);
   --color-accent-ink: var(--color-accent-ink);
 
-  --color-rose-core: oklch(58% 0.18 20);     /* Rose Red */
+  --color-rose-core: #f43f5e;
   --color-rose-soft: var(--color-rose-soft);
-  --color-amber-core: oklch(65% 0.16 75);    /* Amber Gold */
+  --color-amber-core: #f59e0b;
   --color-amber-soft: var(--color-amber-soft);
-  --color-indigo-core: oklch(55% 0.16 260);  /* Indigo Blue */
+  --color-indigo-core: #6366f1;
   --color-indigo-soft: var(--color-indigo-soft);
 
   --shadow-diffuse: var(--shadow-diffuse);
   --shadow-tile: var(--shadow-tile);
   --shadow-press: var(--shadow-press);
   --shadow-glow-emerald: var(--shadow-glow-emerald);
-  --ring-accent: 0 0 0 3px oklch(58% 0.15 160 / 0.25);
+  --ring-accent: 0 0 0 3px rgba(16, 185, 129, 0.25);
 }
 
 :root {
-  --color-ink: oklch(18% 0.015 260);
-  --color-ink-soft: oklch(44% 0.015 260);
-  --color-ink-faint: oklch(62% 0.01 260);
-  --color-line: oklch(90% 0.008 260);
-  --color-line-subtle: oklch(93% 0.006 260);
-  --color-surface: oklch(100% 0 0);
-  --color-surface-subtle: oklch(98% 0.005 260);
-  --color-base: oklch(96% 0.005 260);
+  /* High-Contrast Light Mode */
+  --ink: #0f172a;               /* Crisp Deep Slate-900 */
+  --ink-soft: #475569;          /* Slate-600 */
+  --ink-faint: #64748b;         /* Slate-500 */
+  --line: #e2e8f0;              /* Slate-200 */
+  --line-subtle: #f1f5f9;       /* Slate-100 */
+  --surface: #ffffff;           /* Pure Crisp White Card */
+  --surface-subtle: #f8fafc;    /* Slate-50 Header/Subtle */
+  --base: #f8fafc;              /* Slate-50 Background */
 
-  --color-accent-soft: oklch(95% 0.03 160);  /* Soft Emerald Tint */
-  --color-accent-ink: oklch(30% 0.12 160);  /* Deep Emerald Text */
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-subtle: var(--line-subtle);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-base: var(--base);
 
-  --color-rose-soft: oklch(96% 0.03 20);
-  --color-amber-soft: oklch(96% 0.03 75);
-  --color-indigo-soft: oklch(96% 0.03 260);
+  --color-accent-soft: #ecfdf5;  /* Emerald-50 */
+  --color-accent-ink: #065f46;   /* Emerald-800 */
 
-  --shadow-diffuse: 0 20px 40px -15px oklch(20% 0.02 260 / 0.08);
-  --shadow-tile: 0 1px 3px 0 oklch(20% 0.02 260 / 0.05), 0 1px 2px -1px oklch(20% 0.02 260 / 0.05);
-  --shadow-press: 0 1px 2px oklch(20% 0.02 260 / 0.08);
-  --shadow-glow-emerald: 0 0 24px -4px oklch(58% 0.15 160 / 0.25);
+  --color-rose-soft: #fff1f2;
+  --color-amber-soft: #fffbeb;
+  --color-indigo-soft: #eef2ff;
 
-  --color-bg-gradient-1: oklch(96% 0.035 160 / 0.45);
-  --color-bg-gradient-2: oklch(95% 0.03 240 / 0.35);
+  --shadow-diffuse: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+  --shadow-tile: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+  --shadow-press: 0 1px 2px rgba(15, 23, 42, 0.1);
+  --shadow-glow-emerald: 0 0 24px -4px rgba(16, 185, 129, 0.25);
 
-  --scrollbar-thumb: oklch(80% 0.01 260);
-  --scrollbar-thumb-hover: oklch(65% 0.01 260);
+  --color-bg-gradient-1: rgba(16, 185, 129, 0.07);
+  --color-bg-gradient-2: rgba(99, 102, 241, 0.05);
+
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
 }
 
 .dark, [data-theme="dark"] {
-  /* Deep Obsidian Zinc & Emerald Refraction (NO pure black #000000) */
-  --color-ink: oklch(96% 0.005 260);          /* Crisp Silver/White Text */
-  --color-ink-soft: oklch(72% 0.015 260);     /* Soft Muted Text */
-  --color-ink-faint: oklch(52% 0.015 260);    /* Subtle Secondary Text */
-  --color-line: oklch(24% 0.015 260);         /* Frosted Border Edge */
-  --color-line-subtle: oklch(28% 0.015 260);  /* Inner Dividers */
-  --color-surface: oklch(16% 0.014 260);      /* Obsidian Zinc Card Base */
-  --color-surface-subtle: oklch(13% 0.012 260); /* Deep Charcoal Recessed */
-  --color-base: oklch(10% 0.01 260);          /* Obsidian Background (Zinc-950 tone) */
+  /* High-Contrast Obsidian & Emerald (Dark Mode) */
+  --ink: #f8fafc;               /* Slate-50 / Crisp White-Silver (100% readable) */
+  --ink-soft: #cbd5e1;          /* Slate-300 / High-readability secondary */
+  --ink-faint: #94a3b8;         /* Slate-400 / Secondary helper text */
+  --line: #334155;              /* Slate-700 / Defined distinct border */
+  --line-subtle: #1e293b;       /* Slate-800 / Sub-divider */
+  --surface: #0f172a;           /* Slate-900 / Obsidian Zinc Card Surface */
+  --surface-subtle: #1e293b;    /* Slate-800 / Recessed & Card Header */
+  --base: #020617;              /* Slate-950 / Deep Obsidian Base */
 
-  --color-accent-soft: oklch(22% 0.05 160);   /* Muted Emerald Pill */
-  --color-accent-ink: oklch(78% 0.15 160);   /* Bright Emerald Glow Text */
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-subtle: var(--line-subtle);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-base: var(--base);
 
-  --color-rose-soft: oklch(22% 0.06 20);
-  --color-amber-soft: oklch(22% 0.05 75);
-  --color-indigo-soft: oklch(22% 0.05 260);
+  --color-accent-soft: rgba(16, 185, 129, 0.15);   /* Muted Emerald Pill */
+  --color-accent-ink: #6ee7b7;   /* Emerald-300 */
 
-  --shadow-diffuse: 0 20px 40px -15px oklch(0% 0 0 / 0.55);
-  --shadow-tile: 0 1px 3px 0 oklch(0% 0 0 / 0.35), 0 1px 2px -1px oklch(0% 0 0 / 0.25);
-  --shadow-press: 0 1px 2px oklch(0% 0 0 / 0.45);
-  --shadow-glow-emerald: 0 0 28px -4px oklch(58% 0.18 160 / 0.35);
+  --color-rose-soft: rgba(244, 63, 94, 0.15);
+  --color-amber-soft: rgba(245, 158, 11, 0.15);
+  --color-indigo-soft: rgba(99, 102, 241, 0.15);
 
-  --color-bg-gradient-1: oklch(22% 0.05 160 / 0.18);
-  --color-bg-gradient-2: oklch(18% 0.04 250 / 0.15);
+  --shadow-diffuse: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+  --shadow-tile: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-press: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-glow-emerald: 0 0 28px -4px rgba(16, 185, 129, 0.35);
 
-  --scrollbar-thumb: oklch(30% 0.01 260);
-  --scrollbar-thumb-hover: oklch(42% 0.01 260);
+  --color-bg-gradient-1: rgba(16, 185, 129, 0.12);
+  --color-bg-gradient-2: rgba(99, 102, 241, 0.08);
+
+  --scrollbar-thumb: #475569;
+  --scrollbar-thumb-hover: #64748b;
 }
 
 @layer base {

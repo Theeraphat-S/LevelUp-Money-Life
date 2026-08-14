@@ -123,10 +123,10 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
       <BentoCard>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-lg font-bold tracking-tight text-[var(--color-ink)]">
+            <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
               {t("plan.title")}
             </h2>
-            <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
+            <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
               {t("plan.subtitle")}
             </p>
           </div>

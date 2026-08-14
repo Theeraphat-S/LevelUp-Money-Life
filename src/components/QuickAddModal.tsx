@@ -121,10 +121,10 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-4">
               <div>
-                <h2 className="text-base font-bold tracking-tight text-[var(--color-ink)]">
+                <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
                   {t("quickAdd.title")}
                 </h2>
-                <p className="text-xs text-[var(--color-ink-soft)]">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
                   {t("quickAdd.subtitle")}
                 </p>
               </div>
