@@ -293,10 +293,16 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
 
               {chartType === "donut" && (
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-soft)]"
+                    style={{ color: "var(--ink-soft)" }}
+                  >
                     Total Outflow
                   </span>
-                  <span className="font-mono text-base sm:text-lg font-bold text-[var(--color-ink)]">
+                  <span
+                    className="font-mono text-base sm:text-lg font-extrabold text-[var(--ink)]"
+                    style={{ color: "var(--ink)" }}
+                  >
                     ฿{thb.format(expenses)}
                   </span>
                 </div>

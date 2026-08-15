@@ -99,6 +99,32 @@
 
   --scrollbar-thumb: #CBDAD1;
   --scrollbar-thumb-hover: #AABFB4;
+
+  /* Universal --color-* custom properties mapped to active theme */
+  --color-base: var(--base);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-subtle: var(--line-subtle);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-contrast: var(--primary-contrast);
+  --color-jade: var(--jade);
+  --color-jade-soft: var(--jade-soft);
+  --color-jade-ink: var(--jade-ink);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-amber-ink: var(--amber-ink);
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+  --color-rose-ink: var(--rose-ink);
+  --color-moss: var(--moss);
+  --color-moss-soft: var(--moss-soft);
+  --color-moss-ink: var(--moss-ink);
 }
 
 .dark, [data-theme="dark"] {

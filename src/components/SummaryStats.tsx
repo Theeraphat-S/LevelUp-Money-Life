@@ -140,8 +140,18 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
           </ResponsiveContainer>
           {chartType === "donut" && (
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[11px] uppercase tracking-wider text-[var(--color-ink-soft)]">{t("summary.total")}</span>
-              <span className="font-mono text-lg font-semibold text-[var(--color-ink)]">฿{thb.format(expenses)}</span>
+              <span
+                className="text-[11px] uppercase tracking-wider text-[var(--ink-soft)] font-bold"
+                style={{ color: "var(--ink-soft)" }}
+              >
+                {t("summary.total")}
+              </span>
+              <span
+                className="font-mono text-lg font-extrabold text-[var(--ink)]"
+                style={{ color: "var(--ink)" }}
+              >
+                ฿{thb.format(expenses)}
+              </span>
             </div>
           )}
         </div>
