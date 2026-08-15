@@ -14,6 +14,7 @@ import {
   type Transaction,
   type TransactionCategory,
 } from "../types";
+import { CustomDatePicker } from "./common/CustomDatePicker";
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -221,12 +222,11 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   <label className="block text-xs font-semibold text-[var(--color-ink-soft)] mb-1">
                     {t("quickAdd.dateLabel")}
                   </label>
-                  <input
-                    type="date"
-                    required
+                  <CustomDatePicker
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 font-mono text-xs text-[var(--color-ink)] outline-none focus:border-[var(--primary)] shadow-xs"
+                    onChange={setDate}
+                    ariaLabel={t("quickAdd.dateLabel")}
+                    className="w-full"
                   />
                 </div>
               </div>
@@ -300,11 +300,11 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   id="clearedCheckbox"
                   checked={cleared}
                   onChange={(e) => setCleared(e.target.checked)}
-                  className="h-4 w-4 rounded-md cursor-pointer"
+                  className="h-4 w-4 rounded cursor-pointer accent-[var(--primary)] transition-transform hover:scale-105"
                 />
                 <label
                   htmlFor="clearedCheckbox"
-                  className="text-xs text-[var(--color-ink)] font-medium cursor-pointer"
+                  className="text-xs text-[var(--color-ink)] font-medium cursor-pointer select-none hover:text-[var(--primary)] transition-colors"
                 >
                   {t("quickAdd.clearedLabel")}
                 </label>

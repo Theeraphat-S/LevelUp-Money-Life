@@ -234,6 +234,23 @@
   background: var(--scrollbar-thumb-hover);
 }
 
+/* Checkbox Styling */
+input[type="checkbox"] {
+  accent-color: var(--primary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), filter 0.15s ease;
+}
+
+input[type="checkbox"]:hover {
+  filter: brightness(1.08);
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Slider Controls */
 input[type="range"] {
   -webkit-appearance: none;

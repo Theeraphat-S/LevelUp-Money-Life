@@ -1,11 +1,25 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Funnel, MagnifyingGlass, Plus, Trash, ArrowUUpLeft } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import type { Dispatch, SetStateAction } from "react";
-import { EXPENSE_CATEGORIES, TRANSACTION_CATEGORIES, type Transaction, type TransactionCategory } from "../types";
+import {
+  EXPENSE_CATEGORIES,
+  TRANSACTION_CATEGORIES,
+  CATEGORY_COLORS,
+  type Transaction,
+  type TransactionCategory,
+} from "../types";
+import { CustomSelect, type CustomSelectOption } from "./common/CustomSelect";
+import { CustomDatePicker } from "./common/CustomDatePicker";
 
-export function ExpenseTable({ transactions, setTransactions }: { transactions: Transaction[]; setTransactions: Dispatch<SetStateAction<Transaction[]>> }) {
+export function ExpenseTable({
+  transactions,
+  setTransactions,
+}: {
+  transactions: Transaction[];
+  setTransactions: Dispatch<SetStateAction<Transaction[]>>;
+}) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
@@ -13,19 +27,34 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
 
   const addExpenseRow = () => {
     setTransactions((rows) => [
-      { id: crypto.randomUUID(), name: t("expense.expenseType"), amount: -100, date: new Date().toISOString().slice(0, 10), category: "Food", cleared: false },
+      {
+        id: crypto.randomUUID(),
+        name: t("expense.expenseType"),
+        amount: -100,
+        date: new Date().toISOString().slice(0, 10),
+        category: "Food",
+        cleared: false,
+      },
       ...rows,
     ]);
   };
 
   const addIncomeRow = () => {
     setTransactions((rows) => [
-      { id: crypto.randomUUID(), name: t("expense.incomeType"), amount: 1000, date: new Date().toISOString().slice(0, 10), category: "Income", cleared: false },
+      {
+        id: crypto.randomUUID(),
+        name: t("expense.incomeType"),
+        amount: 1000,
+        date: new Date().toISOString().slice(0, 10),
+        category: "Income",
+        cleared: false,
+      },
       ...rows,
     ]);
   };
 
-  const updateRow = (id: string, patch: Partial<Transaction>) => setTransactions((rows) => rows.map((row) => (row.id === id ? { ...row, ...patch } : row)));
+  const updateRow = (id: string, patch: Partial<Transaction>) =>
+    setTransactions((rows) => rows.map((row) => (row.id === id ? { ...row, ...patch } : row)));
 
   const toggleRowType = (row: Transaction, isIncome: boolean) => {
     const absAmount = Math.abs(row.amount) || (isIncome ? 1000 : 100);
@@ -53,86 +82,121 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
     setCategoryFilter("ALL");
   };
 
-  const filteredTransactions = transactions.filter((row) => {
-    const matchesSearch = row.name.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = categoryFilter === "ALL" || row.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const filterOptions: CustomSelectOption[] = useMemo(
+    () => [
+      { value: "ALL", label: t("expense.allCategories") },
+      ...TRANSACTION_CATEGORIES.map((c) => ({
+        value: c,
+        label: t(`category.${c}`),
+        colorDot: CATEGORY_COLORS[c],
+      })),
+    ],
+    [t]
+  );
+
+  const expenseCategoryOptions: CustomSelectOption[] = useMemo(
+    () =>
+      EXPENSE_CATEGORIES.map((c) => ({
+        value: c,
+        label: t(`category.${c}`),
+        colorDot: CATEGORY_COLORS[c],
+      })),
+    [t]
+  );
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((row) => {
+      const matchesSearch = row.name.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = categoryFilter === "ALL" || row.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }, [transactions, search, categoryFilter]);
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
-      <div className="flex flex-col gap-4 border-b border-[var(--color-line)] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-md transition-all duration-300">
+      {/* Header Deck */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[var(--color-line)] p-6 bg-[var(--color-surface)]">
         <div>
-          <h2 className="text-base font-bold tracking-tight text-[var(--color-ink)]">{t("expense.title")}</h2>
-          <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">{t("expense.subtitle")}</p>
+          <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)]">
+            {t("expense.title")}
+          </h2>
+          <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">
+            {t("expense.subtitle")}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={addExpenseRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-semibold transition hover:opacity-90 shadow-xs"
+            className="flex items-center gap-1.5 rounded-xl border border-[var(--rose)]/30 bg-[var(--rose-soft)] px-3.5 py-1.5 text-xs font-bold text-[var(--rose-ink)] shadow-xs transition hover:brightness-105 active:scale-95 cursor-pointer"
           >
-            <Plus size={14} weight="bold" /> {t("expense.addExpense")}
+            <Plus size={14} weight="bold" />
+            {t("expense.addExpense")}
           </button>
           <button
+            type="button"
             onClick={addIncomeRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-surface)] shadow-xs"
+            className="flex items-center gap-1.5 rounded-xl border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-3.5 py-1.5 text-xs font-bold text-[var(--jade-ink)] shadow-xs transition hover:brightness-105 active:scale-95 cursor-pointer"
           >
-            <Plus size={14} weight="bold" /> {t("expense.addIncome")}
+            <Plus size={14} weight="bold" />
+            {t("expense.addIncome")}
           </button>
         </div>
       </div>
 
+      {/* Undo Banner */}
       <AnimatePresence>
         {lastDeleted && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2.5 text-xs text-[var(--amber-ink)]"
+            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2.5 text-xs font-medium text-[var(--amber-ink)]"
           >
             <span>{t("expense.deleted")}</span>
             <button
+              type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-semibold text-[var(--amber-ink)] underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-bold text-[var(--amber-ink)] underline hover:no-underline"
             >
-              <ArrowUUpLeft size={14} /> {t("expense.undo")}
+              <ArrowUUpLeft size={14} weight="bold" />
+              {t("expense.undo")}
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-base)] px-6 py-3">
-        <div className="flex flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 focus-within:border-[var(--primary)]">
-          <MagnifyingGlass size={16} className="text-[var(--color-ink-soft)]" />
+      {/* Table Toolbar Search & Filters */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-3">
+        <div className="flex flex-1 min-w-[200px] items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 shadow-xs focus-within:border-[var(--primary)]">
+          <MagnifyingGlass size={15} className="text-[var(--color-ink-soft)]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("expense.searchPlaceholder")}
             aria-label={t("expense.searchPlaceholder")}
-            className="w-full bg-transparent text-xs text-[var(--color-ink)] outline-none"
+            className="w-full bg-transparent text-xs text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] outline-none"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Funnel size={15} className="text-[var(--color-ink-soft)]" />
-          <select
+
+        <div className="flex items-center gap-1.5">
+          <Funnel size={14} className="text-[var(--color-ink-soft)]" />
+          <CustomSelect
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            aria-label={t("expense.category")}
-            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--primary)]"
-          >
-            <option value="ALL">{t("expense.allCategories")}</option>
-            {TRANSACTION_CATEGORIES.map((c) => (
-              <option key={c} value={c}>{t(`category.${c}`)}</option>
-            ))}
-          </select>
+            onChange={setCategoryFilter}
+            options={filterOptions}
+            ariaLabel={t("expense.category")}
+            size="sm"
+          />
         </div>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full border-separate border-spacing-0 text-sm">
           <thead>
-            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)] whitespace-nowrap">
+            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--color-ink-soft)] whitespace-nowrap bg-[var(--color-base)]">
               <th className="px-6 py-3 font-semibold">{t("expense.name")}</th>
               <th className="px-4 py-3 font-semibold">{t("expense.type")}</th>
               <th className="px-4 py-3 font-semibold">{t("expense.amount")}</th>
@@ -165,12 +229,20 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                       />
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="inline-flex rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-0.5" role="group" aria-label={t("expense.type")}>
+                      <div
+                        className="inline-flex rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-0.5"
+                        role="group"
+                        aria-label={t("expense.type")}
+                      >
                         <button
                           type="button"
                           onClick={() => toggleRowType(row, false)}
                           aria-pressed={!positive}
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${!positive ? "bg-[var(--rose-soft)] text-[var(--rose-ink)]" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition cursor-pointer ${
+                            !positive
+                              ? "bg-[var(--rose-soft)] text-[var(--rose-ink)]"
+                              : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+                          }`}
                         >
                           {t("expense.expenseType")}
                         </button>
@@ -178,7 +250,11 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                           type="button"
                           onClick={() => toggleRowType(row, true)}
                           aria-pressed={positive}
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${positive ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition cursor-pointer ${
+                            positive
+                              ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]"
+                              : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+                          }`}
                         >
                           {t("expense.incomeType")}
                         </button>
@@ -187,7 +263,13 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1">
-                          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]" : "bg-[var(--rose-soft)] text-[var(--rose-ink)]"}`}>
+                          <span
+                            className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${
+                              positive
+                                ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]"
+                                : "bg-[var(--rose-soft)] text-[var(--rose-ink)]"
+                            }`}
+                          >
                             {positive ? "+฿" : "-฿"}
                           </span>
                           <input
@@ -199,34 +281,37 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                               updateRow(row.id, { amount: positive ? val : -val });
                             }}
                             aria-label={t("expense.amountFor", { name: row.name || "entry" })}
-                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--primary)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"}`}
+                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--primary)] focus:bg-[var(--color-surface)] focus:outline-none ${
+                              positive ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"
+                            }`}
                           />
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <input
-                        type="date"
+                      <CustomDatePicker
                         value={row.date}
-                        onChange={(e) => updateRow(row.id, { date: e.target.value })}
-                        aria-label={t("expense.dateFor", { name: row.name || "entry" })}
-                        className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1.5 font-mono text-xs text-[var(--color-ink-soft)] outline-none transition focus:border-[var(--primary)]"
+                        onChange={(newDate) => updateRow(row.id, { date: newDate })}
+                        ariaLabel={t("expense.dateFor", { name: row.name || "entry" })}
+                        size="sm"
                       />
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {positive ? (
-                        <span className="whitespace-nowrap inline-flex rounded-lg border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--jade-ink)]">
+                        <span className="whitespace-nowrap inline-flex items-center gap-1.5 rounded-lg border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--jade-ink)]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--jade)]" />
                           {t("category.Income")}
                         </span>
                       ) : (
-                        <select
+                        <CustomSelect
                           value={row.category}
-                          onChange={(e) => updateRow(row.id, { category: e.target.value as TransactionCategory })}
-                          aria-label={t("expense.categoryFor", { name: row.name || "entry" })}
-                          className="whitespace-nowrap cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--primary)]"
-                        >
-                          {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{t(`category.${c}`)}</option>)}
-                        </select>
+                          onChange={(val) =>
+                            updateRow(row.id, { category: val as TransactionCategory })
+                          }
+                          options={expenseCategoryOptions}
+                          ariaLabel={t("expense.categoryFor", { name: row.name || "entry" })}
+                          size="sm"
+                        />
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -242,7 +327,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                       <button
                         type="button"
                         onClick={() => deleteRow(row)}
-                        className="rounded-lg p-2 text-[var(--color-ink-soft)] transition hover:bg-[var(--rose-soft)] hover:text-[var(--rose-ink)] focus:outline-none"
+                        className="rounded-lg p-2 text-[var(--color-ink-soft)] transition hover:bg-[var(--rose-soft)] hover:text-[var(--rose-ink)] focus:outline-none cursor-pointer"
                         aria-label={t("expense.delete")}
                       >
                         <Trash size={16} />
@@ -254,36 +339,46 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
             </AnimatePresence>
           </tbody>
         </table>
+
         {transactions.length === 0 && (
           <div className="px-6 py-10 text-center">
-            <h3 className="text-base font-semibold text-[var(--color-ink)]">{t("expense.emptyTitle")}</h3>
-            <p className="mt-1 text-xs text-[var(--color-ink-soft)]">{t("expense.emptyHint")}</p>
+            <h3 className="text-base font-semibold text-[var(--color-ink)]">
+              {t("expense.emptyTitle")}
+            </h3>
+            <p className="mt-1 text-xs text-[var(--color-ink-soft)]">
+              {t("expense.emptyHint")}
+            </p>
             <div className="mt-4 flex justify-center gap-2">
               <button
                 type="button"
                 onClick={addExpenseRow}
-                className="rounded-full bg-zinc-950 dark:bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-emerald-400"
+                className="rounded-xl bg-[var(--primary)] px-4 py-2 text-xs font-bold text-white transition hover:brightness-105"
               >
                 {t("expense.addExpense")}
               </button>
               <button
                 type="button"
                 onClick={addIncomeRow}
-                className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-base)]"
+                className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-base)]"
               >
                 {t("expense.addIncome")}
               </button>
             </div>
           </div>
         )}
+
         {transactions.length > 0 && filteredTransactions.length === 0 && (
           <div className="px-6 py-10 text-center">
-            <h3 className="text-base font-semibold text-[var(--color-ink)]">{t("expense.noResultsTitle")}</h3>
-            <p className="mt-1 text-xs text-[var(--color-ink-soft)]">{t("expense.noResultsHint")}</p>
+            <h3 className="text-base font-semibold text-[var(--color-ink)]">
+              {t("expense.noResultsTitle")}
+            </h3>
+            <p className="mt-1 text-xs text-[var(--color-ink-soft)]">
+              {t("expense.noResultsHint")}
+            </p>
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-4 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-base)]"
+              className="mt-4 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-base)]"
             >
               {t("expense.clearFilters")}
             </button>

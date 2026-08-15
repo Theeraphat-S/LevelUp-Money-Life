@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowDown,
@@ -14,6 +14,8 @@ import {
 } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { BentoCard } from "../common/BentoCard";
+import { CustomSelect, type CustomSelectOption } from "../common/CustomSelect";
+import { CustomDatePicker } from "../common/CustomDatePicker";
 import {
   CATEGORY_COLORS,
   EXPENSE_CATEGORIES,
@@ -81,16 +83,47 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     setStatusFilter("ALL");
   };
 
+  const categoryFilterOptions: CustomSelectOption[] = useMemo(
+    () => [
+      { value: "ALL", label: t("expense.allCategories") },
+      ...TRANSACTION_CATEGORIES.map((c) => ({
+        value: c,
+        label: t(`category.${c}`),
+        colorDot: CATEGORY_COLORS[c],
+      })),
+    ],
+    [t]
+  );
+
+  const statusFilterOptions: CustomSelectOption[] = useMemo(
+    () => [
+      { value: "ALL", label: t("expense.allStatus") },
+      { value: "CLEARED", label: t("expense.onlyCleared") },
+      { value: "PENDING", label: t("expense.onlyPending") },
+    ],
+    [t]
+  );
+
+  const expenseCategoryOptions: CustomSelectOption[] = useMemo(
+    () =>
+      EXPENSE_CATEGORIES.map((c) => ({
+        value: c,
+        label: t(`category.${c}`),
+        colorDot: CATEGORY_COLORS[c],
+      })),
+    [t]
+  );
+
   // Filter Transactions
   const filtered = transactions.filter((row) => {
     if (isMonthScoped && !row.date.startsWith(activeMonth)) return false;
 
     const matchesSearch =
+      search.trim() === "" ||
       row.name.toLowerCase().includes(search.toLowerCase()) ||
-      (row.notes && row.notes.toLowerCase().includes(search.toLowerCase()));
+      t(`category.${row.category}`).toLowerCase().includes(search.toLowerCase());
 
-    const matchesCategory =
-      categoryFilter === "ALL" || row.category === categoryFilter;
+    const matchesCategory = categoryFilter === "ALL" || row.category === categoryFilter;
 
     const matchesStatus =
       statusFilter === "ALL" ||
@@ -106,7 +139,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     if (sortField === "date") {
       result = new Date(a.date).getTime() - new Date(b.date).getTime();
     } else if (sortField === "amount") {
-      result = Math.abs(a.amount) - Math.abs(b.amount);
+      result = a.amount - b.amount;
     } else if (sortField === "name") {
       result = a.name.localeCompare(b.name);
     } else if (sortField === "category") {
@@ -115,77 +148,85 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
     return sortOrder === "asc" ? result : -result;
   });
 
-  // Totals in current view
-  const viewIncome = sorted
+  // Summary Metrics for current view
+  const viewIncome = filtered
     .filter((r) => r.amount > 0)
-    .reduce((s, r) => s + r.amount, 0);
-  const viewExpense = Math.abs(
-    sorted.filter((r) => r.amount < 0).reduce((s, r) => s + r.amount, 0)
-  );
+    .reduce((sum, r) => sum + r.amount, 0);
+
+  const viewExpense = filtered
+    .filter((r) => r.amount < 0)
+    .reduce((sum, r) => sum + Math.abs(r.amount), 0);
+
   const viewNet = viewIncome - viewExpense;
+
+  const activeFilterCount =
+    (categoryFilter !== "ALL" ? 1 : 0) + (statusFilter !== "ALL" ? 1 : 0) + (search ? 1 : 0);
 
   return (
     <BentoCard
       noPadding
-      header={
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                {t("expense.title")}
-              </h2>
-              <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
-                {t("expense.totalEntries", { count: sorted.length })}
-              </span>
-            </div>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
-              {t("expense.subtitle")}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Month Scope Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsMonthScoped((prev) => !prev)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-                isMonthScoped
-                  ? "border-[var(--primary)]/30 bg-[var(--primary-soft)] text-[var(--primary-ink)]"
-                  : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
-              }`}
-            >
-              {isMonthScoped ? `${activeMonth}` : t("header.allMonths")}
-            </button>
-
-            {/* Quick Log Action */}
-            <button
-              type="button"
-              onClick={onOpenQuickAdd}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-semibold hover:opacity-90 transition shadow-sm"
-            >
-              <Plus size={14} weight="bold" />
-              <span>{t("header.quickAdd")}</span>
-            </button>
-          </div>
-        </div>
-      }
+      className="overflow-hidden shadow-sm border border-[var(--color-line)] rounded-3xl"
     >
-      {/* Undo Delete Banner */}
+      {/* Header Deck */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--color-line)] bg-[var(--color-surface)] p-6">
+        <div>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)]">
+              {t("ledger.title")}
+            </h2>
+            <span className="rounded-full bg-[var(--primary-soft)] px-2.5 py-0.5 font-mono text-xs font-bold text-[var(--primary-ink)]">
+              {filtered.length} {t("ledger.records")}
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-[var(--color-ink-soft)]">
+            {t("ledger.subtitle")}
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Month Scope Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsMonthScoped(!isMonthScoped)}
+            className={`rounded-xl border px-3 py-1.5 text-xs font-semibold shadow-xs transition ${
+              isMonthScoped
+                ? "border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary-ink)]"
+                : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+            }`}
+          >
+            {isMonthScoped ? t("ledger.filterMonthScope") : t("ledger.filterAllScope")}
+          </button>
+
+          {/* Quick Add Button */}
+          <button
+            type="button"
+            onClick={onOpenQuickAdd}
+            className="flex items-center gap-1.5 rounded-xl border border-[var(--primary)] bg-[var(--primary)] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition hover:brightness-105 active:scale-95"
+          >
+            <Plus size={15} weight="bold" />
+            {t("ledger.newEntry")}
+          </button>
+        </div>
+      </div>
+
+      {/* Undo Banner */}
       <AnimatePresence>
         {lastDeleted && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2.5 text-xs text-[var(--amber-ink)]"
+            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2.5 text-xs font-medium text-[var(--amber-ink)]"
           >
-            <span>{t("expense.deleted")}</span>
+            <span>{t("ledger.deletedNotice", { name: lastDeleted.name })}</span>
             <button
               type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-bold text-[var(--amber-ink)] underline hover:no-underline"
+              className="flex items-center gap-1 font-bold underline transition hover:opacity-80"
             >
-              <ArrowUUpLeft size={14} /> {t("expense.undo")}
+              <ArrowUUpLeft size={14} weight="bold" />
+              {t("ledger.undo")}
             </button>
           </motion.div>
         )}
@@ -208,31 +249,24 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
         {/* Category Filter */}
         <div className="flex items-center gap-1.5">
           <Funnel size={14} className="text-[var(--color-ink-soft)]" />
-          <select
+          <CustomSelect
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none shadow-xs transition focus:border-[var(--primary)]"
-          >
-            <option value="ALL">{t("expense.allCategories")}</option>
-            {TRANSACTION_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {t(`category.${c}`)}
-              </option>
-            ))}
-          </select>
+            onChange={setCategoryFilter}
+            options={categoryFilterOptions}
+            ariaLabel={t("expense.category")}
+            size="sm"
+          />
         </div>
 
         {/* Status Filter */}
         <div className="flex items-center gap-1">
-          <select
+          <CustomSelect
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as "ALL" | "CLEARED" | "PENDING")}
-            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none shadow-xs transition focus:border-[var(--primary)]"
-          >
-            <option value="ALL">{t("expense.allStatus")}</option>
-            <option value="CLEARED">{t("expense.onlyCleared")}</option>
-            <option value="PENDING">{t("expense.onlyPending")}</option>
-          </select>
+            onChange={(val) => setStatusFilter(val as "ALL" | "CLEARED" | "PENDING")}
+            options={statusFilterOptions}
+            ariaLabel={t("expense.allStatus")}
+            size="sm"
+          />
         </div>
       </div>
 
@@ -343,34 +377,30 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                     {/* Category */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       {isPositive ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-md border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-2 py-0.5 font-semibold text-[var(--jade-ink)] text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--jade-ink)]">
                           <span className="h-1.5 w-1.5 rounded-full bg-[var(--jade)]" />
                           {t("category.Income")}
                         </span>
                       ) : (
-                        <select
+                        <CustomSelect
                           value={row.category}
-                          onChange={(e) =>
-                            updateRow(row.id, { category: e.target.value as TransactionCategory })
+                          onChange={(val) =>
+                            updateRow(row.id, { category: val as TransactionCategory })
                           }
-                          className="cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1 text-xs font-medium text-[var(--color-ink)] outline-none hover:border-[var(--primary)]"
-                        >
-                          {EXPENSE_CATEGORIES.map((c) => (
-                            <option key={c} value={c}>
-                              {t(`category.${c}`)}
-                            </option>
-                          ))}
-                        </select>
+                          options={expenseCategoryOptions}
+                          ariaLabel={t("expense.category")}
+                          size="sm"
+                        />
                       )}
                     </td>
 
                     {/* Date */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <input
-                        type="date"
+                      <CustomDatePicker
                         value={row.date}
-                        onChange={(e) => updateRow(row.id, { date: e.target.value })}
-                        className="rounded-md bg-transparent font-mono text-xs text-[var(--color-ink-soft)] outline-none focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-[var(--primary)]"
+                        onChange={(newDate) => updateRow(row.id, { date: newDate })}
+                        ariaLabel={t("expense.date")}
+                        size="sm"
                       />
                     </td>
 

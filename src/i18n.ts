@@ -285,6 +285,24 @@ const resources = {
         Debt: "Debt & Loans",
         Savings: "Savings & Investments",
       },
+      calendar: {
+        today: "Today",
+        clear: "Clear",
+        close: "Close",
+        selectDate: "Select Date",
+        prevMonth: "Previous Month",
+        nextMonth: "Next Month",
+        months: [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ],
+        monthsShort: [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ],
+        weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        weekdaysShort: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+      },
       lang: { toggle: "Switch Language", en: "EN", th: "TH" },
       theme: {
         title: "Theme Mode",
@@ -561,6 +579,24 @@ const resources = {
         Fun: "ความบันเทิงและสังสรรค์",
         Debt: "หนี้สินและค่างวด",
         Savings: "เงินออมและการลงทุน",
+      },
+      calendar: {
+        today: "วันนี้",
+        clear: "ล้างค่า",
+        close: "ปิด",
+        selectDate: "เลือกวันที่",
+        prevMonth: "เดือนก่อนหน้า",
+        nextMonth: "เดือนถัดไป",
+        months: [
+          "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+          "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+        ],
+        monthsShort: [
+          "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+          "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+        ],
+        weekdays: ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"],
+        weekdaysShort: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."],
       },
       lang: { toggle: "เปลี่ยนภาษา", en: "EN", th: "TH" },
       theme: {

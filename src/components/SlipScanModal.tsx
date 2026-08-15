@@ -26,6 +26,7 @@ import {
   type Transaction,
   type TransactionCategory,
 } from "../types";
+import { CustomDatePicker } from "./common/CustomDatePicker";
 import { parseSlipImage, type ParsedSlipResult } from "../services/slipScanner";
 import { getSetting, saveSetting } from "../services/db";
 
@@ -882,16 +883,11 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                               </span>
                             )}
                           </div>
-                          <input
-                            type="date"
-                            required
+                          <CustomDatePicker
                             value={currentItem.date}
-                            onChange={(e) => updateCurrentItem({ date: e.target.value, hasDetectedDate: true })}
-                            className={`w-full rounded-xl border px-3 py-2 font-mono text-xs text-[var(--color-ink)] outline-none shadow-xs transition ${
-                              !currentItem.hasDetectedDate
-                                ? "border-amber-400 dark:border-amber-600 bg-amber-50/40 dark:bg-amber-950/20 focus:border-amber-500"
-                                : "border-[var(--color-line)] bg-[var(--color-surface)] focus:border-[var(--color-accent)]"
-                            }`}
+                            onChange={(newDate) => updateCurrentItem({ date: newDate, hasDetectedDate: true })}
+                            ariaLabel={t("quickAdd.dateLabel")}
+                            className="w-full"
                           />
                           {!currentItem.hasDetectedDate && (
                             <p className="mt-1 text-[10px] text-amber-600 dark:text-amber-400 font-medium">
@@ -970,11 +966,11 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                           id="slipClearedCheckbox"
                           checked={currentItem.cleared}
                           onChange={(e) => updateCurrentItem({ cleared: e.target.checked })}
-                          className="h-4 w-4 rounded-md cursor-pointer"
+                          className="h-4 w-4 rounded cursor-pointer accent-[var(--primary)] transition-transform hover:scale-105"
                         />
                         <label
                           htmlFor="slipClearedCheckbox"
-                          className="text-xs text-[var(--color-ink)] font-medium cursor-pointer"
+                          className="text-xs text-[var(--color-ink)] font-medium cursor-pointer select-none hover:text-[var(--primary)] transition-colors"
                         >
                           {t("quickAdd.clearedLabel")}
                         </label>
