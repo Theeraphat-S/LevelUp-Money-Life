@@ -823,28 +823,36 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                                 category: currentItem.category === "Income" ? "Food" : currentItem.category,
                               });
                             }}
-                            className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition ${
+                            className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition group ${
                               currentItem.type === "expense"
-                                ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 shadow-xs"
-                                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+                                ? "bg-[var(--rose-soft)] text-[var(--rose-ink)] border border-[var(--rose)]/30 shadow-xs"
+                                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)]"
                             }`}
                           >
-                            <Receipt size={16} weight="duotone" />
-                            {t("quickAdd.expenseType")}
+                            <Receipt
+                              size={16}
+                              weight="duotone"
+                              className="text-[var(--rose)] transition group-hover:scale-110"
+                            />
+                            <span>{t("quickAdd.expenseType")}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => {
                               updateCurrentItem({ type: "income", category: "Income" });
                             }}
-                            className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition ${
+                            className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition group ${
                               currentItem.type === "income"
-                                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shadow-xs"
-                                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
+                                ? "bg-[var(--jade-soft)] text-[var(--jade-ink)] border border-[var(--jade)]/30 shadow-xs"
+                                : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)]"
                             }`}
                           >
-                            <Coins size={16} weight="duotone" />
-                            {t("quickAdd.incomeType")}
+                            <Coins
+                              size={16}
+                              weight="duotone"
+                              className="text-[var(--jade)] transition group-hover:scale-110"
+                            />
+                            <span>{t("quickAdd.incomeType")}</span>
                           </button>
                         </div>
                       </div>
@@ -855,8 +863,20 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                           <label className="block text-xs font-semibold text-[var(--color-ink-soft)] mb-1">
                             {t("quickAdd.amountLabel")}
                           </label>
-                          <div className="flex items-center rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 focus-within:border-[var(--color-accent)] shadow-xs">
-                            <span className="font-mono text-base font-bold text-emerald-700 dark:text-emerald-400 mr-2">
+                          <div
+                            className={`flex items-center rounded-xl border bg-[var(--color-surface)] px-3.5 py-2 transition shadow-xs ${
+                              currentItem.type === "expense"
+                                ? "border-[var(--color-line)] focus-within:border-[var(--rose)] focus-within:ring-2 focus-within:ring-[var(--rose)]/20"
+                                : "border-[var(--color-line)] focus-within:border-[var(--jade)] focus-within:ring-2 focus-within:ring-[var(--jade)]/20"
+                            }`}
+                          >
+                            <span
+                              className={`font-mono text-base font-bold mr-2 select-none transition-colors ${
+                                currentItem.type === "expense"
+                                  ? "text-[var(--amount-icon-rose)]"
+                                  : "text-[var(--amount-icon-jade)]"
+                              }`}
+                            >
                               ฿
                             </span>
                             <input
@@ -867,7 +887,11 @@ export const SlipScanModal: React.FC<SlipScanModalProps> = ({
                               placeholder="0.00"
                               value={currentItem.amountStr}
                               onChange={(e) => updateCurrentItem({ amountStr: e.target.value })}
-                              className="w-full bg-transparent font-mono text-lg font-bold text-[var(--color-ink)] outline-none"
+                              className={`w-full bg-transparent font-mono text-xl font-bold outline-none transition-colors ${
+                                currentItem.type === "expense"
+                                  ? "text-[var(--rose-ink)] placeholder:text-[var(--rose-ink)]/35"
+                                  : "text-[var(--jade-ink)] placeholder:text-[var(--jade-ink)]/35"
+                              }`}
                             />
                           </div>
                         </div>

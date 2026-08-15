@@ -85,6 +85,10 @@
   --rose-soft: rgba(185, 109, 105, 0.12);
   --rose-ink: #873632;
 
+  /* Amount icon accent — higher contrast than base rose/jade */
+  --amount-icon-rose: #A03C38;  /* Deep Clay Red — readable on white */
+  --amount-icon-jade: #2D7A5A;  /* Deep Jade Green — readable on white */
+
   --moss: #879B62;              /* Moss secondary category */
   --moss-soft: rgba(135, 155, 98, 0.12);
   --moss-ink: #4E5E32;
@@ -156,6 +160,10 @@
   --rose-soft: rgba(213, 138, 131, 0.16);
   --rose-ink: #D58A83;
 
+  /* Amount icon accent — higher contrast than base rose/jade on dark bg */
+  --amount-icon-rose: #F0A49E;  /* Bright Coral — readable on dark green */
+  --amount-icon-jade: #7DD6A8;  /* Bright Mint — readable on dark green */
+
   --moss: #A7B67B;              /* Sage Moss secondary category */
   --moss-soft: rgba(167, 182, 123, 0.16);
   --moss-ink: #A7B67B;
@@ -205,6 +213,12 @@
   textarea {
     font: inherit;
     color: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-ink-faint);
+    opacity: 0.75;
   }
 
   button {
