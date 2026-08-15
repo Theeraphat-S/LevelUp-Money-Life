@@ -26,6 +26,7 @@ import { BentoCard } from "../common/BentoCard";
 import { MetricTile } from "../common/MetricTile";
 import {
   CATEGORY_COLORS,
+  CHART_PALETTE,
   type Transaction,
   type TransactionCategory,
 } from "../../types";
@@ -68,11 +69,11 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
     });
 
   const breakdown = Object.entries(categoryTotals)
-    .map(([name, value]) => ({
+    .map(([name, value], index) => ({
       name: name as TransactionCategory,
       displayName: t(`category.${name}`),
       value,
-      color: CATEGORY_COLORS[name as TransactionCategory] || "oklch(60% 0.1 260)",
+      color: CATEGORY_COLORS[name as TransactionCategory] || CHART_PALETTE[index % CHART_PALETTE.length],
     }))
     .sort((a, b) => b.value - a.value);
 
@@ -118,7 +119,7 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
           icon={<TrendUp size={18} weight="bold" />}
           label={t("metric.income")}
           value={`฿${thb.format(income)}`}
-          tone="emerald"
+          tone="jade"
         />
         <MetricTile
           icon={<TrendDown size={18} weight="bold" />}
@@ -130,7 +131,7 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
           icon={<PiggyBank size={18} weight="duotone" />}
           label={t("metric.savingsRate")}
           value={`${savingsRate}%`}
-          tone={savingsRate >= 20 ? "emerald" : "amber"}
+          tone={savingsRate >= 20 ? "jade" : "amber"}
         />
         <MetricTile
           icon={<Fire size={18} weight="fill" />}
@@ -145,7 +146,7 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
         <BentoCard
           header={
             <div className="flex items-center gap-2">
-              <Lightbulb size={18} weight="fill" className="text-amber-500" />
+              <Lightbulb size={18} weight="fill" className="text-[var(--amber)]" />
               <h3 className="text-sm font-bold text-[var(--color-ink)]">
                 {t("analytics.insightsTitle")}
               </h3>
@@ -158,10 +159,10 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
                 key={i}
                 className={`rounded-xl border p-3.5 text-xs font-medium leading-relaxed ${
                   ins.type === "positive"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100"
+                    ? "border-[var(--jade)]/30 bg-[var(--jade-soft)] text-[var(--jade-ink)]"
                     : ins.type === "warning"
-                    ? "border-amber-500/30 bg-amber-500/10 text-amber-950 dark:text-amber-100"
-                    : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-zinc-900 dark:text-zinc-100"
+                    ? "border-[var(--amber)]/30 bg-[var(--amber-soft)] text-[var(--amber-ink)]"
+                    : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-[var(--color-ink)]"
                 }`}
               >
                 {ins.text}
@@ -292,10 +293,10 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
 
               {chartType === "donut" && (
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-soft)]">
                     Total Outflow
                   </span>
-                  <span className="font-mono text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  <span className="font-mono text-base sm:text-lg font-bold text-[var(--color-ink)]">
                     ฿{thb.format(expenses)}
                   </span>
                 </div>

@@ -123,10 +123,10 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
       <BentoCard>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h2 className="text-lg font-bold tracking-tight text-[var(--color-ink)]">
               {t("plan.title")}
             </h2>
-            <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+            <p className="mt-0.5 text-xs text-[var(--color-ink-soft)]">
               {t("plan.subtitle")}
             </p>
           </div>
@@ -137,7 +137,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                 {t("plan.incomeLabel")}:
               </label>
               <div className="flex items-center gap-1">
-                <span className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-400">฿</span>
+                <span className="font-mono text-sm font-bold text-[var(--primary-ink)]">฿</span>
                 <input
                   type="number"
                   min="0"
@@ -154,7 +154,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
               onClick={apply503020}
               className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 text-xs font-semibold text-[var(--color-ink)] hover:bg-[var(--color-surface-subtle)] transition shadow-xs"
             >
-              <MagicWand size={15} weight="duotone" className="text-emerald-600 dark:text-emerald-400" />
+              <MagicWand size={15} weight="duotone" className="text-[var(--primary)]" />
               <span>{t("plan.preset503020")}</span>
             </button>
 
@@ -162,7 +162,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
               <button
                 type="button"
                 onClick={autoBalance}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 dark:bg-emerald-500 px-3 py-2 text-xs font-semibold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-emerald-400 transition shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-2 text-xs font-semibold hover:opacity-90 transition shadow-xs"
               >
                 <Scales size={15} />
                 <span>{t("plan.autoBalance")}</span>
@@ -175,13 +175,13 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
         <div className="mt-4 flex items-center justify-between border-t border-[var(--color-line)] pt-3 text-xs">
           <div className="flex items-center gap-2">
             {isBalanced ? (
-              <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
-                <CheckCircle size={16} weight="fill" />
+              <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--jade-ink)]">
+                <CheckCircle size={16} weight="fill" className="text-[var(--jade)]" />
                 {t("plan.balanced")}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 font-semibold text-rose-600 dark:text-rose-400">
-                <WarningCircle size={16} weight="fill" />
+              <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--rose-ink)]">
+                <WarningCircle size={16} weight="fill" className="text-[var(--rose)]" />
                 {t("plan.unbalanced", { total: totalPercent })}
               </span>
             )}
@@ -260,7 +260,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                 <div className="rounded-xl border border-[var(--color-line)] p-3 bg-[var(--color-surface-subtle)]">
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="text-[var(--color-ink-soft)]">{t("plan.actualSpent")}:</span>
-                    <span className={`font-mono font-bold ${isOver ? "text-rose-600 dark:text-rose-400" : "text-[var(--color-ink)]"}`}>
+                    <span className={`font-mono font-bold ${isOver ? "text-[var(--rose-ink)]" : "text-[var(--color-ink)]"}`}>
                       ฿{thb.format(actualSpent)}
                     </span>
                   </div>
@@ -269,12 +269,12 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         isOver
-                          ? "bg-rose-500"
+                          ? "bg-[var(--rose)]"
                           : bucketKey === "Needs"
-                          ? "bg-emerald-500"
+                          ? "bg-[var(--primary)]"
                           : bucketKey === "Wants"
-                          ? "bg-indigo-500"
-                          : "bg-amber-500"
+                          ? "bg-[var(--moss)]"
+                          : "bg-[var(--jade)]"
                       }`}
                       style={{ width: `${consumedPct}%` }}
                     />
@@ -284,7 +284,7 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                     <span className="text-[var(--color-ink-soft)]">{consumedPct}% of budget</span>
                     <span
                       className={`font-semibold ${
-                        isOver ? "text-rose-600 dark:text-rose-400" : "text-emerald-700 dark:text-emerald-400"
+                        isOver ? "text-[var(--rose-ink)]" : "text-[var(--jade-ink)]"
                       }`}
                     >
                       {isOver
@@ -364,8 +364,8 @@ export const BudgetPlanner: React.FC<BudgetPlannerProps> = ({
                 labelStyle={{ color: "var(--color-ink)", fontWeight: "bold" }}
               />
               <Legend />
-              <Bar dataKey="Planned" fill="var(--color-ink-faint)" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="Actual" fill="var(--color-accent)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Planned" fill="var(--color-line)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Actual" fill="var(--primary)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Transaction, CATEGORY_COLORS, TransactionCategory } from "../types";
+import { Transaction, CATEGORY_COLORS, CHART_PALETTE, TransactionCategory } from "../types";
 import { PieChart as PieIcon, BarChart2 } from "lucide-react";
 
 interface CategorySpendingChartProps {
@@ -37,11 +37,11 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
     categoryTotals[item.category] = (categoryTotals[item.category] || 0) + item.amount;
   });
 
-  const chartData = Object.entries(categoryTotals).map(([category, amount]) => ({
+  const chartData = Object.entries(categoryTotals).map(([category, amount], index) => ({
     name: t(`category.${category}`, category),
     rawCategory: category as TransactionCategory,
     amount,
-    color: CATEGORY_COLORS[category as TransactionCategory] || "oklch(60% 0.12 200)",
+    color: CATEGORY_COLORS[category as TransactionCategory] || CHART_PALETTE[index % CHART_PALETTE.length],
   }));
 
   chartData.sort((a, b) => b.amount - a.amount);

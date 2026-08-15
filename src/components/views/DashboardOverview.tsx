@@ -99,14 +99,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           label={t("metric.net")}
           value={`${netCashFlow >= 0 ? "+" : ""}฿${thb.format(netCashFlow)}`}
           subtext={netCashFlow >= 0 ? "Positive cash flow" : "Net deficit"}
-          tone={netCashFlow >= 0 ? "emerald" : "rose"}
+          tone={netCashFlow >= 0 ? "jade" : "rose"}
         />
         <MetricTile
           icon={<Coins size={18} weight="duotone" />}
           label={t("metric.income")}
           value={`฿${thb.format(monthIncome)}`}
           subtext={`Budget baseline: ฿${thb.format(income)}`}
-          tone="emerald"
+          tone="jade"
         />
         <MetricTile
           icon={<Receipt size={18} weight="duotone" />}
@@ -120,7 +120,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           label={t("metric.savingsRate")}
           value={`${savingsRate}%`}
           subtext={`Cleared logs: ${clearedCount}/${totalCount}`}
-          tone={savingsRate >= 20 ? "emerald" : "amber"}
+          tone={savingsRate >= 20 ? "jade" : "amber"}
         />
       </div>
 
@@ -132,7 +132,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           header={
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Scales size={18} weight="duotone" className="text-emerald-600" />
+                <Scales size={18} weight="duotone" className="text-[var(--primary)]" />
                 <h3 className="text-sm font-bold tracking-tight text-[var(--color-ink)]">
                   {t("plan.title")}
                 </h3>
@@ -140,7 +140,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab("budget")}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--primary-ink)] hover:underline transition"
               >
                 <span>{t("tabs.budget")}</span>
                 <ArrowRight size={13} />
@@ -175,12 +175,12 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         isOver
-                          ? "bg-rose-500"
+                          ? "bg-[var(--rose)]"
                           : bucketKey === "Needs"
-                          ? "bg-emerald-500"
+                          ? "bg-[var(--primary)]"
                           : bucketKey === "Wants"
-                          ? "bg-indigo-500"
-                          : "bg-amber-500"
+                          ? "bg-[var(--moss)]"
+                          : "bg-[var(--jade)]"
                       }`}
                       style={{ width: `${consumedPct}%` }}
                     />
@@ -188,7 +188,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
                   <div className="mt-1.5 flex items-center justify-between text-[10px] text-[var(--color-ink-soft)]">
                     <span>{consumedPct}% used</span>
-                    <span className={isOver ? "font-bold text-rose-600 dark:text-rose-400" : ""}>
+                    <span className={isOver ? "font-bold text-[var(--rose-ink)]" : ""}>
                       {isOver
                         ? t("plan.overBudget", { amount: thb.format(actual - plannedBudget) })
                         : `฿${thb.format(plannedBudget - actual)} ${t("plan.remaining")}`}
@@ -206,12 +206,12 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           header={
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkle size={18} weight="fill" className="text-amber-500" />
+                <Sparkle size={18} weight="fill" className="text-[var(--amber)]" />
                 <h3 className="text-sm font-bold tracking-tight text-[var(--color-ink)]">
                   {t("quests.title")}
                 </h3>
               </div>
-              <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+              <span className="rounded-full bg-[var(--jade-soft)] px-2.5 py-0.5 font-mono text-xs font-bold text-[var(--jade-ink)] border border-[var(--jade)]/30">
                 {completedQuests}/{quests.length}
               </span>
             </div>
@@ -224,20 +224,20 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                 onClick={() => onToggleQuest(quest.id)}
                 className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition ${
                   quest.done
-                    ? "border-emerald-500/30 bg-emerald-500/5 text-zinc-400 dark:text-zinc-500"
+                    ? "border-[var(--jade)]/30 bg-[var(--jade-soft)]/50 text-[var(--color-ink-soft)]"
                     : "border-[var(--color-line)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-subtle)] text-[var(--color-ink)]"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   {quest.done ? (
-                    <CheckCircle size={20} weight="fill" className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <CheckCircle size={20} weight="fill" className="text-[var(--jade)] shrink-0" />
                   ) : (
-                    <Circle size={20} weight="duotone" className="text-zinc-400 shrink-0" />
+                    <Circle size={20} weight="duotone" className="text-[var(--color-ink-soft)] shrink-0" />
                   )}
                   <div>
                     <div
                       className={`text-xs font-semibold ${
-                        quest.done ? "line-through text-zinc-400 dark:text-zinc-500" : "text-[var(--color-ink)]"
+                        quest.done ? "line-through text-[var(--color-ink-soft)] opacity-70" : "text-[var(--color-ink)]"
                       }`}
                     >
                       {quest.title}
@@ -247,7 +247,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     </div>
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 shrink-0">
+                <span className="font-mono text-xs font-bold text-[var(--jade-ink)] bg-[var(--jade-soft)] px-2 py-0.5 rounded-md border border-[var(--jade)]/25 shrink-0">
                   +{quest.xp} XP
                 </span>
               </div>
@@ -264,7 +264,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab("quests")}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--primary-ink)] hover:underline transition"
             >
               <span>{t("tabs.quests")}</span>
               <ArrowRight size={13} />
@@ -272,7 +272,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <button
               type="button"
               onClick={onOpenQuickAdd}
-              className="rounded-lg bg-zinc-950 dark:bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-emerald-400 transition shadow-xs"
+              className="rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-bold hover:opacity-90 transition shadow-xs"
             >
               + {t("header.quickAdd")}
             </button>
@@ -285,10 +285,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         header={
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm sm:text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              <h3 className="text-sm sm:text-base font-bold tracking-tight text-[var(--color-ink)]">
                 {t("expense.title")} · {activeMonth}
               </h3>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+              <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">
                 {t("expense.subtitle")}
               </p>
             </div>
@@ -317,21 +317,21 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <tbody className="divide-y divide-[var(--color-line)]">
               {recentTransactions.map((row) => {
                 const isPositive = row.amount >= 0;
-                const catColor = CATEGORY_COLORS[row.category] || "oklch(60% 0.1 260)";
+                const catColor = CATEGORY_COLORS[row.category] || "var(--color-line)";
                 return (
                   <tr key={row.id} className="hover:bg-[var(--color-surface-subtle)] transition-colors">
                     <td className="py-2.5 px-3 font-semibold text-[var(--color-ink)]">
                       <div className="flex items-center gap-2">
                         <span>{row.name}</span>
                         {row.notes && (
-                          <span className="rounded-sm bg-zinc-100 dark:bg-zinc-800 px-1 py-0.2 text-[9px] text-zinc-600 dark:text-zinc-300 font-normal">
+                          <span className="rounded-sm bg-[var(--color-surface-subtle)] px-1 py-0.2 text-[9px] text-[var(--color-ink-soft)] font-normal border border-[var(--color-line)]">
                             {row.notes}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-medium border border-[var(--color-line)] bg-[var(--color-surface)] text-[11px]">
+                      <span className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 font-medium border border-[var(--color-line)] bg-[var(--color-surface)] text-[11px]">
                         <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: catColor }} />
                         {t(`category.${row.category}`)}
                       </span>
@@ -340,18 +340,18 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       {row.date}
                     </td>
                     <td className="py-2.5 px-3 font-mono font-bold text-right whitespace-nowrap">
-                      <span className={isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>
+                      <span className={isPositive ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"}>
                         {isPositive ? "+" : "-"}฿{thb.format(Math.abs(row.amount))}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-center whitespace-nowrap">
                       {row.cleared ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--jade-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--jade-ink)] border border-[var(--jade)]/30">
                           <ShieldCheck size={12} weight="fill" />
                           {t("expense.cleared")}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--amber-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--amber-ink)] border border-[var(--amber)]/30">
                           {t("expense.pending")}
                         </span>
                       )}

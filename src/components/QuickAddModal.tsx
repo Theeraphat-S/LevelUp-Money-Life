@@ -146,14 +146,14 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                     onClose();
                     onOpenScanSlip();
                   }}
-                  className="w-full flex items-center justify-between rounded-xl border border-dashed border-emerald-500/40 bg-emerald-500/5 hover:bg-emerald-500/10 px-3.5 py-2 text-xs text-emerald-800 dark:text-emerald-300 transition group cursor-pointer"
+                  className="w-full flex items-center justify-between rounded-xl border border-dashed border-[var(--primary)]/40 bg-[var(--primary-soft)] hover:opacity-95 px-3.5 py-2 text-xs text-[var(--primary-ink)] transition group cursor-pointer"
                 >
                   <span className="flex items-center gap-2 font-bold">
-                    <Receipt size={16} weight="duotone" className="text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition" />
+                    <Receipt size={16} weight="duotone" className="text-[var(--primary)] group-hover:scale-110 transition" />
                     <span>{t("quickAdd.scanSlipTab")}</span>
                   </span>
-                  <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-                    <Sparkle size={12} weight="fill" className="text-emerald-500" />
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--jade-ink)]">
+                    <Sparkle size={12} weight="fill" className="text-[var(--jade)]" />
                     <span>Auto-fill from image</span>
                   </span>
                 </button>
@@ -169,7 +169,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   }}
                   className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition ${
                     type === "expense"
-                      ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 shadow-xs"
+                      ? "bg-[var(--rose-soft)] text-[var(--rose-ink)] border border-[var(--rose)]/30 shadow-xs"
                       : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
                   }`}
                 >
@@ -184,7 +184,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   }}
                   className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition ${
                     type === "income"
-                      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 shadow-xs"
+                      ? "bg-[var(--jade-soft)] text-[var(--jade-ink)] border border-[var(--jade)]/30 shadow-xs"
                       : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
                   }`}
                 >
@@ -199,7 +199,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   <label className="block text-xs font-semibold text-[var(--color-ink-soft)] mb-1">
                     {t("quickAdd.amountLabel")}
                   </label>
-                  <div className="flex items-center rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 focus-within:border-[var(--color-accent)] shadow-xs">
+                  <div className="flex items-center rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 focus-within:border-[var(--primary)] shadow-xs">
                     <span className="font-mono text-sm font-bold text-[var(--color-ink-soft)] mr-2">
                       ฿
                     </span>
@@ -226,7 +226,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                     required
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 font-mono text-xs text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)] shadow-xs"
+                    className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 font-mono text-xs text-[var(--color-ink)] outline-none focus:border-[var(--primary)] shadow-xs"
                   />
                 </div>
               </div>
@@ -242,7 +242,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   placeholder={t("quickAdd.namePlaceholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)] shadow-xs"
+                  className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--primary)] shadow-xs"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                           onClick={() => setCategory(cat)}
                           className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
                             isSelected
-                              ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-semibold shadow-xs"
+                              ? "border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary-ink)] font-semibold shadow-xs"
                               : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
                           }`}
                         >
@@ -289,7 +289,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   placeholder={t("quickAdd.notesPlaceholder")}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs text-[var(--color-ink)] outline-none focus:border-[var(--color-accent)]"
+                  className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs text-[var(--color-ink)] outline-none focus:border-[var(--primary)]"
                 />
               </div>
 
@@ -300,7 +300,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   id="clearedCheckbox"
                   checked={cleared}
                   onChange={(e) => setCleared(e.target.checked)}
-                  className="h-4 w-4 rounded-md accent-emerald-600 cursor-pointer"
+                  className="h-4 w-4 rounded-md cursor-pointer"
                 />
                 <label
                   htmlFor="clearedCheckbox"
@@ -311,7 +311,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
               </div>
 
               {error && (
-                <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 text-xs font-medium text-rose-700 dark:text-rose-300">
+                <div className="rounded-xl border border-[var(--rose)]/30 bg-[var(--rose-soft)] px-3 py-2 text-xs font-medium text-[var(--rose-ink)]">
                   {error}
                 </div>
               )}
@@ -327,9 +327,9 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 dark:bg-emerald-500 px-4 py-2 text-xs font-semibold text-white dark:text-zinc-950 shadow-xs transition hover:bg-zinc-800 dark:hover:bg-emerald-400 active:scale-[0.98]"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-4 py-2 text-xs font-semibold shadow-xs transition hover:opacity-90 active:scale-[0.98]"
                 >
-                  <Sparkle size={15} weight="fill" className="text-emerald-400 dark:text-zinc-950" />
+                  <Sparkle size={15} weight="fill" />
                   <span>{t("quickAdd.submit", { xp: 15 })}</span>
                 </button>
               </div>

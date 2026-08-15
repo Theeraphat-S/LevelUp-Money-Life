@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Cell, Pie, PieChart, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
 import { ChartPie, ChartBar } from "@phosphor-icons/react";
-import { CATEGORY_COLORS, type Transaction, type TransactionCategory } from "../types";
+import { CATEGORY_COLORS, CHART_PALETTE, type Transaction, type TransactionCategory } from "../types";
 
 const thb = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
@@ -20,11 +20,11 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
       acc[r.category] = (acc[r.category] ?? 0) + Math.abs(r.amount);
       return acc;
     }, {}),
-  ).map(([name, value]) => ({
+  ).map(([name, value], index) => ({
     name: name as TransactionCategory,
     displayName: t(`category.${name}`),
     value,
-    color: CATEGORY_COLORS[name as TransactionCategory] ?? "oklch(60% 0.05 260)",
+    color: CATEGORY_COLORS[name as TransactionCategory] ?? CHART_PALETTE[index % CHART_PALETTE.length],
   }));
 
   breakdown.sort((a, b) => b.value - a.value);
@@ -61,7 +61,7 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
             aria-label={t("summary.viewBarAria")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
               chartType === "bar"
-                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs"
+                ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-xs border border-[var(--color-line)]"
                 : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
             }`}
           >
@@ -72,9 +72,9 @@ export function SummaryStats({ transactions, month }: { transactions: Transactio
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label={t("summary.income")} value={`+฿${thb.format(income)}`} tone="text-emerald-700 dark:text-emerald-400" />
-        <Stat label={t("summary.expenses")} value={`-฿${thb.format(expenses)}`} tone="text-rose-600 dark:text-rose-400" />
-        <Stat label={t("summary.net")} value={`${net >= 0 ? "+" : ""}฿${thb.format(net)}`} tone={net >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"} />
+        <Stat label={t("summary.income")} value={`+฿${thb.format(income)}`} tone="text-[var(--jade-ink)]" />
+        <Stat label={t("summary.expenses")} value={`-฿${thb.format(expenses)}`} tone="text-[var(--rose-ink)]" />
+        <Stat label={t("summary.net")} value={`${net >= 0 ? "+" : ""}฿${thb.format(net)}`} tone={net >= 0 ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"} />
       </div>
 
       {topCategory && (

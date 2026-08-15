@@ -63,13 +63,13 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
     <section className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)]">
       <div className="flex flex-col gap-4 border-b border-[var(--color-line)] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("expense.title")}</h2>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">{t("expense.subtitle")}</p>
+          <h2 className="text-base font-bold tracking-tight text-[var(--color-ink)]">{t("expense.title")}</h2>
+          <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">{t("expense.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={addExpenseRow}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 transition hover:bg-zinc-800 dark:hover:bg-emerald-400 shadow-xs"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-semibold transition hover:opacity-90 shadow-xs"
           >
             <Plus size={14} weight="bold" /> {t("expense.addExpense")}
           </button>
@@ -88,12 +88,12 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-200/60 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-6 py-2.5 text-xs text-amber-900 dark:text-amber-200"
+            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2.5 text-xs text-[var(--amber-ink)]"
           >
             <span>{t("expense.deleted")}</span>
             <button
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-semibold text-amber-950 dark:text-amber-300 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-semibold text-[var(--amber-ink)] underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("expense.undo")}
             </button>
@@ -102,7 +102,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
       </AnimatePresence>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-base)] px-6 py-3">
-        <div className="flex flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 focus-within:border-[var(--color-accent)]">
+        <div className="flex flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 focus-within:border-[var(--primary)]">
           <MagnifyingGlass size={16} className="text-[var(--color-ink-soft)]" />
           <input
             type="text"
@@ -119,7 +119,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             aria-label={t("expense.category")}
-            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--color-accent)]"
+            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--primary)]"
           >
             <option value="ALL">{t("expense.allCategories")}</option>
             {TRANSACTION_CATEGORIES.map((c) => (
@@ -161,7 +161,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                         value={row.name}
                         onChange={(e) => updateRow(row.id, { name: e.target.value })}
                         aria-label={t("expense.nameFor", { name: row.name || "entry" })}
-                        className="w-48 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2.5 py-1.5 text-[var(--color-ink)] transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none"
+                        className="w-48 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2.5 py-1.5 text-[var(--color-ink)] transition focus:border-[var(--primary)] focus:bg-[var(--color-surface)] focus:outline-none"
                       />
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -170,7 +170,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                           type="button"
                           onClick={() => toggleRowType(row, false)}
                           aria-pressed={!positive}
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${!positive ? "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${!positive ? "bg-[var(--rose-soft)] text-[var(--rose-ink)]" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
                         >
                           {t("expense.expenseType")}
                         </button>
@@ -178,7 +178,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                           type="button"
                           onClick={() => toggleRowType(row, true)}
                           aria-pressed={positive}
-                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${positive ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
+                          className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${positive ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]" : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"}`}
                         >
                           {t("expense.incomeType")}
                         </button>
@@ -187,7 +187,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1">
-                          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300" : "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300"}`}>
+                          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-mono text-xs font-bold ${positive ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]" : "bg-[var(--rose-soft)] text-[var(--rose-ink)]"}`}>
                             {positive ? "+฿" : "-฿"}
                           </span>
                           <input
@@ -199,7 +199,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                               updateRow(row.id, { amount: positive ? val : -val });
                             }}
                             aria-label={t("expense.amountFor", { name: row.name || "entry" })}
-                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--color-accent)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                            className={`w-28 rounded-lg border border-[var(--color-line)]/50 bg-[var(--color-surface)] px-2 py-1.5 font-mono font-medium transition focus:border-[var(--primary)] focus:bg-[var(--color-surface)] focus:outline-none ${positive ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"}`}
                           />
                         </div>
                       </div>
@@ -210,12 +210,12 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                         value={row.date}
                         onChange={(e) => updateRow(row.id, { date: e.target.value })}
                         aria-label={t("expense.dateFor", { name: row.name || "entry" })}
-                        className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1.5 font-mono text-xs text-[var(--color-ink-soft)] outline-none transition focus:border-[var(--color-accent)]"
+                        className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1.5 font-mono text-xs text-[var(--color-ink-soft)] outline-none transition focus:border-[var(--primary)]"
                       />
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {positive ? (
-                        <span className="whitespace-nowrap inline-flex rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                        <span className="whitespace-nowrap inline-flex rounded-lg border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--jade-ink)]">
                           {t("category.Income")}
                         </span>
                       ) : (
@@ -223,7 +223,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                           value={row.category}
                           onChange={(e) => updateRow(row.id, { category: e.target.value as TransactionCategory })}
                           aria-label={t("expense.categoryFor", { name: row.name || "entry" })}
-                          className="whitespace-nowrap cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--color-accent)]"
+                          className="whitespace-nowrap cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none transition focus:border-[var(--primary)]"
                         >
                           {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{t(`category.${c}`)}</option>)}
                         </select>
@@ -234,7 +234,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                         type="checkbox"
                         checked={row.cleared}
                         onChange={(e) => updateRow(row.id, { cleared: e.target.checked })}
-                        className="h-4 w-4 cursor-pointer accent-[var(--color-accent)]"
+                        className="h-4 w-4 cursor-pointer accent-[var(--primary)]"
                         aria-label={t("expense.markCleared", { name: row.name })}
                       />
                     </td>
@@ -242,7 +242,7 @@ export function ExpenseTable({ transactions, setTransactions }: { transactions: 
                       <button
                         type="button"
                         onClick={() => deleteRow(row)}
-                        className="rounded-lg p-2 text-zinc-400 dark:text-zinc-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 focus:outline-none focus-visible:shadow-[var(--ring-accent)]"
+                        className="rounded-lg p-2 text-[var(--color-ink-soft)] transition hover:bg-[var(--rose-soft)] hover:text-[var(--rose-ink)] focus:outline-none"
                         aria-label={t("expense.delete")}
                       >
                         <Trash size={16} />

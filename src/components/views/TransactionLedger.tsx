@@ -150,7 +150,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
               onClick={() => setIsMonthScoped((prev) => !prev)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
                 isMonthScoped
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
+                  ? "border-[var(--primary)]/30 bg-[var(--primary-soft)] text-[var(--primary-ink)]"
                   : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
               }`}
             >
@@ -161,9 +161,9 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
             <button
               type="button"
               onClick={onOpenQuickAdd}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 transition hover:bg-zinc-800 dark:hover:bg-emerald-400 shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-semibold hover:opacity-90 transition shadow-sm"
             >
-              <Plus size={14} weight="bold" className="text-emerald-400 dark:text-zinc-950" />
+              <Plus size={14} weight="bold" />
               <span>{t("header.quickAdd")}</span>
             </button>
           </div>
@@ -177,13 +177,13 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-500/30 bg-amber-500/10 px-6 py-2.5 text-xs text-amber-900 dark:text-amber-200"
+            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2.5 text-xs text-[var(--amber-ink)]"
           >
             <span>{t("expense.deleted")}</span>
             <button
               type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-bold text-amber-950 dark:text-amber-300 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-bold text-[var(--amber-ink)] underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("expense.undo")}
             </button>
@@ -194,14 +194,14 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       {/* Filter and Search Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-3">
         {/* Search */}
-        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 shadow-xs focus-within:border-[var(--color-accent)]">
-          <MagnifyingGlass size={15} className="text-zinc-500 dark:text-zinc-400" />
+        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1.5 shadow-xs focus-within:border-[var(--primary)]">
+          <MagnifyingGlass size={15} className="text-[var(--color-ink-soft)]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("expense.searchPlaceholder")}
-            className="w-full bg-transparent text-xs text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 outline-none"
+            className="w-full bg-transparent text-xs text-[var(--color-ink)] placeholder:text-[var(--color-ink-faint)] outline-none"
           />
         </div>
 
@@ -211,7 +211,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none shadow-xs transition focus:border-[var(--color-accent)]"
+            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none shadow-xs transition focus:border-[var(--primary)]"
           >
             <option value="ALL">{t("expense.allCategories")}</option>
             {TRANSACTION_CATEGORIES.map((c) => (
@@ -227,7 +227,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as "ALL" | "CLEARED" | "PENDING")}
-            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none shadow-xs transition focus:border-[var(--color-accent)]"
+            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink)] outline-none shadow-xs transition focus:border-[var(--primary)]"
           >
             <option value="ALL">{t("expense.allStatus")}</option>
             <option value="CLEARED">{t("expense.onlyCleared")}</option>
@@ -240,14 +240,14 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       <div className="flex flex-wrap items-center justify-between border-b border-[var(--color-line)] bg-[var(--color-base)] px-6 py-2 text-xs font-mono">
         <div className="flex items-center gap-4">
           <span className="text-[var(--color-ink-soft)]">
-            In: <span className="font-bold text-emerald-700 dark:text-emerald-400">+฿{thb.format(viewIncome)}</span>
+            In: <span className="font-bold text-[var(--jade-ink)]">+฿{thb.format(viewIncome)}</span>
           </span>
           <span className="text-[var(--color-ink-soft)]">
-            Out: <span className="font-bold text-rose-600 dark:text-rose-400">-฿{thb.format(viewExpense)}</span>
+            Out: <span className="font-bold text-[var(--rose-ink)]">-฿{thb.format(viewExpense)}</span>
           </span>
           <span className="text-[var(--color-ink-soft)]">
             Net:{" "}
-            <span className={`font-bold ${viewNet >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+            <span className={`font-bold ${viewNet >= 0 ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"}`}>
               {viewNet >= 0 ? "+" : ""}฿{thb.format(viewNet)}
             </span>
           </span>
@@ -256,7 +256,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
           <button
             type="button"
             onClick={clearFilters}
-            className="text-[11px] font-sans font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
+            className="text-[11px] font-sans font-semibold text-[var(--primary-ink)] hover:underline"
           >
             {t("expense.clearFilters")}
           </button>
@@ -312,7 +312,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
             <AnimatePresence initial={false}>
               {sorted.map((row) => {
                 const isPositive = row.amount >= 0;
-                const catColor = CATEGORY_COLORS[row.category] || "oklch(60% 0.1 260)";
+                const catColor = CATEGORY_COLORS[row.category] || "var(--color-line)";
 
                 return (
                   <motion.tr
@@ -330,10 +330,10 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                           type="text"
                           value={row.name}
                           onChange={(e) => updateRow(row.id, { name: e.target.value })}
-                          className="w-full bg-transparent font-medium text-zinc-900 dark:text-zinc-100 outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1.5 focus:py-0.5 focus:ring-1 focus:ring-emerald-500"
+                          className="w-full bg-transparent font-medium text-[var(--color-ink)] outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1.5 focus:py-0.5 focus:ring-1 focus:ring-[var(--primary)]"
                         />
                         {row.notes && (
-                          <div className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
+                          <div className="text-[10px] text-[var(--color-ink-soft)] font-medium">
                             {row.notes}
                           </div>
                         )}
@@ -343,8 +343,8 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                     {/* Category */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       {isPositive ? (
-                        <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-800 dark:text-emerald-300 text-[11px]">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+                        <span className="inline-flex items-center gap-1.5 rounded-md border border-[var(--jade)]/30 bg-[var(--jade-soft)] px-2 py-0.5 font-semibold text-[var(--jade-ink)] text-[11px]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--jade)]" />
                           {t("category.Income")}
                         </span>
                       ) : (
@@ -353,7 +353,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                           onChange={(e) =>
                             updateRow(row.id, { category: e.target.value as TransactionCategory })
                           }
-                          className="cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1 text-xs font-medium text-[var(--color-ink)] outline-none hover:border-[var(--color-accent)]"
+                          className="cursor-pointer rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2 py-1 text-xs font-medium text-[var(--color-ink)] outline-none hover:border-[var(--primary)]"
                         >
                           {EXPENSE_CATEGORIES.map((c) => (
                             <option key={c} value={c}>
@@ -370,7 +370,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                         type="date"
                         value={row.date}
                         onChange={(e) => updateRow(row.id, { date: e.target.value })}
-                        className="rounded-md bg-transparent font-mono text-xs text-zinc-600 dark:text-zinc-300 outline-none focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-emerald-500"
+                        className="rounded-md bg-transparent font-mono text-xs text-[var(--color-ink-soft)] outline-none focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-[var(--primary)]"
                       />
                     </td>
 
@@ -379,7 +379,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                       <div className="flex items-center justify-end gap-1">
                         <span
                           className={`font-mono text-xs font-bold ${
-                            isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                            isPositive ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"
                           }`}
                         >
                           {isPositive ? "+" : "-"}฿
@@ -393,8 +393,8 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                             const val = Math.abs(parseFloat(e.target.value) || 0);
                             updateRow(row.id, { amount: isPositive ? val : -val });
                           }}
-                          className={`w-24 text-right bg-transparent font-mono text-xs font-bold outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-emerald-500 ${
-                            isPositive ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                          className={`w-24 text-right bg-transparent font-mono text-xs font-bold outline-none focus:rounded-md focus:bg-[var(--color-surface)] focus:px-1 focus:ring-1 focus:ring-[var(--primary)] ${
+                            isPositive ? "text-[var(--jade-ink)]" : "text-[var(--rose-ink)]"
                           }`}
                         />
                       </div>
@@ -407,13 +407,13 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                         onClick={() => updateRow(row.id, { cleared: !row.cleared })}
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition ${
                           row.cleared
-                            ? "bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
-                            : "bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/30"
+                            ? "bg-[var(--jade-soft)] text-[var(--jade-ink)] border border-[var(--jade)]/30"
+                            : "bg-[var(--amber-soft)] text-[var(--amber-ink)] border border-[var(--amber)]/30"
                         }`}
                       >
                         {row.cleared ? (
                           <>
-                            <ShieldCheck size={12} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
+                            <ShieldCheck size={12} weight="fill" className="text-[var(--jade)]" />
                             <span>{t("expense.cleared")}</span>
                           </>
                         ) : (
@@ -427,7 +427,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                       <button
                         type="button"
                         onClick={() => deleteRow(row)}
-                        className="rounded-lg p-1.5 text-zinc-500 dark:text-zinc-400 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400"
+                        className="rounded-lg p-1.5 text-[var(--color-ink-soft)] transition hover:bg-[var(--rose-soft)] hover:text-[var(--rose-ink)]"
                         aria-label={t("expense.delete")}
                       >
                         <Trash size={15} />

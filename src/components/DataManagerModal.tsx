@@ -154,10 +154,10 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-6 py-4">
               <div>
-                <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                <h2 className="text-base font-bold tracking-tight text-[var(--color-ink)]">
                   {t("dataManager.title")}
                 </h2>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">
                   {t("dataManager.subtitle")}
                 </p>
               </div>
@@ -175,8 +175,8 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
                 <div
                   className={`flex items-center gap-2 rounded-xl p-3 text-xs font-medium ${
                     feedback.type === "success"
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                      : "bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
+                      ? "bg-[var(--jade-soft)] text-[var(--jade-ink)] border border-[var(--jade)]/30"
+                      : "bg-[var(--rose-soft)] text-[var(--rose-ink)] border border-[var(--rose)]/30"
                   }`}
                 >
                   <CheckCircle size={16} />
@@ -187,7 +187,7 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
               {/* CSV Section */}
               <div className="rounded-xl border border-[var(--color-line)] p-4 bg-[var(--color-surface-subtle)]">
                 <div className="flex items-center gap-2 mb-1 text-sm font-semibold text-[var(--color-ink)]">
-                  <FileCsv size={18} weight="duotone" className="text-emerald-600 dark:text-emerald-400" />
+                  <FileCsv size={18} weight="duotone" className="text-[var(--primary)]" />
                   <span>{t("dataManager.csvSection")}</span>
                 </div>
                 <p className="text-xs text-[var(--color-ink-soft)] mb-3">
@@ -221,7 +221,7 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
               {/* JSON Section */}
               <div className="rounded-xl border border-[var(--color-line)] p-4 bg-[var(--color-surface-subtle)]">
                 <div className="flex items-center gap-2 mb-1 text-sm font-semibold text-[var(--color-ink)]">
-                  <FileCode size={18} weight="duotone" className="text-indigo-600 dark:text-indigo-400" />
+                  <FileCode size={18} weight="duotone" className="text-[var(--moss)]" />
                   <span>{t("dataManager.jsonSection")}</span>
                 </div>
                 <p className="text-xs text-[var(--color-ink-soft)] mb-3">
@@ -253,18 +253,18 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
               </div>
 
               {/* Danger Zone */}
-              <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/20 p-4">
-                <div className="flex items-center gap-2 mb-1 text-sm font-semibold text-rose-900 dark:text-rose-300">
-                  <Warning size={18} weight="fill" className="text-rose-600 dark:text-rose-400" />
+              <div className="rounded-xl border border-[var(--rose)]/30 bg-[var(--rose-soft)]/50 p-4">
+                <div className="flex items-center gap-2 mb-1 text-sm font-semibold text-[var(--rose-ink)]">
+                  <Warning size={18} weight="fill" className="text-[var(--rose)]" />
                   <span>{t("dataManager.dangerZone")}</span>
                 </div>
-                <p className="text-xs text-rose-700 dark:text-rose-400 mb-3">
+                <p className="text-xs text-[var(--rose-ink)]/80 mb-3">
                   {t("dataManager.resetConfirm")}
                 </p>
                 <button
                   type="button"
                   onClick={handleResetConfirm}
-                  className="rounded-lg bg-rose-600 dark:bg-rose-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 dark:hover:bg-rose-600 transition shadow-xs"
+                  className="rounded-lg bg-[var(--rose)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 transition shadow-xs"
                 >
                   {t("dataManager.resetData")}
                 </button>

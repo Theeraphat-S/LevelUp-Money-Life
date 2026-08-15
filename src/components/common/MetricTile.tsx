@@ -6,30 +6,42 @@ interface MetricTileProps {
   label: string;
   value: string;
   subtext?: string;
-  tone?: "emerald" | "rose" | "indigo" | "amber" | "neutral";
+  tone?: "jade" | "emerald" | "teal" | "rose" | "indigo" | "amber" | "moss" | "neutral";
   className?: string;
   onClick?: () => void;
 }
 
 const TONE_STYLES = {
+  jade: {
+    iconBg: "bg-[var(--jade-soft)] text-[var(--jade-ink)] border-[var(--jade)]/25",
+    valueText: "text-[var(--jade-ink)]",
+  },
   emerald: {
-    iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    valueText: "text-emerald-700 dark:text-emerald-400",
+    iconBg: "bg-[var(--jade-soft)] text-[var(--jade-ink)] border-[var(--jade)]/25",
+    valueText: "text-[var(--jade-ink)]",
+  },
+  teal: {
+    iconBg: "bg-[var(--primary-soft)] text-[var(--primary-ink)] border-[var(--primary)]/25",
+    valueText: "text-[var(--primary-ink)]",
   },
   rose: {
-    iconBg: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
-    valueText: "text-rose-600 dark:text-rose-400",
-  },
-  indigo: {
-    iconBg: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
-    valueText: "text-indigo-700 dark:text-indigo-400",
+    iconBg: "bg-[var(--rose-soft)] text-[var(--rose-ink)] border-[var(--rose)]/25",
+    valueText: "text-[var(--rose-ink)]",
   },
   amber: {
-    iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    valueText: "text-amber-700 dark:text-amber-400",
+    iconBg: "bg-[var(--amber-soft)] text-[var(--amber-ink)] border-[var(--amber)]/25",
+    valueText: "text-[var(--amber-ink)]",
+  },
+  moss: {
+    iconBg: "bg-[var(--moss-soft)] text-[var(--moss-ink)] border-[var(--moss)]/25",
+    valueText: "text-[var(--moss-ink)]",
+  },
+  indigo: {
+    iconBg: "bg-[var(--moss-soft)] text-[var(--moss-ink)] border-[var(--moss)]/25",
+    valueText: "text-[var(--moss-ink)]",
   },
   neutral: {
-    iconBg: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20",
+    iconBg: "bg-[var(--color-surface-subtle)] text-[var(--color-ink-soft)] border-[var(--color-line)]",
     valueText: "text-[var(--color-ink)]",
   },
 };

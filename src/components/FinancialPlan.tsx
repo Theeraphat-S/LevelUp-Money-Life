@@ -20,9 +20,9 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
 
   const apply503020 = () => {
     setAllocations([
-      { id: "needs", label: "Needs", percent: 50, color: "oklch(58% 0.13 165)" },
-      { id: "wants", label: "Wants", percent: 30, color: "oklch(62% 0.11 230)" },
-      { id: "savings", label: "Savings", percent: 20, color: "oklch(70% 0.14 80)" },
+      { id: "needs", label: "Needs", percent: 50, color: "#1C5954" },
+      { id: "wants", label: "Wants", percent: 30, color: "#879B62" },
+      { id: "savings", label: "Savings", percent: 20, color: "#4D8E75" },
     ]);
   };
 
@@ -50,7 +50,7 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
         </div>
         <label className="flex flex-col gap-1 text-xs font-medium text-[var(--color-ink-soft)]">
           {t("plan.incomeLabel")}
-          <div className="flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 focus-within:border-[var(--color-accent)] shadow-xs">
+          <div className="flex items-center gap-1.5 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-1.5 focus-within:border-[var(--primary)] shadow-xs">
             <span className="font-mono text-xs text-[var(--color-ink-soft)]">฿</span>
             <input
               type="number"
@@ -67,7 +67,7 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
       </div>
 
       {income <= 0 && (
-        <div className="mb-4 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-4 py-2.5 text-xs text-amber-900 dark:text-amber-200">
+        <div className="mb-4 rounded-xl border border-[var(--amber)]/30 bg-[var(--amber-soft)] px-4 py-2.5 text-xs text-[var(--amber-ink)]">
           {t("plan.incomeHint")}
         </div>
       )}
@@ -96,7 +96,7 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
             </div>
           ))}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <div className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium ${balanced ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]" : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50"}`}>
+            <div className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium ${balanced ? "bg-[var(--jade-soft)] text-[var(--jade-ink)] border border-[var(--jade)]/30" : "bg-[var(--rose-soft)] text-[var(--rose-ink)] border border-[var(--rose)]/30"}`}>
               <span>{balanced ? t("plan.balanced") : t("plan.unbalanced")}</span>
               <span className="font-mono font-bold">{total}%</span>
             </div>
@@ -107,13 +107,13 @@ export function FinancialPlan({ income, setIncome, allocations, setAllocations }
                 onClick={apply503020}
                 className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-line)] bg-[var(--color-base)] px-3 py-1.5 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-line)] active:translate-y-px"
               >
-                <MagicWand size={14} className="text-[var(--color-accent)]" /> {t("plan.preset503020")}
+                <MagicWand size={14} className="text-[var(--primary)]" /> {t("plan.preset503020")}
               </button>
               {!balanced && (
                 <button
                   type="button"
                   onClick={autoBalance}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 dark:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white dark:text-zinc-950 transition hover:bg-zinc-800 dark:hover:bg-emerald-400 active:translate-y-px"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-semibold shadow-xs transition hover:opacity-90 active:translate-y-px"
                 >
                   <Scales size={14} /> {t("plan.autoBalance")}
                 </button>

@@ -6,7 +6,7 @@
   --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Refined FinTech Command Center Bento Tokens mapped to dynamic variables */
+  /* Nature-Inspired FinTech Command Center Bento Tokens */
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-ink-faint: var(--ink-faint);
@@ -16,101 +16,134 @@
   --color-surface-subtle: var(--surface-subtle);
   --color-base: var(--base);
 
-  /* Curated Accents */
-  --color-accent: #10b981;
-  --color-accent-soft: var(--color-accent-soft);
-  --color-accent-ink: var(--color-accent-ink);
+  /* Curated Semantic Accents */
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-contrast: var(--primary-contrast);
 
-  --color-rose-core: #f43f5e;
-  --color-rose-soft: var(--color-rose-soft);
-  --color-amber-core: #f59e0b;
-  --color-amber-soft: var(--color-amber-soft);
-  --color-indigo-core: #6366f1;
-  --color-indigo-soft: var(--color-indigo-soft);
+  --color-jade: var(--jade);
+  --color-jade-soft: var(--jade-soft);
+  --color-jade-ink: var(--jade-ink);
+
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-amber-ink: var(--amber-ink);
+
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+  --color-rose-ink: var(--rose-ink);
+
+  --color-moss: var(--moss);
+  --color-moss-soft: var(--moss-soft);
+  --color-moss-ink: var(--moss-ink);
+
+  /* Deprecated aliases mapped cleanly to new tokens */
+  --color-accent: var(--primary);
+  --color-accent-soft: var(--primary-soft);
+  --color-accent-ink: var(--primary-ink);
+  --color-rose-core: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+  --color-amber-core: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-indigo-core: var(--moss);
+  --color-indigo-soft: var(--moss-soft);
 
   --shadow-diffuse: var(--shadow-diffuse);
   --shadow-tile: var(--shadow-tile);
   --shadow-press: var(--shadow-press);
-  --shadow-glow-emerald: var(--shadow-glow-emerald);
-  --ring-accent: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  --shadow-glow-teal: var(--shadow-glow-teal);
+  --ring-accent: 0 0 0 3px rgba(28, 89, 84, 0.25);
 }
 
 :root {
-  /* High-Contrast Light Mode */
-  --ink: #0f172a;               /* Crisp Deep Slate-900 */
-  --ink-soft: #475569;          /* Slate-600 */
-  --ink-faint: #64748b;         /* Slate-500 */
-  --line: #e2e8f0;              /* Slate-200 */
-  --line-subtle: #f1f5f9;       /* Slate-100 */
-  --surface: #ffffff;           /* Pure Crisp White Card */
-  --surface-subtle: #f8fafc;    /* Slate-50 Header/Subtle */
-  --base: #f8fafc;              /* Slate-50 Background */
+  /* High-Agency Nature-Inspired Light Mode */
+  --base: #F5F8F4;              /* Mist Green background */
+  --surface: #FEFFFC;           /* Pure crisp card surface */
+  --surface-subtle: #EAF1EB;    /* Mist subtle secondary surface */
+  --ink: #142D2B;               /* Deep Ink primary text */
+  --ink-soft: #49605C;          /* Slate Forest secondary text */
+  --ink-faint: #6B827E;         /* Muted Forest faint text */
+  --line: #D9E5DD;              /* Light Sage border line */
+  --line-subtle: #E5EFE8;       /* Subtle sub-divider */
 
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-ink-faint: var(--ink-faint);
-  --color-line: var(--line);
-  --color-line-subtle: var(--line-subtle);
-  --color-surface: var(--surface);
-  --color-surface-subtle: var(--surface-subtle);
-  --color-base: var(--base);
+  /* Semantic Accents (Light) */
+  --primary: #1C5954;           /* Deep Teal primary action */
+  --primary-soft: rgba(28, 89, 84, 0.10);
+  --primary-ink: #1C5954;
+  --primary-contrast: #FEFFFC;
 
-  --color-accent-soft: #ecfdf5;  /* Emerald-50 */
-  --color-accent-ink: #065f46;   /* Emerald-800 */
+  --jade: #4D8E75;              /* Soft Jade growth/income/XP */
+  --jade-soft: rgba(77, 142, 117, 0.12);
+  --jade-ink: #285444;
 
-  --color-rose-soft: #fff1f2;
-  --color-amber-soft: #fffbeb;
-  --color-indigo-soft: #eef2ff;
+  --amber: #C99A4B;             /* Muted Amber warning/pending */
+  --amber-soft: rgba(201, 154, 75, 0.12);
+  --amber-ink: #8A601B;
 
-  --shadow-diffuse: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
-  --shadow-tile: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
-  --shadow-press: 0 1px 2px rgba(15, 23, 42, 0.1);
-  --shadow-glow-emerald: 0 0 24px -4px rgba(16, 185, 129, 0.25);
+  --rose: #B96D69;              /* Clay Rose expense/error */
+  --rose-soft: rgba(185, 109, 105, 0.12);
+  --rose-ink: #873632;
 
-  --color-bg-gradient-1: rgba(16, 185, 129, 0.07);
-  --color-bg-gradient-2: rgba(99, 102, 241, 0.05);
+  --moss: #879B62;              /* Moss secondary category */
+  --moss-soft: rgba(135, 155, 98, 0.12);
+  --moss-ink: #4E5E32;
 
-  --scrollbar-thumb: #cbd5e1;
-  --scrollbar-thumb-hover: #94a3b8;
+  --shadow-diffuse: 0 20px 40px -15px rgba(20, 45, 43, 0.07);
+  --shadow-tile: 0 1px 3px 0 rgba(20, 45, 43, 0.05), 0 1px 2px -1px rgba(20, 45, 43, 0.05);
+  --shadow-press: 0 1px 2px rgba(20, 45, 43, 0.08);
+  --shadow-glow-teal: 0 0 24px -4px rgba(28, 89, 84, 0.22);
+
+  --color-bg-gradient-1: rgba(77, 142, 117, 0.06);
+  --color-bg-gradient-2: rgba(28, 89, 84, 0.04);
+
+  --scrollbar-thumb: #CBDAD1;
+  --scrollbar-thumb-hover: #AABFB4;
 }
 
 .dark, [data-theme="dark"] {
-  /* High-Contrast Obsidian & Emerald (Dark Mode) */
-  --ink: #f8fafc;               /* Slate-50 / Crisp White-Silver (100% readable) */
-  --ink-soft: #cbd5e1;          /* Slate-300 / High-readability secondary */
-  --ink-faint: #94a3b8;         /* Slate-400 / Secondary helper text */
-  --line: #334155;              /* Slate-700 / Defined distinct border */
-  --line-subtle: #1e293b;       /* Slate-800 / Sub-divider */
-  --surface: #0f172a;           /* Slate-900 / Obsidian Zinc Card Surface */
-  --surface-subtle: #1e293b;    /* Slate-800 / Recessed & Card Header */
-  --base: #020617;              /* Slate-950 / Deep Obsidian Base */
+  /* High-Contrast Obsidian Ink Green (Dark Mode) */
+  --base: #071B1A;              /* Ink Green deep base */
+  --surface: #0D2927;           /* Ink Forest card surface */
+  --surface-subtle: #143532;    /* Forest subtle secondary surface */
+  --ink: #EDF7F1;               /* Crisp Sage primary text */
+  --ink-soft: #C2D3CB;          /* Muted Sage secondary text */
+  --ink-faint: #8FA79D;         /* Faint Sage helper text */
+  --line: #294943;              /* Defined Forest border line */
+  --line-subtle: #1D3D3A;       /* Forest sub-divider */
 
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-ink-faint: var(--ink-faint);
-  --color-line: var(--line);
-  --color-line-subtle: var(--line-subtle);
-  --color-surface: var(--surface);
-  --color-surface-subtle: var(--surface-subtle);
-  --color-base: var(--base);
+  /* Semantic Accents (Dark) */
+  --primary: #76AA9D;           /* Soft Sage Teal primary action */
+  --primary-soft: rgba(118, 170, 157, 0.16);
+  --primary-ink: #76AA9D;
+  --primary-contrast: #071B1A;
 
-  --color-accent-soft: rgba(16, 185, 129, 0.15);   /* Muted Emerald Pill */
-  --color-accent-ink: #6ee7b7;   /* Emerald-300 */
+  --jade: #8BB999;              /* Light Jade growth/income/XP */
+  --jade-soft: rgba(139, 185, 153, 0.16);
+  --jade-ink: #8BB999;
 
-  --color-rose-soft: rgba(244, 63, 94, 0.15);
-  --color-amber-soft: rgba(245, 158, 11, 0.15);
-  --color-indigo-soft: rgba(99, 102, 241, 0.15);
+  --amber: #D7AE68;             /* Warm Gold Amber warning/pending */
+  --amber-soft: rgba(215, 174, 104, 0.16);
+  --amber-ink: #D7AE68;
 
-  --shadow-diffuse: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+  --rose: #D58A83;              /* Soft Terracotta Rose expense/error */
+  --rose-soft: rgba(213, 138, 131, 0.16);
+  --rose-ink: #D58A83;
+
+  --moss: #A7B67B;              /* Sage Moss secondary category */
+  --moss-soft: rgba(167, 182, 123, 0.16);
+  --moss-ink: #A7B67B;
+
+  --shadow-diffuse: 0 20px 40px -15px rgba(0, 0, 0, 0.65);
   --shadow-tile: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
   --shadow-press: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-glow-emerald: 0 0 28px -4px rgba(16, 185, 129, 0.35);
+  --shadow-glow-teal: 0 0 28px -4px rgba(118, 170, 157, 0.3);
 
-  --color-bg-gradient-1: rgba(16, 185, 129, 0.12);
-  --color-bg-gradient-2: rgba(99, 102, 241, 0.08);
+  --color-bg-gradient-1: rgba(77, 142, 117, 0.10);
+  --color-bg-gradient-2: rgba(28, 89, 84, 0.08);
 
-  --scrollbar-thumb: #475569;
-  --scrollbar-thumb-hover: #64748b;
+  --scrollbar-thumb: #294943;
+  --scrollbar-thumb-hover: #3A635B;
 }
 
 @layer base {
@@ -154,7 +187,7 @@
 }
 
 ::selection {
-  background: oklch(58% 0.15 160 / 0.3);
+  background: rgba(28, 89, 84, 0.25);
   color: inherit;
 }
 
@@ -188,30 +221,30 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
   background: var(--color-surface);
-  border: 2.5px solid var(--color-accent);
+  border: 2.5px solid var(--color-primary);
   box-shadow: var(--shadow-tile);
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: grab;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 0 0 6px oklch(58% 0.15 160 / 0.2), var(--shadow-tile);
+  box-shadow: 0 0 0 6px var(--primary-soft), var(--shadow-tile);
 }
 input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
   transform: scale(1.05);
-  box-shadow: 0 0 0 8px oklch(58% 0.15 160 / 0.25), var(--shadow-tile);
+  box-shadow: 0 0 0 8px var(--primary-soft), var(--shadow-tile);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
   background: var(--color-surface);
-  border: 2.5px solid var(--color-accent);
+  border: 2.5px solid var(--color-primary);
   box-shadow: var(--shadow-tile);
   cursor: grab;
 }

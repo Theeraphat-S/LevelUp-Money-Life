@@ -9,11 +9,11 @@ const XpPulse = memo(function XpPulse({ xp }: { xp: number }) {
   return (
     <span className="relative inline-flex">
       <motion.span
-        className="absolute inset-0 rounded-full bg-[oklch(72%_0.15_165)]"
+        className="absolute inset-0 rounded-full bg-[var(--jade)]"
         animate={{ scale: [1, 1.4], opacity: [0.4, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
       />
-      <span className="relative rounded-full bg-[oklch(72%_0.15_165)] px-3 py-1.5 font-mono text-xs font-bold text-[oklch(18%_0.02_165)] shadow-sm">
+      <span className="relative rounded-full bg-[var(--jade)] px-3 py-1.5 font-mono text-xs font-bold text-[#FEFFFC] dark:text-[#071B1A] shadow-sm">
         {xp} XP
       </span>
     </span>
@@ -58,13 +58,13 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 px-6 py-2 text-xs text-amber-800 dark:text-amber-200"
+            className="flex items-center justify-between border-b border-[var(--amber)]/30 bg-[var(--amber-soft)] px-6 py-2 text-xs text-[var(--amber-ink)]"
           >
             <span>{t("quests.deleted")}</span>
             <button
               type="button"
               onClick={undoDelete}
-              className="inline-flex items-center gap-1 font-semibold text-amber-900 dark:text-amber-300 underline hover:no-underline"
+              className="inline-flex items-center gap-1 font-semibold text-[var(--amber-ink)] underline hover:no-underline"
             >
               <ArrowUUpLeft size={14} /> {t("quests.undo")}
             </button>
@@ -90,27 +90,27 @@ export function DailyQuests({ quests, setQuests }: { quests: Quest[]; setQuests:
                   onClick={() => toggleQuest(quest.id)}
                   aria-pressed={quest.done}
                   aria-label={t("quests.toggle", { title: quest.title })}
-                  className="flex flex-1 items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-0.5"
+                  className="flex flex-1 items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] rounded-lg py-0.5"
                 >
                   <motion.div whileTap={{ scale: 0.85 }}>
                     {quest.done ? (
-                      <CheckCircle size={20} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
+                      <CheckCircle size={20} weight="fill" className="text-[var(--jade)]" />
                     ) : (
-                      <Circle size={20} weight="duotone" className="text-zinc-400 dark:text-zinc-500" />
+                      <Circle size={20} weight="duotone" className="text-[var(--color-ink-soft)]" />
                     )}
                   </motion.div>
                   <div>
-                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-zinc-500 dark:text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-100"}`}>{quest.title}</span>
-                    <span className="block font-mono text-[10px] text-zinc-500 dark:text-zinc-400">{quest.date}</span>
+                    <span className={`block text-xs sm:text-sm font-medium transition-all ${quest.done ? "text-[var(--color-ink-soft)] opacity-70 line-through" : "text-[var(--color-ink)]"}`}>{quest.title}</span>
+                    <span className="block font-mono text-[10px] text-[var(--color-ink-soft)]">{quest.date}</span>
                   </div>
                 </button>
 
                 <div className="flex items-center gap-2 pl-2">
-                  <span className="font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">+{quest.xp}</span>
+                  <span className="font-mono text-xs font-semibold text-[var(--jade-ink)] bg-[var(--jade-soft)] px-2 py-0.5 rounded-md border border-[var(--jade)]/30">+{quest.xp}</span>
                   <button
                     type="button"
                     onClick={() => deleteQuest(quest)}
-                    className="rounded-md p-1 text-zinc-400 dark:text-zinc-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400"
+                    className="rounded-md p-1 text-[var(--color-ink-soft)] transition hover:bg-[var(--rose-soft)] hover:text-[var(--rose-ink)]"
                     aria-label={t("quests.delete")}
                   >
                     <Trash size={14} />

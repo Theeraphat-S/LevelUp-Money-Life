@@ -28,22 +28,30 @@ export const CATEGORY_BUCKET_MAP: Record<Exclude<TransactionCategory, "Income">,
 };
 
 export const CATEGORY_COLORS: Record<TransactionCategory, string> = {
-  Income: "oklch(60% 0.15 150)",   // Emerald
-  Food: "oklch(62% 0.14 30)",      // Warm Coral / Orange
-  Transport: "oklch(60% 0.13 240)", // Azure Blue
-  Home: "oklch(58% 0.12 280)",     // Indigo / Purple
-  Health: "oklch(62% 0.15 350)",    // Rose / Pink
-  Learning: "oklch(65% 0.14 190)",  // Teal / Cyan
-  Fun: "oklch(68% 0.15 70)",       // Amber / Gold
-  Debt: "oklch(55% 0.16 20)",      // Deep Red / Terracotta
-  Savings: "oklch(68% 0.15 165)",  // Bright Emerald Green
+  Income: "#4D8E75",    // Soft Jade (Growth / Income)
+  Food: "#C99A4B",      // Muted Amber (Living necessity / Daily)
+  Transport: "#1C5954", // Deep Teal (Core structure)
+  Home: "#879B62",      // Moss (Secondary / Domestic)
+  Health: "#879B62",    // Moss (Wellness / Secondary)
+  Learning: "#1C5954",  // Deep Teal (Growth investment)
+  Fun: "#C99A4B",       // Muted Amber (Lifestyle / Leisure)
+  Debt: "#B96D69",      // Clay Rose (Expense / Obligation)
+  Savings: "#4D8E75",   // Soft Jade (Positive Savings Goal)
 };
 
 export const BUCKET_COLORS: Record<BudgetBucket, string> = {
-  Needs: "oklch(58% 0.13 165)",   // Emerald
-  Wants: "oklch(62% 0.11 230)",   // Indigo Blue
-  Savings: "oklch(70% 0.13 80)",  // Amber Gold
+  Needs: "#1C5954",   // Deep Teal
+  Wants: "#879B62",   // Moss
+  Savings: "#4D8E75", // Soft Jade
 };
+
+export const CHART_PALETTE = [
+  "#4D8E75", // 1. Soft Jade
+  "#1C5954", // 2. Deep Teal
+  "#879B62", // 3. Moss
+  "#C99A4B", // 4. Muted Amber
+  "#B96D69", // 5. Clay Rose
+] as const;
 
 export type Transaction = {
   id: string;
