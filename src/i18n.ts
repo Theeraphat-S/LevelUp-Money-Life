@@ -182,6 +182,21 @@ const resources = {
           Savings: "Future wealth: emergency fund, investments, and debt retirement.",
         },
       },
+      alloc: {
+        Needs: "Needs",
+        Wants: "Wants",
+        Savings: "Savings",
+      },
+      ledger: {
+        title: "Transaction Ledger",
+        records: "records",
+        subtitle: "Full audit trail of your cash inflows and outflows.",
+        filterMonthScope: "This Month",
+        filterAllScope: "All Time",
+        newEntry: "+ New Entry",
+        deletedNotice: "\"{{name}}\" has been deleted.",
+        undo: "Undo",
+      },
       analytics: {
         title: "Financial Intelligence Hub",
         subtitle: "Deep visual analytics into spending breakdown and cash flow trends.",
@@ -195,6 +210,7 @@ const resources = {
         insightSavingsLow: "Your savings rate is {{rate}}%. Consider trimming discretionary wants.",
         insightBalanced: "Your spending aligns closely with your 50/30/20 budget framework.",
         insightNeedsHigh: "Needs consumed {{pct}}% of your income. Look for recurring fixed cost optimizations.",
+        insightTopCategory: "{{category}} accounted for {{pct}}% of your expenses. Consider reviewing recurring subscriptions or dining frequency.",
         emptyChart: "No expenses logged in this timeframe to generate analytics.",
       },
       quests: {
@@ -477,6 +493,21 @@ const resources = {
           Savings: "เงินสำหรับอนาคตและความมั่นคง: เงินสำรองฉุกเฉิน, เงินลงทุน, ชำระหนี้สิน",
         },
       },
+      alloc: {
+        Needs: "จำเป็น",
+        Wants: "อยากได้",
+        Savings: "เงินออม",
+      },
+      ledger: {
+        title: "สมุดบัญชีรายรับ-รายจ่าย",
+        records: "รายการ",
+        subtitle: "ตรวจสอบรายการเงินเข้าและเงินออกอย่างละเอียด แม่นยำ และโปร่งใส",
+        filterMonthScope: "เดือนปัจจุบัน",
+        filterAllScope: "ทุกช่วงเวลา",
+        newEntry: "+ บันทึกรายการ",
+        deletedNotice: "ลบ \"{{name}}\" แล้ว",
+        undo: "เลิกทำ",
+      },
       analytics: {
         title: "ศูนย์วิเคราะห์ข้อมูลการเงิน (Analytics Hub)",
         subtitle: "เจาะลึกสัดส่วนการใช้จ่าย พฤติกรรมทางการเงิน และแนวโน้มกระแสเงินสด",
@@ -490,6 +521,7 @@ const resources = {
         insightSavingsLow: "อัตราการออมอยู่ที่ {{rate}}% ลองพิจารณาลดรายจ่ายหมวดอยากได้เพื่อเพิ่มเงินเก็บ",
         insightBalanced: "การใช้จ่ายของคุณสอดคล้องกับกรอบงบประมาณ 50/30/20 เป็นอย่างดี",
         insightNeedsHigh: "ค่าใช้จ่ายจำเป็นสูงถึง {{pct}}% ของรายได้ ลองสำรวจค่าใช้จ่ายคงที่ที่อาจลดได้",
+        insightTopCategory: "{{category}} คิดเป็น {{pct}}% ของรายจ่ายทั้งหมด ลองทบทวนค่าใช้จ่ายประจำหรือความถี่ในการรับประทานอาหารนอกบ้าน",
         emptyChart: "ยังไม่มีข้อมูลรายจ่ายในเดือนนี้เพื่อนำมาประมวลผลกราฟสถิติ",
       },
       quests: {

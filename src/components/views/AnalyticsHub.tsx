@@ -99,7 +99,7 @@ export const AnalyticsHub: React.FC<AnalyticsHubProps> = ({
 
   if (topCategory && topPct > 40) {
     insights.push({
-      text: `${topCategory.displayName} accounted for ${topPct}% of your expenses. Consider reviewing recurring subscriptions or dining frequency.`,
+      text: t("analytics.insightTopCategory", { category: topCategory.displayName, pct: topPct }),
       type: "warning",
     });
   }
