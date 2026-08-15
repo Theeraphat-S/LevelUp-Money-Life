@@ -171,7 +171,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--color-line)] bg-[var(--color-surface)] p-6">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)]">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)] dark:text-white">
               {t("ledger.title")}
             </h2>
             <span className="rounded-full bg-[var(--primary-soft)] px-2.5 py-0.5 font-mono text-xs font-bold text-[var(--primary-ink)]">

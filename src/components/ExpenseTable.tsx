@@ -117,7 +117,10 @@ export function ExpenseTable({
       {/* Header Deck */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[var(--color-line)] p-6 bg-[var(--color-surface)]">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)]">
+          <h2
+            className="text-xl font-bold tracking-tight"
+            style={{ color: 'var(--ink)' }}
+          >
             {t("expense.title")}
           </h2>
           <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">

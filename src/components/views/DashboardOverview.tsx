@@ -285,7 +285,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         header={
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm sm:text-base font-bold tracking-tight text-[var(--color-ink)]">
+              <h3
+                className="text-sm sm:text-base font-bold tracking-tight"
+                style={{ color: 'var(--ink)' }}
+              >
                 {t("expense.title")} · {activeMonth}
               </h3>
               <p className="text-xs text-[var(--color-ink-soft)] mt-0.5">
