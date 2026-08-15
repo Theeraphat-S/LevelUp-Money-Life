@@ -311,8 +311,8 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                   <div
                     className={`grid h-9 w-9 place-items-center rounded-xl border text-base ${
                       ach.unlocked
-                        ? "border-[var(--jade)]/30 bg-[var(--jade-soft)] text-[var(--jade)]"
-                        : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)]"
+                        ? "border-[var(--amber)]/40 bg-[var(--amber-soft)] text-[var(--amber)]"
+                        : "border-[var(--color-line)] bg-[var(--color-surface-subtle)] text-[var(--color-ink-faint)]"
                     }`}
                   >
                     <Trophy size={18} weight={ach.unlocked ? "fill" : "duotone"} />
