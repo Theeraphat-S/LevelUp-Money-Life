@@ -18,6 +18,10 @@ src-tauri/gen/
 *.log
 Thumbs.db
 
+# Agent workspaces & logs (exclude skills)
+.agents/*
+!.agents/skills/
+
 # Env
 .env
 .env.*

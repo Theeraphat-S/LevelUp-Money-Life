@@ -63,6 +63,51 @@ export type Transaction = {
   notes?: string;
 };
 
+export type PresetItem = {
+  id: string;
+  icon: string; // Emoji icon, e.g. "☕", "🍱", "🚇", "🛒"
+  name: string;
+  amount: number; // Positive number for default value
+  category: TransactionCategory;
+  type?: "expense" | "income";
+  usageCount?: number;
+  isCustom?: boolean;
+};
+
+export type ParsedQuickTransaction = {
+  isValid: boolean;
+  name: string;
+  amount: number; // Negative for expense, positive for income
+  category: TransactionCategory;
+  type: "expense" | "income";
+  notes?: string;
+  raw: string;
+  error?: string;
+};
+
+export type AutocompleteItem = {
+  id: string;
+  name: string;
+  amount: number;
+  category: TransactionCategory;
+  type: "expense" | "income";
+  source: "preset" | "history";
+  icon?: string;
+  frequency?: number;
+};
+
+export type DailySafeToSpend = {
+  dailySafeToSpend: number;       // Average spendable THB per day for rest of month
+  todayRemaining: number;         // Spendable budget remaining for today (dailySafeToSpend - todayExpenses)
+  todaySpent: number;             // Total expenses logged today
+  monthSpendableBudget: number;   // Monthly allowance (Needs + Wants, excluding Savings target)
+  monthSpent: number;             // Total expenses logged so far this month
+  monthRemaining: number;         // Total spendable budget remaining for the month
+  daysRemainingInMonth: number;   // Days remaining in active month including today
+  totalDaysInMonth: number;
+  status: "comfortable" | "caution" | "critical";
+};
+
 export type Allocation = {
   id: string;
   label: BudgetBucket | string;

@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CalendarDots, Sparkle } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { HeaderCommandDeck } from "./components/HeaderCommandDeck";
+import { QuickCommandBar } from "./components/QuickCommandBar";
+import { UndoToast } from "./components/UndoToast";
 import { QuickAddModal } from "./components/QuickAddModal";
 import { SlipScanModal } from "./components/SlipScanModal";
 import { DataManagerModal } from "./components/DataManagerModal";
@@ -36,17 +38,20 @@ import {
   updateStreak,
 } from "./services/gamification";
 import { getDefaultTaxProfile } from "./services/taxCalculator";
+import { DEFAULT_PRESETS, getStoredPresets, saveStoredPresets } from "./utils/presetManager";
+import { getLocalTodayISO } from "./utils/safeToSpend";
 import type { BackupData } from "./services/exportImport";
 import type {
   Allocation,
   GamificationState,
+  PresetItem,
   Quest,
   TaxProfile,
   Transaction,
   ViewTab,
 } from "./types";
 
-const today = new Date().toISOString().slice(0, 10);
+const today = getLocalTodayISO();
 const currentMonthISO = today.slice(0, 7);
 
 const sampleTransactions: Transaction[] = [
@@ -97,6 +102,8 @@ export default function App() {
   const [isSlipScanOpen, setIsSlipScanOpen] = useState<boolean>(false);
   const [slipInitialFiles, setSlipInitialFiles] = useState<(File | string)[]>([]);
   const [isDataManagerOpen, setIsDataManagerOpen] = useState<boolean>(false);
+  const [presets, setPresetsState] = useState<PresetItem[]>(DEFAULT_PRESETS);
+  const [lastLoggedTx, setLastLoggedTx] = useState<Transaction | null>(null);
   const [toastNotice, setToastNotice] = useState<{ message: string; visible: boolean }>({
     message: "",
     visible: false,
@@ -219,6 +226,7 @@ export default function App() {
         const savedAchievements = await getSetting<string[]>("unlockedAchievements", [
           "first_log",
         ]);
+        const savedPresets = await getStoredPresets();
 
         // Update streak based on current date
         const { newStreak, today: curToday } = updateStreak(savedLastDate, savedStreak);
@@ -232,6 +240,7 @@ export default function App() {
         setStreakDays(newStreak);
         setLastActiveDate(curToday);
         setUnlockedAchievementIds(savedAchievements);
+        setPresetsState(savedPresets);
 
         await saveSetting("streakDays", newStreak);
         await saveSetting("lastActiveDate", curToday);
@@ -304,10 +313,73 @@ export default function App() {
     });
   };
 
+  const setPresets = (value: PresetItem[] | ((prev: PresetItem[]) => PresetItem[])) => {
+    setPresetsState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      saveStoredPresets(next).catch(console.error);
+      return next;
+    });
+  };
+
+  // Handle Quick Command Bar / Preset Transaction Logging
+  const handleLogQuickTransaction = (newTx: Transaction) => {
+    setTransactions((prev) => [newTx, ...prev]);
+    addXp(15);
+    setLastLoggedTx(newTx);
+
+    // Auto-complete daily logging quest if active
+    setQuests((prev) =>
+      prev.map((q) => {
+        if (q.id === "q1" && !q.done) {
+          addXp(q.xp);
+          return { ...q, done: true };
+        }
+        return q;
+      })
+    );
+
+    // Check newly unlocked achievements
+    const { newlyUnlocked, bonusXp } = evaluateAchievements(
+      [newTx, ...transactions],
+      quests,
+      allocations,
+      streakDays,
+      unlockedAchievementIds
+    );
+
+    if (newlyUnlocked.length > 0) {
+      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
+      setUnlockedAchievementIds(newIds);
+      saveSetting("unlockedAchievements", newIds).catch(console.error);
+      if (bonusXp > 0) {
+        addXp(bonusXp);
+      }
+    }
+  };
+
+  // Handle Undo Transaction Revert
+  const handleUndoTransaction = (tx: Transaction) => {
+    setTransactions((prev) => prev.filter((item) => item.id !== tx.id));
+    setTotalXp((prev) => {
+      const next = Math.max(0, prev - 15);
+      saveSetting("totalXp", next).catch(console.error);
+      return next;
+    });
+    setLastLoggedTx(null);
+    setToastNotice({
+      message: t("quickBar.toastUndone", { name: tx.name }),
+      visible: true,
+    });
+    setTimeout(() => {
+      setToastNotice((prev) => ({ ...prev, visible: false }));
+    }, 3500);
+  };
+
   // Handle Quick Add Save
   const handleSaveQuickTransaction = (newTx: Transaction) => {
     setTransactions((prev) => [newTx, ...prev]);
     addXp(15);
+    setLastLoggedTx(newTx);
 
     // Check newly unlocked achievements
     const { newlyUnlocked, bonusXp } = evaluateAchievements(
@@ -455,6 +527,7 @@ export default function App() {
     if (backup.quests) setQuests(backup.quests);
     if (typeof backup.income === "number") setIncome(backup.income);
     if (backup.taxProfile) setTaxProfile(backup.taxProfile);
+    if (backup.presets) setPresets(backup.presets);
     if (backup.gamification?.totalXp) {
       setTotalXp(backup.gamification.totalXp);
       saveSetting("totalXp", backup.gamification.totalXp);
@@ -476,6 +549,7 @@ export default function App() {
     await saveSetting("totalXp", 180);
     await saveSetting("streakDays", 1);
     await saveSetting("unlockedAchievements", ["first_log"]);
+    await saveStoredPresets(DEFAULT_PRESETS);
 
     setTransactionsState(sampleTransactions);
     setAllocationsState(sampleAllocations);
@@ -484,6 +558,7 @@ export default function App() {
     setTotalXp(180);
     setStreakDays(1);
     setUnlockedAchievementIds(["first_log"]);
+    setPresetsState(DEFAULT_PRESETS);
   };
 
   if (loading) {
@@ -514,6 +589,17 @@ export default function App() {
           onOpenDataManager={() => setIsDataManagerOpen(true)}
           themeMode={themeMode}
           setThemeMode={setThemeMode}
+        />
+
+        {/* Quick Command Bar & One-Tap Presets System */}
+        <QuickCommandBar
+          transactions={transactions}
+          allocations={allocations}
+          income={income}
+          activeMonth={activeMonth}
+          presets={presets}
+          setPresets={setPresets}
+          onLogTransaction={handleLogQuickTransaction}
         />
 
         {/* Dynamic View Transitions */}
@@ -666,6 +752,7 @@ export default function App() {
           income={income}
           gamification={gamification}
           taxProfile={taxProfile}
+          presets={presets}
           onRestoreBackup={handleRestoreBackup}
           onImportTransactions={handleImportTransactions}
           onResetData={handleResetData}
@@ -676,6 +763,15 @@ export default function App() {
           level={levelUpModal.level}
           rankKey={levelUpModal.rankKey}
           onClose={() => setLevelUpModal((prev) => ({ ...prev, isOpen: false }))}
+        />
+
+        {/* 5-Second Undo Toast for Quick Logging */}
+        <UndoToast
+          transaction={lastLoggedTx}
+          xpAwarded={15}
+          onUndo={handleUndoTransaction}
+          onDismiss={() => setLastLoggedTx(null)}
+          durationMs={5000}
         />
 
         {/* Global Toast Notification */}
