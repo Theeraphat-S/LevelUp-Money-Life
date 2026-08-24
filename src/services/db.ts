@@ -1,5 +1,6 @@
 import Database from "@tauri-apps/plugin-sql";
-import type { Allocation, Quest, Transaction } from "../types";
+import type { Allocation, Quest, TaxProfile, Transaction } from "../types";
+import { getDefaultTaxProfile } from "./taxCalculator";
 
 let dbInstance: Database | null = null;
 let isTauriSqlAvailable = true;
@@ -284,3 +285,13 @@ export async function saveSetting<T>(key: string, value: T): Promise<void> {
     console.error(`Failed to save setting ${key}:`, err);
   }
 }
+
+// --- Tax Profile CRUD ---
+export async function getTaxProfile(): Promise<TaxProfile> {
+  return getSetting<TaxProfile>("tax_profile", getDefaultTaxProfile());
+}
+
+export async function saveTaxProfile(profile: TaxProfile): Promise<void> {
+  return saveSetting<TaxProfile>("tax_profile", profile);
+}
+

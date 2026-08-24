@@ -102,7 +102,7 @@ export type GamificationState = {
   unlockedAchievementIds: string[];
 };
 
-export type ViewTab = "dashboard" | "ledger" | "budget" | "analytics" | "quests";
+export type ViewTab = "dashboard" | "ledger" | "budget" | "tax" | "analytics" | "quests";
 
 export type SortField = "date" | "amount" | "name" | "category";
 export type SortOrder = "asc" | "desc";
@@ -110,3 +110,117 @@ export type SortOrder = "asc" | "desc";
 export type ThemeMode = "system" | "light" | "dark";
 export type EffectiveTheme = "light" | "dark";
 
+// ==========================================
+// THAI PERSONAL INCOME TAX (PIT) TYPES
+// ==========================================
+
+export type TaxAssessableIncome = {
+  salary40_1: number;         // Monthly salary * 12
+  bonus40_1: number;          // Annual bonus / irregular wage
+  freelance40_2: number;      // Freelance / service contract income
+  other40_2: number;          // Commission / other 40(2)
+};
+
+export type TaxAllowances = {
+  // 1. Personal & Family
+  hasSpouseNoIncome: boolean;
+  childrenCount: number;             // Born before 2018 or 1st child (30k/child)
+  children2018OnwardsCount: number;  // 2nd+ child born in 2018+ (60k/child)
+  parentsCount: number;              // Age >= 60, income <= 30k (30k/parent, max 4 = 120k)
+  disabledDependentsCount: number;   // 60k/person
+  antenatalAndDeliveryCost: number;  // Max 60k
+
+  // 2. Insurance & Social Security
+  socialSecurity: number;            // Max 9,000
+  lifeInsurance: number;             // Max 100,000 (combined with health <= 100,000)
+  healthInsurance: number;           // Max 25,000
+  parentsHealthInsurance: number;    // Max 15,000
+
+  // 3. Retirement Savings Group (Combined 500,000 THB ceiling)
+  rmf: number;                       // Max 30% assessable income, <= 500k
+  ssf: number;                       // Max 30% assessable income, <= 200k
+  pvdOrGpf: number;                  // Provident / GPF Fund, max 15% wage, <= 500k
+  annuityInsurance: number;          // Max 15% assessable income, <= 200k
+  nsf: number;                       // National Savings Fund (กอช.), max 30k
+
+  // 4. ThaiESG Fund (Independent 300,000 THB Pool)
+  thaiESG: number;                   // Max 30% assessable income, <= 300k
+
+  // 5. Property & Real Estate
+  homeLoanInterest: number;          // Max 100,000
+
+  // 6. Donations
+  educationAndHospitalDonations: number; // 2x multiplier (200% deduction)
+  generalDonations: number;              // 1x multiplier (100% deduction)
+  politicalPartyDonations: number;       // Max 10,000
+};
+
+export type TaxProfile = {
+  taxYear: number;
+  income: TaxAssessableIncome;
+  allowances: TaxAllowances;
+  withholdingTax: number;     // ภาษีหัก ณ ที่จ่าย ที่ถูกหักไว้แล้ว
+};
+
+export type TaxBracketDetail = {
+  bracketIndex: number;
+  minIncome: number;
+  maxIncome: number;
+  rate: number;               // 0 to 0.35
+  ratePercent: number;        // 0 to 35
+  taxableInBracket: number;
+  taxInBracket: number;
+  maxTaxInBracket: number;
+  isCurrentMarginal: boolean;
+};
+
+export type TaxDeductionBreakdown = {
+  statutoryExpense: number;
+  personalAndFamily: number;
+  insuranceAndSocialSecurity: number;
+  retirementGroup: number;
+  retirementGroupCapUsed: number;
+  retirementGroupCapMax: number;
+  thaiESG: number;
+  thaiESGCapMax: number;
+  property: number;
+  netIncomeBeforeDonations: number;
+  donationsDeductible: number;
+  donationCeiling: number;
+  totalDeductionsAndAllowances: number;
+};
+
+export type TaxOptimizationAdvice = {
+  id: string;
+  category: "thaiESG" | "rmf" | "ssf" | "annuity" | "insurance" | "homeLoan" | "donation";
+  titleKey: string;
+  descKey: string;
+  recommendedAmount: number;
+  estimatedTaxSavings: number;
+  roiPercent: number;
+  priority: "high" | "medium" | "low";
+  currentUsed: number;
+  maxHeadroom: number;
+};
+
+export type TaxCalculationResult = {
+  grossAssessableIncome: number;
+  totalIncome40_1: number;
+  totalIncome40_2: number;
+  statutoryExpense: number;
+  incomeAfterExpenses: number;
+  deductions: TaxDeductionBreakdown;
+  netTaxableIncome: number;
+  brackets: TaxBracketDetail[];
+  progressiveTax: number;
+  isAmtApplicable: boolean;
+  amtTax: number;
+  taxBeforeWithholding: number;
+  withholdingTax: number;
+  netTaxPayable: number;      // > 0 = Pay more, < 0 = Refund
+  taxRefund: number;
+  additionalTaxPayable: number;
+  marginalTaxRate: number;    // 0 to 0.35
+  effectiveTaxRate: number;   // 0 to 100 %
+  advice: TaxOptimizationAdvice[];
+};

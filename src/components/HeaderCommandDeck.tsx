@@ -84,6 +84,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
     { id: "dashboard", label: t("tabs.dashboard") },
     { id: "ledger", label: t("tabs.ledger") },
     { id: "budget", label: t("tabs.budget") },
+    { id: "tax", label: t("tabs.tax") },
     { id: "analytics", label: t("tabs.analytics") },
     { id: "quests", label: t("tabs.quests") },
   ];

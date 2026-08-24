@@ -76,6 +76,22 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     xpReward: 45,
     unlocked: false,
   },
+  {
+    id: "tax_planner",
+    titleKey: "achievements.tax_planner.title",
+    descKey: "achievements.tax_planner.desc",
+    iconName: "Calculator",
+    xpReward: 50,
+    unlocked: false,
+  },
+  {
+    id: "tax_optimizer",
+    titleKey: "achievements.tax_optimizer.title",
+    descKey: "achievements.tax_optimizer.desc",
+    iconName: "ChartLineUp",
+    xpReward: 75,
+    unlocked: false,
+  },
 ];
 
 /**

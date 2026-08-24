@@ -13,6 +13,7 @@ import { useTheme } from "./hooks/useTheme";
 import { DashboardOverview } from "./components/views/DashboardOverview";
 import { TransactionLedger } from "./components/views/TransactionLedger";
 import { BudgetPlanner } from "./components/views/BudgetPlanner";
+import { TaxPlannerView } from "./components/views/TaxPlannerView";
 import { AnalyticsHub } from "./components/views/AnalyticsHub";
 import { QuestsGrowth } from "./components/views/QuestsGrowth";
 
@@ -26,17 +27,21 @@ import {
   saveAllQuests,
   getSetting,
   saveSetting,
+  getTaxProfile,
+  saveTaxProfile,
 } from "./services/db";
 import {
   calculateLevelFromTotalXp,
   evaluateAchievements,
   updateStreak,
 } from "./services/gamification";
+import { getDefaultTaxProfile } from "./services/taxCalculator";
 import type { BackupData } from "./services/exportImport";
 import type {
   Allocation,
   GamificationState,
   Quest,
+  TaxProfile,
   Transaction,
   ViewTab,
 } from "./types";
@@ -76,6 +81,7 @@ export default function App() {
   const [transactions, setTransactionsState] = useState<Transaction[]>([]);
   const [allocations, setAllocationsState] = useState<Allocation[]>([]);
   const [income, setIncomeState] = useState<number>(48000);
+  const [taxProfile, setTaxProfileState] = useState<TaxProfile>(() => getDefaultTaxProfile(48000 * 12));
   const [quests, setQuestsState] = useState<Quest[]>([]);
 
   // Gamification & Streak State
@@ -206,6 +212,7 @@ export default function App() {
         }
 
         const inc = await getSetting<number>("income", 48000);
+        const savedTaxProfile = await getTaxProfile();
         const savedXp = await getSetting<number>("totalXp", 180);
         const savedStreak = await getSetting<number>("streakDays", 1);
         const savedLastDate = await getSetting<string>("lastActiveDate", today);
@@ -220,6 +227,7 @@ export default function App() {
         setAllocationsState(allocs);
         setQuestsState(qsts);
         setIncomeState(inc);
+        setTaxProfileState(savedTaxProfile);
         setTotalXp(savedXp);
         setStreakDays(newStreak);
         setLastActiveDate(curToday);
@@ -284,6 +292,14 @@ export default function App() {
     setIncomeState((prev) => {
       const next = typeof value === "function" ? value(prev) : value;
       saveSetting("income", next).catch(console.error);
+      return next;
+    });
+  };
+
+  const setTaxProfile = (value: TaxProfile | ((prev: TaxProfile) => TaxProfile)) => {
+    setTaxProfileState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      saveTaxProfile(next).catch(console.error);
       return next;
     });
   };
@@ -438,6 +454,7 @@ export default function App() {
     if (backup.allocations) setAllocations(backup.allocations);
     if (backup.quests) setQuests(backup.quests);
     if (typeof backup.income === "number") setIncome(backup.income);
+    if (backup.taxProfile) setTaxProfile(backup.taxProfile);
     if (backup.gamification?.totalXp) {
       setTotalXp(backup.gamification.totalXp);
       saveSetting("totalXp", backup.gamification.totalXp);
@@ -558,6 +575,23 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeTab === "tax" && (
+            <motion.div
+              key="tax"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <TaxPlannerView
+                taxProfile={taxProfile}
+                setTaxProfile={setTaxProfile}
+                monthlyIncome={income}
+                onAwardXp={(xp) => addXp(xp)}
+              />
+            </motion.div>
+          )}
+
           {activeTab === "analytics" && (
             <motion.div
               key="analytics"
@@ -631,6 +665,7 @@ export default function App() {
           quests={quests}
           income={income}
           gamification={gamification}
+          taxProfile={taxProfile}
           onRestoreBackup={handleRestoreBackup}
           onImportTransactions={handleImportTransactions}
           onResetData={handleResetData}

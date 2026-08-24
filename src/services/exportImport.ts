@@ -1,4 +1,4 @@
-import type { Allocation, GamificationState, Quest, Transaction, TransactionCategory } from "../types";
+import type { Allocation, GamificationState, Quest, TaxProfile, Transaction, TransactionCategory } from "../types";
 import { TRANSACTION_CATEGORIES } from "../types";
 
 /**
@@ -135,6 +135,7 @@ export type BackupData = {
   quests: Quest[];
   income: number;
   gamification?: GamificationState;
+  taxProfile?: TaxProfile;
 };
 
 /**
@@ -142,7 +143,7 @@ export type BackupData = {
  */
 export function exportBackupJSON(data: Omit<BackupData, "version" | "exportedAt">): void {
   const fullBackup: BackupData = {
-    version: "2.0.0",
+    version: "3.0.0",
     exportedAt: new Date().toISOString(),
     ...data,
   };
@@ -173,3 +174,4 @@ export function parseBackupJSON(jsonStr: string): BackupData {
   }
   return parsed as BackupData;
 }
+
