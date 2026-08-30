@@ -12,6 +12,7 @@ import {
   Buildings,
   HeartStraight,
   TreeEvergreen,
+  Star,
 } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { BentoCard } from "../common/BentoCard";
@@ -202,7 +203,7 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
                 <span
                   className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                     brk.rate === 0
-                      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                      ? "bg-[var(--jade-soft)] text-[var(--jade-ink)]"
                       : brk.isCurrentMarginal
                       ? "bg-[var(--primary)] text-white"
                       : "bg-[var(--color-surface)] text-[var(--color-ink)] border border-[var(--color-line)]"
@@ -228,8 +229,9 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
               </div>
 
               {brk.isCurrentMarginal && (
-                <div className="mt-2 text-center text-[10px] font-bold text-[var(--primary-ink)]">
-                  ★ {t("tax.brackets.activeMarginal")}
+                <div className="mt-2 flex items-center justify-center gap-1 text-[10px] font-bold text-[var(--primary-ink)]">
+                  <Star size={12} weight="fill" />
+                  <span>{t("tax.brackets.activeMarginal")}</span>
                 </div>
               )}
             </div>
@@ -270,22 +272,22 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
           </div>
 
           {/* ThaiESG Fund Meter (Independent 300k Pool) */}
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3.5">
+          <div className="rounded-xl border border-[var(--color-line)] bg-[var(--jade-soft)] p-3.5">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-200">
-                <TreeEvergreen size={14} weight="fill" className="text-emerald-500" />
+              <span className="inline-flex items-center gap-1 text-[var(--jade-ink)]">
+                <TreeEvergreen size={14} weight="fill" className="text-[var(--jade-ink)]" />
                 ThaiESG (Independent ฿300k)
               </span>
-              <span className="font-mono text-emerald-700 dark:text-emerald-300">
+              <span className="font-mono text-[var(--jade-ink)]">
                 {t("tax.meters.capUsed", {
                   used: thb.format(result.deductions.thaiESG),
                   max: thb.format(result.deductions.thaiESGCapMax),
                 })}
               </span>
             </div>
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-emerald-200 dark:bg-emerald-950">
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--color-line)]">
               <div
-                className="h-full rounded-full bg-emerald-500"
+                className="h-full rounded-full bg-[var(--jade)]"
                 style={{
                   width: `${
                     result.deductions.thaiESGCapMax > 0
@@ -319,7 +321,7 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
             </div>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[var(--color-line)]">
               <div
-                className="h-full rounded-full bg-[#4D8E75]"
+                className="h-full rounded-full bg-[var(--jade)]"
                 style={{
                   width: `${Math.min(
                     100,
@@ -344,7 +346,7 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
       {result.advice.length > 0 && (
         <BentoCard>
           <div className="mb-4 flex items-center gap-2">
-            <LightbulbFilament size={20} weight="fill" className="text-amber-500" />
+            <LightbulbFilament size={20} weight="fill" className="text-[var(--amber-ink)]" />
             <div>
               <h3 className="text-sm font-bold text-[var(--color-ink)]">
                 {t("tax.advisor.title")}
@@ -363,7 +365,7 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                    <span className="rounded-full bg-[var(--jade-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--jade-ink)]">
                       {t("tax.advisor.roiBadge", { roi: adv.roiPercent })}
                     </span>
                     <span className="font-mono text-xs font-bold text-[var(--jade-ink)]">
@@ -656,9 +658,10 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
           {/* Tab 4: Retirement & ThaiESG */}
           {activeAccordion === "retirement" && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="col-span-full rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3">
-                <label className="text-xs font-bold text-emerald-800 dark:text-emerald-200">
-                  ★ {t("tax.inputs.thaiESG")}
+              <div className="col-span-full rounded-xl border border-[var(--color-line)] bg-[var(--jade-soft)] p-3">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--jade-ink)]">
+                  <Star size={14} weight="fill" />
+                  <span>{t("tax.inputs.thaiESG")}</span>
                 </label>
                 <input
                   type="number"
@@ -667,7 +670,7 @@ export const TaxPlannerView: React.FC<TaxPlannerViewProps> = ({
                   step="5000"
                   value={taxProfile.allowances.thaiESG || 0}
                   onChange={(e) => updateAllowance("thaiESG", parseFloat(e.target.value) || 0)}
-                  className="mt-1 w-full rounded-xl border border-emerald-500/40 bg-[var(--color-surface)] px-3 py-2 font-mono text-sm font-bold text-[var(--color-ink)] outline-none"
+                  className="mt-1 w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 font-mono text-sm font-bold text-[var(--color-ink)] outline-none"
                 />
               </div>
 

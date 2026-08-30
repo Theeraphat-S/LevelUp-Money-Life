@@ -12,4 +12,8 @@ export default defineConfig({
   build: {
     target: "esnext",
   },
+  // @ts-expect-error vitest types
+  test: {
+    environment: "jsdom",
+  },
 });

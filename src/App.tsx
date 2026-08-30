@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CalendarDots, Sparkle } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
+
+// Components & Modals
 import { HeaderCommandDeck } from "./components/HeaderCommandDeck";
 import { QuickCommandBar } from "./components/QuickCommandBar";
 import { UndoToast } from "./components/UndoToast";
@@ -9,7 +11,6 @@ import { QuickAddModal } from "./components/QuickAddModal";
 import { SlipScanModal } from "./components/SlipScanModal";
 import { DataManagerModal } from "./components/DataManagerModal";
 import { LevelUpCelebration } from "./components/LevelUpCelebration";
-import { useTheme } from "./hooks/useTheme";
 
 // Views
 import { DashboardOverview } from "./components/views/DashboardOverview";
@@ -19,7 +20,17 @@ import { TaxPlannerView } from "./components/views/TaxPlannerView";
 import { AnalyticsHub } from "./components/views/AnalyticsHub";
 import { QuestsGrowth } from "./components/views/QuestsGrowth";
 
-// Services & Types
+// Domain Hooks
+import { useTheme } from "./hooks/useTheme";
+import { useToast } from "./hooks/useToast";
+import { useGamification } from "./hooks/useGamification";
+import { useTransactions } from "./hooks/useTransactions";
+import { useBudgetAllocations } from "./hooks/useBudgetAllocations";
+import { useQuests } from "./hooks/useQuests";
+import { useTaxProfile } from "./hooks/useTaxProfile";
+import { useBankSlipListener } from "./hooks/useBankSlipListener";
+
+// Services, Constants & Types
 import {
   getTransactions,
   saveAllTransactions,
@@ -29,163 +40,102 @@ import {
   saveAllQuests,
   getSetting,
   saveSetting,
-  getTaxProfile,
-  saveTaxProfile,
+  getTaxProfile as getSavedTaxProfile,
 } from "./services/db";
-import {
-  calculateLevelFromTotalXp,
-  evaluateAchievements,
-  updateStreak,
-} from "./services/gamification";
-import { getDefaultTaxProfile } from "./services/taxCalculator";
+import { evaluateAchievements } from "./services/gamification";
 import { DEFAULT_PRESETS, getStoredPresets, saveStoredPresets } from "./utils/presetManager";
-import { getLocalTodayISO } from "./utils/safeToSpend";
+import {
+  SAMPLE_TRANSACTIONS,
+  SAMPLE_ALLOCATIONS,
+  SAMPLE_QUESTS,
+  getInitialDates,
+} from "./constants/sampleData";
 import type { BackupData } from "./services/exportImport";
-import type {
-  Allocation,
-  GamificationState,
-  PresetItem,
-  Quest,
-  TaxProfile,
-  Transaction,
-  ViewTab,
-} from "./types";
+import type { Transaction, ViewTab } from "./types";
 
-const today = getLocalTodayISO();
-const currentMonthISO = today.slice(0, 7);
-
-const sampleTransactions: Transaction[] = [
-  { id: "t1", name: "Monthly Salary", amount: 48000, date: `${currentMonthISO}-01`, category: "Income", cleared: true, notes: "Direct bank deposit" },
-  { id: "t2", name: "Condo Rent & Maintenance", amount: -12500, date: `${currentMonthISO}-02`, category: "Home", cleared: true, notes: "Auto-debit" },
-  { id: "t3", name: "Groceries — Tops Market", amount: -1420, date: `${currentMonthISO}-04`, category: "Food", cleared: true, notes: "Weekly pantry restock" },
-  { id: "t4", name: "BTS Rabbit Card Top-up", amount: -500, date: `${currentMonthISO}-05`, category: "Transport", cleared: true },
-  { id: "t5", name: "Data Science Specialization", amount: -1200, date: `${currentMonthISO}-07`, category: "Learning", cleared: true, notes: "Online certificate" },
-  { id: "t6", name: "Dinner & Cafe — Thonglor", amount: -680, date: `${currentMonthISO}-09`, category: "Fun", cleared: false },
-  { id: "t7", name: "Emergency Fund Allocation", amount: -5000, date: `${currentMonthISO}-10`, category: "Savings", cleared: true, notes: "High yield savings" },
-  { id: "t8", name: "Fitness Membership", amount: -1500, date: `${currentMonthISO}-12`, category: "Health", cleared: true },
-];
-
-const sampleAllocations: Allocation[] = [
-  { id: "needs", label: "Needs", percent: 50, color: "oklch(58% 0.13 165)" },
-  { id: "wants", label: "Wants", percent: 30, color: "oklch(62% 0.11 230)" },
-  { id: "savings", label: "Savings", percent: 20, color: "oklch(70% 0.13 80)" },
-];
-
-const sampleQuests: Quest[] = [
-  { id: "q1", title: "Log every daily expense today", date: today, xp: 15, done: false },
-  { id: "q2", title: "Review monthly 50/30/20 budget allocations", date: today, xp: 20, done: true },
-  { id: "q3", title: "Transfer 500 THB to emergency savings", date: today, xp: 25, done: false },
-];
+const { today, currentMonthISO } = getInitialDates();
 
 export default function App() {
   const { t } = useTranslation();
   const { themeMode, setThemeMode } = useTheme();
   const [loading, setLoading] = useState(true);
 
-  // Core Financial Data
-  const [transactions, setTransactionsState] = useState<Transaction[]>([]);
-  const [allocations, setAllocationsState] = useState<Allocation[]>([]);
-  const [income, setIncomeState] = useState<number>(48000);
-  const [taxProfile, setTaxProfileState] = useState<TaxProfile>(() => getDefaultTaxProfile(48000 * 12));
-  const [quests, setQuestsState] = useState<Quest[]>([]);
-
-  // Gamification & Streak State
-  const [totalXp, setTotalXp] = useState<number>(180);
-  const [streakDays, setStreakDays] = useState<number>(1);
-  const [lastActiveDate, setLastActiveDate] = useState<string>(today);
-  const [unlockedAchievementIds, setUnlockedAchievementIds] = useState<string[]>([]);
-
   // Navigation & Modals
   const [activeMonth, setActiveMonth] = useState<string>(currentMonthISO);
   const [activeTab, setActiveTab] = useState<ViewTab>("dashboard");
   const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
-  const [isSlipScanOpen, setIsSlipScanOpen] = useState<boolean>(false);
-  const [slipInitialFiles, setSlipInitialFiles] = useState<(File | string)[]>([]);
   const [isDataManagerOpen, setIsDataManagerOpen] = useState<boolean>(false);
-  const [presets, setPresetsState] = useState<PresetItem[]>(DEFAULT_PRESETS);
-  const [lastLoggedTx, setLastLoggedTx] = useState<Transaction | null>(null);
-  const [toastNotice, setToastNotice] = useState<{ message: string; visible: boolean }>({
-    message: "",
-    visible: false,
-  });
-  const [levelUpModal, setLevelUpModal] = useState<{
-    isOpen: boolean;
-    level: number;
-    rankKey: string;
-  }>({
-    isOpen: false,
-    level: 1,
-    rankKey: "rank.novice",
-  });
 
-  // Global Clipboard Paste & Drag-and-Drop listener for Bank Slips (Single & Batch)
-  useEffect(() => {
-    const handleGlobalPaste = (e: ClipboardEvent) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      const files: File[] = [];
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") !== -1) {
-          const file = items[i].getAsFile();
-          if (file) files.push(file);
-        }
-      }
-      if (files.length > 0) {
-        e.preventDefault();
-        setSlipInitialFiles(files);
-        setIsSlipScanOpen(true);
-      }
-    };
+  // Domain Hooks
+  const { toastNotice, showToast } = useToast();
+  const {
+    isSlipScanOpen,
+    setIsSlipScanOpen,
+    slipInitialFiles,
+    setSlipInitialFiles,
+    openSlipScan,
+  } = useBankSlipListener();
 
-    const handleGlobalDrop = (e: DragEvent) => {
-      if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        const imageFiles: File[] = [];
-        for (let i = 0; i < e.dataTransfer.files.length; i++) {
-          const f = e.dataTransfer.files[i];
-          if (f.type.startsWith("image/")) {
-            imageFiles.push(f);
-          }
-        }
-        if (imageFiles.length > 0) {
-          e.preventDefault();
-          setSlipInitialFiles(imageFiles);
-          setIsSlipScanOpen(true);
-        }
-      }
-    };
+  const {
+    gamification,
+    levelUpModal,
+    addXp,
+    checkAchievements,
+    setTotalXp,
+    setStreakDays,
+    setUnlockedAchievementIds,
+    closeLevelUpModal,
+    initGamification,
+    totalXp,
+    streakDays,
+    unlockedAchievementIds,
+  } = useGamification();
 
-    const handleGlobalDragOver = (e: DragEvent) => {
-      if (e.dataTransfer?.types?.includes("Files")) {
-        e.preventDefault();
-      }
-    };
+  const {
+    transactions,
+    setTransactions,
+    setTransactionsState,
+    presets,
+    setPresets,
+    setPresetsState,
+    lastLoggedTx,
+    setLastLoggedTx,
+    logQuickTransaction,
+    undoTransaction,
+    saveQuickTransaction,
+    saveSlipTransaction,
+    saveBatchSlipTransactions,
+    importTransactions,
+    initTransactions,
+  } = useTransactions();
 
-    window.addEventListener("paste", handleGlobalPaste);
-    window.addEventListener("drop", handleGlobalDrop);
-    window.addEventListener("dragover", handleGlobalDragOver);
-    return () => {
-      window.removeEventListener("paste", handleGlobalPaste);
-      window.removeEventListener("drop", handleGlobalDrop);
-      window.removeEventListener("dragover", handleGlobalDragOver);
-    };
-  }, []);
+  const {
+    allocations,
+    setAllocations,
+    setAllocationsState,
+    income,
+    setIncome,
+    setIncomeState,
+    initAllocations,
+  } = useBudgetAllocations();
 
-  // Calculate Level and Progression
-  const gamification: GamificationState = useMemo(() => {
-    const levelStats = calculateLevelFromTotalXp(totalXp);
-    return {
-      level: levelStats.level,
-      currentLevelXp: levelStats.currentLevelXp,
-      xpForNextLevel: levelStats.xpForNextLevel,
-      totalXp,
-      streakDays,
-      lastActiveDate,
-      titleRankKey: levelStats.titleRankKey,
-      unlockedAchievementIds,
-    };
-  }, [totalXp, streakDays, lastActiveDate, unlockedAchievementIds]);
+  const {
+    quests,
+    setQuests,
+    setQuestsState,
+    toggleQuest,
+    autoCompleteLoggingQuest,
+    initQuests,
+  } = useQuests();
 
-  // Evaluate Achievements
+  const {
+    taxProfile,
+    setTaxProfile,
+    setTaxProfileState,
+    initTaxProfile,
+  } = useTaxProfile();
+
+  // Evaluate Active Achievements
   const { allAchievements } = useMemo(() => {
     return evaluateAchievements(
       transactions,
@@ -202,24 +152,24 @@ export default function App() {
       try {
         let txs = await getTransactions();
         if (txs.length === 0) {
-          txs = sampleTransactions;
+          txs = SAMPLE_TRANSACTIONS;
           await saveAllTransactions(txs);
         }
 
         let allocs = await getAllocations();
         if (allocs.length === 0) {
-          allocs = sampleAllocations;
+          allocs = SAMPLE_ALLOCATIONS;
           await saveAllocations(allocs);
         }
 
         let qsts = await getQuests();
         if (qsts.length === 0) {
-          qsts = sampleQuests;
+          qsts = SAMPLE_QUESTS;
           await saveAllQuests(qsts);
         }
 
         const inc = await getSetting<number>("income", 48000);
-        const savedTaxProfile = await getTaxProfile();
+        const savedTax = await getSavedTaxProfile();
         const savedXp = await getSetting<number>("totalXp", 180);
         const savedStreak = await getSetting<number>("streakDays", 1);
         const savedLastDate = await getSetting<string>("lastActiveDate", today);
@@ -228,22 +178,11 @@ export default function App() {
         ]);
         const savedPresets = await getStoredPresets();
 
-        // Update streak based on current date
-        const { newStreak, today: curToday } = updateStreak(savedLastDate, savedStreak);
-
-        setTransactionsState(txs);
-        setAllocationsState(allocs);
-        setQuestsState(qsts);
-        setIncomeState(inc);
-        setTaxProfileState(savedTaxProfile);
-        setTotalXp(savedXp);
-        setStreakDays(newStreak);
-        setLastActiveDate(curToday);
-        setUnlockedAchievementIds(savedAchievements);
-        setPresetsState(savedPresets);
-
-        await saveSetting("streakDays", newStreak);
-        await saveSetting("lastActiveDate", curToday);
+        initTransactions(txs, savedPresets);
+        initAllocations(allocs, inc);
+        initQuests(qsts);
+        initTaxProfile(savedTax);
+        initGamification(savedXp, savedStreak, savedLastDate, savedAchievements);
       } catch (err) {
         console.error("Database initialization failed, fallback loaded:", err);
       } finally {
@@ -251,234 +190,55 @@ export default function App() {
       }
     }
     loadData();
-  }, []);
-
-  // Award XP and check Level Up
-  const addXp = (amount: number) => {
-    const prevStats = calculateLevelFromTotalXp(totalXp);
-    const newTotalXp = totalXp + amount;
-    const nextStats = calculateLevelFromTotalXp(newTotalXp);
-
-    setTotalXp(newTotalXp);
-    saveSetting("totalXp", newTotalXp).catch(console.error);
-
-    // Trigger Level Up Celebration if level increased
-    if (nextStats.level > prevStats.level) {
-      setLevelUpModal({
-        isOpen: true,
-        level: nextStats.level,
-        rankKey: nextStats.titleRankKey,
-      });
-    }
-  };
-
-  // State Updaters with Database Sync
-  const setTransactions = (value: Transaction[] | ((prev: Transaction[]) => Transaction[])) => {
-    setTransactionsState((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      saveAllTransactions(next).catch(console.error);
-      return next;
-    });
-  };
-
-  const setAllocations = (value: Allocation[] | ((prev: Allocation[]) => Allocation[])) => {
-    setAllocationsState((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      saveAllocations(next).catch(console.error);
-      return next;
-    });
-  };
-
-  const setQuests = (value: Quest[] | ((prev: Quest[]) => Quest[])) => {
-    setQuestsState((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      saveAllQuests(next).catch(console.error);
-      return next;
-    });
-  };
-
-  const setIncome = (value: number | ((prev: number) => number)) => {
-    setIncomeState((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      saveSetting("income", next).catch(console.error);
-      return next;
-    });
-  };
-
-  const setTaxProfile = (value: TaxProfile | ((prev: TaxProfile) => TaxProfile)) => {
-    setTaxProfileState((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      saveTaxProfile(next).catch(console.error);
-      return next;
-    });
-  };
-
-  const setPresets = (value: PresetItem[] | ((prev: PresetItem[]) => PresetItem[])) => {
-    setPresetsState((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      saveStoredPresets(next).catch(console.error);
-      return next;
-    });
-  };
+  }, [initTransactions, initAllocations, initQuests, initTaxProfile, initGamification]);
 
   // Handle Quick Command Bar / Preset Transaction Logging
   const handleLogQuickTransaction = (newTx: Transaction) => {
-    setTransactions((prev) => [newTx, ...prev]);
-    addXp(15);
-    setLastLoggedTx(newTx);
-
-    // Auto-complete daily logging quest if active
-    setQuests((prev) =>
-      prev.map((q) => {
-        if (q.id === "q1" && !q.done) {
-          addXp(q.xp);
-          return { ...q, done: true };
-        }
-        return q;
-      })
-    );
-
-    // Check newly unlocked achievements
-    const { newlyUnlocked, bonusXp } = evaluateAchievements(
-      [newTx, ...transactions],
-      quests,
-      allocations,
-      streakDays,
-      unlockedAchievementIds
-    );
-
-    if (newlyUnlocked.length > 0) {
-      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
-      setUnlockedAchievementIds(newIds);
-      saveSetting("unlockedAchievements", newIds).catch(console.error);
-      if (bonusXp > 0) {
-        addXp(bonusXp);
-      }
-    }
+    logQuickTransaction(newTx, {
+      onAwardXp: addXp,
+      onAfterLogged: (tx) => {
+        autoCompleteLoggingQuest(addXp);
+        checkAchievements([tx, ...transactions], quests, allocations);
+      },
+    });
   };
 
   // Handle Undo Transaction Revert
   const handleUndoTransaction = (tx: Transaction) => {
-    setTransactions((prev) => prev.filter((item) => item.id !== tx.id));
-    setTotalXp((prev) => {
-      const next = Math.max(0, prev - 15);
-      saveSetting("totalXp", next).catch(console.error);
-      return next;
+    undoTransaction(tx, {
+      onDeductXp: (amount) => setTotalXp((prev) => Math.max(0, prev - amount)),
+      onToast: showToast,
+      undoNoticeMessage: t("quickBar.toastUndone", { name: tx.name }),
     });
-    setLastLoggedTx(null);
-    setToastNotice({
-      message: t("quickBar.toastUndone", { name: tx.name }),
-      visible: true,
-    });
-    setTimeout(() => {
-      setToastNotice((prev) => ({ ...prev, visible: false }));
-    }, 3500);
   };
 
   // Handle Quick Add Save
   const handleSaveQuickTransaction = (newTx: Transaction) => {
-    setTransactions((prev) => [newTx, ...prev]);
-    addXp(15);
-    setLastLoggedTx(newTx);
-
-    // Check newly unlocked achievements
-    const { newlyUnlocked, bonusXp } = evaluateAchievements(
-      [newTx, ...transactions],
-      quests,
-      allocations,
-      streakDays,
-      unlockedAchievementIds
-    );
-
-    if (newlyUnlocked.length > 0) {
-      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
-      setUnlockedAchievementIds(newIds);
-      saveSetting("unlockedAchievements", newIds).catch(console.error);
-      if (bonusXp > 0) {
-        addXp(bonusXp);
-      }
-    }
-  };
-
-  // Handle Slip Scan Save (Awards +25 XP bonus + triggers daily quest check)
-  const handleSaveSlipTransaction = (newTx: Transaction, xpBonus: number = 25) => {
-    setTransactions((prev) => [newTx, ...prev]);
-    addXp(xpBonus);
-
-    // Auto-complete daily logging quest if active
-    setQuests((prev) =>
-      prev.map((q) => {
-        if (q.id === "q1" && !q.done) {
-          addXp(q.xp);
-          return { ...q, done: true };
-        }
-        return q;
-      })
-    );
-
-    // Check newly unlocked achievements
-    const { newlyUnlocked, bonusXp } = evaluateAchievements(
-      [newTx, ...transactions],
-      quests,
-      allocations,
-      streakDays,
-      unlockedAchievementIds
-    );
-
-    if (newlyUnlocked.length > 0) {
-      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
-      setUnlockedAchievementIds(newIds);
-      saveSetting("unlockedAchievements", newIds).catch(console.error);
-      if (bonusXp > 0) {
-        addXp(bonusXp);
-      }
-    }
-
-    setToastNotice({
-      message: t("slipScanner.toastSuccess", { xp: xpBonus }),
-      visible: true,
+    saveQuickTransaction(newTx, {
+      onAwardXp: addXp,
+      onAfterLogged: (tx) => {
+        checkAchievements([tx, ...transactions], quests, allocations);
+      },
     });
-    setTimeout(() => {
-      setToastNotice((prev) => ({ ...prev, visible: false }));
-    }, 4000);
   };
 
-  // Handle Batch Slip Save (Awards cumulative XP + batch combo)
+  // Handle Slip Scan Save
+  const handleSaveSlipTransaction = (newTx: Transaction, xpBonus = 25) => {
+    saveSlipTransaction(newTx, xpBonus, {
+      onAwardXp: addXp,
+      onAfterLogged: (tx) => {
+        autoCompleteLoggingQuest(addXp);
+        checkAchievements([tx, ...transactions], quests, allocations);
+      },
+      onToast: (msg) => showToast(msg, 4000),
+      toastMessage: t("slipScanner.toastSuccess", { xp: xpBonus }),
+    });
+  };
+
+  // Handle Batch Slip Save
   const handleSaveBatchSlipTransactions = (newTxs: Transaction[], totalXpBonus: number) => {
     if (!newTxs || newTxs.length === 0) return;
-    setTransactions((prev) => [...newTxs, ...prev]);
-    addXp(totalXpBonus);
 
-    // Auto-complete daily logging quest if active
-    setQuests((prev) =>
-      prev.map((q) => {
-        if (q.id === "q1" && !q.done) {
-          addXp(q.xp);
-          return { ...q, done: true };
-        }
-        return q;
-      })
-    );
-
-    // Check newly unlocked achievements
-    const { newlyUnlocked, bonusXp } = evaluateAchievements(
-      [...newTxs, ...transactions],
-      quests,
-      allocations,
-      streakDays,
-      unlockedAchievementIds
-    );
-
-    if (newlyUnlocked.length > 0) {
-      const newIds = [...unlockedAchievementIds, ...newlyUnlocked.map((a) => a.id)];
-      setUnlockedAchievementIds(newIds);
-      saveSetting("unlockedAchievements", newIds).catch(console.error);
-      if (bonusXp > 0) {
-        addXp(bonusXp);
-      }
-    }
-
-    // Group transaction count by month (YYYY-MM)
     const monthCounts: Record<string, number> = {};
     newTxs.forEach((tx) => {
       const m = tx.date ? tx.date.slice(0, 7) : "";
@@ -495,29 +255,15 @@ export default function App() {
       monthSummary = ` · (${monthKeys.map((m) => `${m}: ${monthCounts[m]}`).join(", ")})`;
     }
 
-    setToastNotice({
-      message: `${t("slipScanner.batchToastSuccess", { count: newTxs.length, xp: totalXpBonus })}${monthSummary}`,
-      visible: true,
+    saveBatchSlipTransactions(newTxs, totalXpBonus, {
+      onAwardXp: addXp,
+      onAfterLoggedBatch: (txs) => {
+        autoCompleteLoggingQuest(addXp);
+        checkAchievements([...txs, ...transactions], quests, allocations);
+      },
+      onToast: (msg) => showToast(msg, 5500),
+      toastMessage: `${t("slipScanner.batchToastSuccess", { count: newTxs.length, xp: totalXpBonus })}${monthSummary}`,
     });
-    setTimeout(() => {
-      setToastNotice((prev) => ({ ...prev, visible: false }));
-    }, 5500);
-  };
-
-  // Handle Quest Toggle
-  const handleToggleQuest = (id: string) => {
-    setQuests((prev) =>
-      prev.map((q) => {
-        if (q.id === id) {
-          const nextDone = !q.done;
-          if (nextDone) {
-            addXp(q.xp);
-          }
-          return { ...q, done: nextDone };
-        }
-        return q;
-      })
-    );
   };
 
   // Restore Complete Backup
@@ -530,30 +276,23 @@ export default function App() {
     if (backup.presets) setPresets(backup.presets);
     if (backup.gamification?.totalXp) {
       setTotalXp(backup.gamification.totalXp);
-      saveSetting("totalXp", backup.gamification.totalXp);
     }
-  };
-
-  // Import CSV Transactions
-  const handleImportTransactions = (imported: Transaction[]) => {
-    setTransactions((prev) => [...imported, ...prev]);
-    addXp(imported.length * 10);
   };
 
   // Reset to Sample Data
   const handleResetData = async () => {
-    await saveAllTransactions(sampleTransactions);
-    await saveAllocations(sampleAllocations);
-    await saveAllQuests(sampleQuests);
+    await saveAllTransactions(SAMPLE_TRANSACTIONS);
+    await saveAllocations(SAMPLE_ALLOCATIONS);
+    await saveAllQuests(SAMPLE_QUESTS);
     await saveSetting("income", 48000);
     await saveSetting("totalXp", 180);
     await saveSetting("streakDays", 1);
     await saveSetting("unlockedAchievements", ["first_log"]);
     await saveStoredPresets(DEFAULT_PRESETS);
 
-    setTransactionsState(sampleTransactions);
-    setAllocationsState(sampleAllocations);
-    setQuestsState(sampleQuests);
+    setTransactionsState(SAMPLE_TRANSACTIONS);
+    setAllocationsState(SAMPLE_ALLOCATIONS);
+    setQuestsState(SAMPLE_QUESTS);
     setIncomeState(48000);
     setTotalXp(180);
     setStreakDays(1);
@@ -582,10 +321,7 @@ export default function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           onOpenQuickAdd={() => setIsQuickAddOpen(true)}
-          onOpenScanSlip={() => {
-            setSlipInitialFiles([]);
-            setIsSlipScanOpen(true);
-          }}
+          onOpenScanSlip={() => openSlipScan([])}
           onOpenDataManager={() => setIsDataManagerOpen(true)}
           themeMode={themeMode}
           setThemeMode={setThemeMode}
@@ -619,7 +355,7 @@ export default function App() {
                 income={income}
                 activeMonth={activeMonth}
                 setActiveTab={setActiveTab}
-                onToggleQuest={handleToggleQuest}
+                onToggleQuest={(id) => toggleQuest(id, addXp)}
                 onOpenQuickAdd={() => setIsQuickAddOpen(true)}
               />
             </motion.div>
@@ -706,7 +442,7 @@ export default function App() {
                 setQuests={setQuests}
                 gamification={gamification}
                 achievements={allAchievements}
-                onToggleQuest={handleToggleQuest}
+                onToggleQuest={(id) => toggleQuest(id, addXp)}
               />
             </motion.div>
           )}
@@ -725,10 +461,7 @@ export default function App() {
           isOpen={isQuickAddOpen}
           onClose={() => setIsQuickAddOpen(false)}
           onSave={handleSaveQuickTransaction}
-          onOpenScanSlip={() => {
-            setSlipInitialFiles([]);
-            setIsSlipScanOpen(true);
-          }}
+          onOpenScanSlip={() => openSlipScan([])}
           defaultDate={today}
         />
 
@@ -754,7 +487,7 @@ export default function App() {
           taxProfile={taxProfile}
           presets={presets}
           onRestoreBackup={handleRestoreBackup}
-          onImportTransactions={handleImportTransactions}
+          onImportTransactions={(txs) => importTransactions(txs, { onAwardXp: addXp })}
           onResetData={handleResetData}
         />
 
@@ -762,7 +495,7 @@ export default function App() {
           isOpen={levelUpModal.isOpen}
           level={levelUpModal.level}
           rankKey={levelUpModal.rankKey}
-          onClose={() => setLevelUpModal((prev) => ({ ...prev, isOpen: false }))}
+          onClose={closeLevelUpModal}
         />
 
         {/* 5-Second Undo Toast for Quick Logging */}
