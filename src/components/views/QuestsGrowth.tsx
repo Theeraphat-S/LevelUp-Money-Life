@@ -117,7 +117,6 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                 Discipline Streak
               </span>
               <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)] flex items-center gap-1.5">
-                <span>🔥</span>
                 <AnimatedCounter value={gamification.streakDays} duration={0.3} />
                 <span>{t("quests.streakTitle", { days: "" }).replace("0", "").trim()}</span>
               </h2>

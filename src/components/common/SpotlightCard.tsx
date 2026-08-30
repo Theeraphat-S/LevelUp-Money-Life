@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { motion, useReducedMotion, type HTMLMotionProps } from "framer-motion";
 
 interface SpotlightCardProps extends HTMLMotionProps<"div"> {
@@ -18,32 +18,26 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
   ...props
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const shouldReduceMotion = useReducedMotion();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!enableGlow || shouldReduceMotion || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    cardRef.current.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    cardRef.current.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
   };
 
   return (
     <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       whileHover={
         enableLift && !shouldReduceMotion
           ? { y: -2 }
           : undefined
       }
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
-      className={`relative overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)] transition-shadow duration-300 hover:shadow-[var(--shadow-diffuse)] ${className}`}
+      className={`group/spotlight relative overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)] transition-shadow duration-300 hover:shadow-[var(--shadow-diffuse)] ${className}`}
       {...props}
     >
       {/* 1px Inner Refraction Top Border */}
@@ -52,10 +46,9 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
       {/* Dynamic Cursor Spotlight Effect */}
       {enableGlow && !shouldReduceMotion && (
         <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-out z-0"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover/spotlight:opacity-100 z-0"
           style={{
-            opacity: isHovered ? 1 : 0,
-            background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, ${spotlightColor}, transparent 80%)`,
+            background: `radial-gradient(350px circle at var(--mouse-x, -999px) var(--mouse-y, -999px), ${spotlightColor}, transparent 80%)`,
           }}
         />
       )}
@@ -65,3 +58,4 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
     </motion.div>
   );
 };
+

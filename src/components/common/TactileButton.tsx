@@ -4,14 +4,12 @@ import { motion, useReducedMotion, type HTMLMotionProps } from "framer-motion";
 interface TactileButtonProps extends HTMLMotionProps<"button"> {
   children: React.ReactNode;
   className?: string;
-  variant?: "primary" | "secondary" | "ghost" | "danger";
   disabled?: boolean;
 }
 
 export const TactileButton: React.FC<TactileButtonProps> = ({
   children,
   className = "",
-  variant,
   disabled = false,
   ...props
 }) => {
@@ -30,3 +28,4 @@ export const TactileButton: React.FC<TactileButtonProps> = ({
     </motion.button>
   );
 };
+

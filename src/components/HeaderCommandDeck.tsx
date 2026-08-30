@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   CaretLeft,
   CaretRight,
@@ -45,6 +45,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
   setThemeMode,
 }) => {
   const { t, i18n } = useTranslation();
+  const shouldReduceMotion = useReducedMotion();
   const currentLang = i18n.language?.startsWith("th") ? "th" : "en";
   const currentMonthISO = new Date().toISOString().slice(0, 7);
 
@@ -151,9 +152,9 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-[var(--color-line)]">
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-[#4D8E75] to-[#1C5954] dark:from-[#8BB999] dark:to-[#76AA9D] shadow-xs"
-                initial={{ width: 0 }}
+                initial={shouldReduceMotion ? { width: `${levelProgressPct}%` } : { width: 0 }}
                 animate={{ width: `${levelProgressPct}%` }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               />
             </div>
           </div>

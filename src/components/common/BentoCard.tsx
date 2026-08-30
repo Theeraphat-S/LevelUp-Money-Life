@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { motion, useReducedMotion, type HTMLMotionProps } from "framer-motion";
 
 interface BentoCardProps extends HTMLMotionProps<"section"> {
@@ -20,30 +20,25 @@ export const BentoCard: React.FC<BentoCardProps> = ({
   ...motionProps
 }) => {
   const cardRef = useRef<HTMLElement>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const shouldReduceMotion = useReducedMotion();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!enableSpotlight || shouldReduceMotion || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    cardRef.current.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    cardRef.current.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
   };
 
   return (
     <motion.section
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+      whileHover={!shouldReduceMotion ? { y: -2 } : undefined}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className={`relative overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)] transition-shadow duration-300 hover:shadow-[var(--shadow-diffuse)] ${className}`}
+      className={`group/bento relative overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[var(--shadow-tile)] transition-shadow duration-300 hover:shadow-[var(--shadow-diffuse)] ${className}`}
       {...motionProps}
     >
       {/* 1px Inner Refraction Top Border */}
@@ -52,10 +47,9 @@ export const BentoCard: React.FC<BentoCardProps> = ({
       {/* Dynamic Cursor Spotlight Effect */}
       {enableSpotlight && !shouldReduceMotion && (
         <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-out z-0"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover/bento:opacity-100 z-0"
           style={{
-            opacity: isHovered ? 1 : 0,
-            background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(28, 89, 84, 0.05), transparent 80%)`,
+            background: "radial-gradient(400px circle at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(28, 89, 84, 0.05), transparent 80%)",
           }}
         />
       )}
@@ -76,4 +70,5 @@ export const BentoCard: React.FC<BentoCardProps> = ({
     </motion.section>
   );
 };
+
 

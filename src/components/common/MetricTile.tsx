@@ -74,25 +74,19 @@ export const MetricTile: React.FC<MetricTileProps> = ({
 }) => {
   const styles = TONE_STYLES[tone];
   const tileRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const shouldReduceMotion = useReducedMotion();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (shouldReduceMotion || !tileRef.current) return;
     const rect = tileRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    tileRef.current.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    tileRef.current.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
   };
 
   return (
     <motion.div
       ref={tileRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       whileHover={!shouldReduceMotion ? { y: -2 } : undefined}
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
       onClick={onClick}
@@ -104,10 +98,9 @@ export const MetricTile: React.FC<MetricTileProps> = ({
       {/* Subtle Dynamic Spotlight Effect */}
       {!shouldReduceMotion && (
         <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-out z-0"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 z-0"
           style={{
-            opacity: isHovered ? 1 : 0,
-            background: `radial-gradient(220px circle at ${mousePos.x}px ${mousePos.y}px, ${styles.spotlight}, transparent 80%)`,
+            background: `radial-gradient(220px circle at var(--mouse-x, -999px) var(--mouse-y, -999px), ${styles.spotlight}, transparent 80%)`,
           }}
         />
       )}
