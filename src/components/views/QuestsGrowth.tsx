@@ -13,6 +13,9 @@ import {
 } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { BentoCard } from "../common/BentoCard";
+import { TactileButton } from "../common/TactileButton";
+import { AnimatedCounter } from "../common/AnimatedCounter";
+import { FloatingReward, type FloatingRewardItem } from "../common/FloatingReward";
 import type { Achievement, GamificationState, Quest } from "../../types";
 
 interface QuestsGrowthProps {
@@ -45,6 +48,22 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
   const [newQuestTitle, setNewQuestTitle] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [lastDeleted, setLastDeleted] = useState<Quest | null>(null);
+  const [floatingRewards, setFloatingRewards] = useState<FloatingRewardItem[]>([]);
+
+  const handleToggle = (quest: Quest, e: React.MouseEvent) => {
+    if (!quest.done) {
+      setFloatingRewards((prev) => [
+        ...prev,
+        {
+          id: `${quest.id}-${Date.now()}`,
+          text: `+${quest.xp} XP Completed!`,
+          x: e.clientX,
+          y: e.clientY,
+        },
+      ]);
+    }
+    onToggleQuest(quest.id);
+  };
 
   const handleAddQuest = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +97,13 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
 
   return (
     <div className="space-y-6">
+      <FloatingReward
+        rewards={floatingRewards}
+        onComplete={(id) => {
+          setFloatingRewards((prev) => prev.filter((r) => r.id !== id));
+        }}
+      />
+
       {/* Top Streak & Gamification Banner */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         {/* Streak Flame Banner (5 cols) */}
@@ -90,8 +116,10 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[var(--amber-ink)]">
                 Discipline Streak
               </span>
-              <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)]">
-                {t("quests.streakTitle", { days: gamification.streakDays })}
+              <h2 className="text-xl font-bold tracking-tight text-[var(--color-ink)] flex items-center gap-1.5">
+                <span>🔥</span>
+                <AnimatedCounter value={gamification.streakDays} duration={0.3} />
+                <span>{t("quests.streakTitle", { days: "" }).replace("0", "").trim()}</span>
               </h2>
               <p className="mt-1 text-xs text-[var(--color-ink-soft)] leading-relaxed">
                 {t("quests.streakSubtitle")}
@@ -111,8 +139,9 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                   {t("quests.roadmapTitle")}
                 </h3>
               </div>
-              <span className="font-mono text-xs font-bold text-[var(--jade-ink)]">
-                Level {gamification.level}
+              <span className="font-mono text-xs font-bold text-[var(--jade-ink)] flex items-center gap-1">
+                <span>Level</span>
+                <AnimatedCounter value={gamification.level} duration={0.3} />
               </span>
             </div>
           }
@@ -160,14 +189,14 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
                 {t("quests.subtitle")}
               </p>
             </div>
-            <button
+            <TactileButton
               type="button"
               onClick={() => setIsAdding((p) => !p)}
               className="inline-flex items-center gap-1.5 rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-semibold hover:opacity-90 transition shadow-xs"
             >
               <Plus size={14} weight="bold" />
               <span>{t("quests.add")}</span>
-            </button>
+            </TactileButton>
           </div>
         }
       >
@@ -183,7 +212,7 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               <button
                 type="button"
                 onClick={undoDelete}
-                className="inline-flex items-center gap-1 font-bold text-[var(--amber-ink)] underline hover:no-underline"
+                className="inline-flex items-center gap-1 font-bold text-[var(--amber-ink)] underline hover:no-underline cursor-pointer"
               >
                 <ArrowUUpLeft size={14} /> {t("quests.undo")}
               </button>
@@ -202,16 +231,16 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
               onChange={(e) => setNewQuestTitle(e.target.value)}
               className="flex-1 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-2 text-xs text-[var(--color-ink)] outline-none focus:border-[var(--primary)] shadow-xs"
             />
-            <button
+            <TactileButton
               type="submit"
               className="rounded-xl bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3.5 py-2 text-xs font-bold shadow-xs hover:opacity-90"
             >
               Save Quest
-            </button>
+            </TactileButton>
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className="rounded-xl border border-[var(--color-line)] px-3 py-2 text-xs text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
+              className="rounded-xl border border-[var(--color-line)] px-3 py-2 text-xs text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] cursor-pointer"
             >
               Cancel
             </button>
@@ -230,8 +259,8 @@ export const QuestsGrowth: React.FC<QuestsGrowthProps> = ({
             >
               <button
                 type="button"
-                onClick={() => onToggleQuest(quest.id)}
-                className="flex flex-1 items-center gap-3 text-left"
+                onClick={(e) => handleToggle(quest, e)}
+                className="flex flex-1 items-center gap-3 text-left cursor-pointer"
               >
                 {quest.done ? (
                   <CheckCircle size={22} weight="fill" className="text-[var(--jade)] shrink-0" />

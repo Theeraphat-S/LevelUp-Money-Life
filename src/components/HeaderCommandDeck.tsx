@@ -15,6 +15,8 @@ import {
 } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { AppLogo } from "./AppLogo";
+import { TactileButton } from "./common/TactileButton";
+import { AnimatedCounter } from "./common/AnimatedCounter";
 import type { GamificationState, ThemeMode, ViewTab } from "../types";
 
 interface HeaderCommandDeckProps {
@@ -136,11 +138,14 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
           <div className="mt-3 max-w-md">
             <div className="flex items-center justify-between text-[11px] font-medium text-[var(--color-ink-soft)]">
               <span>{t("rank." + gamification.titleRankKey.replace("rank.", ""))}</span>
-              <span className="font-mono text-[var(--jade-ink)] font-semibold">
-                {t("header.xpProgress", {
-                  current: gamification.currentLevelXp,
-                  next: gamification.xpForNextLevel,
-                })}
+              <span className="font-mono text-[var(--jade-ink)] font-semibold flex items-center gap-1">
+                <span>XP:</span>
+                <AnimatedCounter
+                  value={gamification.currentLevelXp}
+                  className="font-bold text-[var(--jade-ink)]"
+                  duration={0.3}
+                />
+                <span className="text-[var(--color-ink-soft)]">/ {gamification.xpForNextLevel}</span>
               </span>
             </div>
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-[var(--color-line)]">
@@ -161,7 +166,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
             <button
               type="button"
               onClick={prevMonth}
-              className="rounded-lg p-1.5 text-[var(--color-ink-soft)] transition hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]"
+              className="rounded-lg p-1.5 text-[var(--color-ink-soft)] transition hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] cursor-pointer"
               aria-label="Previous Month"
             >
               <CaretLeft size={16} weight="bold" />
@@ -174,7 +179,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
             <button
               type="button"
               onClick={nextMonth}
-              className="rounded-lg p-1.5 text-[var(--color-ink-soft)] transition hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]"
+              className="rounded-lg p-1.5 text-[var(--color-ink-soft)] transition hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] cursor-pointer"
               aria-label="Next Month"
             >
               <CaretRight size={16} weight="bold" />
@@ -184,7 +189,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveMonth(currentMonthISO)}
-                className="ml-1 rounded-md bg-[var(--color-surface)] px-2 py-0.5 text-[10px] font-semibold text-[var(--primary-ink)] border border-[var(--color-line)] hover:bg-[var(--primary-soft)]"
+                className="ml-1 rounded-md bg-[var(--color-surface)] px-2 py-0.5 text-[10px] font-semibold text-[var(--primary-ink)] border border-[var(--color-line)] hover:bg-[var(--primary-soft)] cursor-pointer"
               >
                 {t("header.currentMonth")}
               </button>
@@ -208,7 +213,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
                   aria-label={`${t("theme.title")}: ${opt.label}`}
                   aria-checked={isSelected}
                   role="radio"
-                  className={`relative flex items-center justify-center rounded-lg p-1.5 text-xs transition-colors duration-200 ${
+                  className={`relative flex items-center justify-center rounded-lg p-1.5 text-xs transition-colors duration-200 cursor-pointer ${
                     isSelected
                       ? "text-[var(--color-ink)] font-bold"
                       : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
@@ -234,7 +239,7 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
                 key={lng}
                 type="button"
                 onClick={() => i18n.changeLanguage(lng)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition ${
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
                   currentLang === lng
                     ? "bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] shadow-xs"
                     : "text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
@@ -246,41 +251,41 @@ export const HeaderCommandDeck: React.FC<HeaderCommandDeckProps> = ({
           </div>
 
           {/* Data Manager Trigger */}
-          <button
+          <TactileButton
             type="button"
             onClick={onOpenDataManager}
             title={t("header.dataManager")}
             aria-label={t("header.dataManager")}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-2 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-surface)] active:scale-[0.98] shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-2 text-xs font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-surface)] shadow-xs"
           >
             <Database size={15} weight="duotone" />
             <span className="hidden sm:inline">{t("header.dataManager")}</span>
-          </button>
+          </TactileButton>
 
           {/* Scan Slip Button */}
-          <button
+          <TactileButton
             type="button"
             onClick={onOpenScanSlip}
             title={t("header.scanSlipTip")}
             aria-label={t("header.scanSlip")}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--primary)]/30 bg-[var(--primary-soft)] px-3 py-2 text-xs font-semibold text-[var(--primary-ink)] transition hover:opacity-90 active:scale-[0.98] shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--primary)]/30 bg-[var(--primary-soft)] px-3 py-2 text-xs font-semibold text-[var(--primary-ink)] transition hover:opacity-90 shadow-xs"
           >
             <Receipt size={15} weight="duotone" className="text-[var(--primary)]" />
             <span>{t("header.scanSlip")}</span>
             <span className="hidden sm:inline-flex items-center text-[10px] font-bold text-[var(--jade-ink)] opacity-90">
               +25 XP
             </span>
-          </button>
+          </TactileButton>
 
           {/* Quick Add Button — Primary Deep Teal */}
-          <button
+          <TactileButton
             type="button"
             onClick={onOpenQuickAdd}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3.5 py-2 text-xs font-semibold transition hover:opacity-90 active:scale-[0.98] shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3.5 py-2 text-xs font-semibold transition hover:opacity-90 shadow-sm"
           >
             <Plus size={15} weight="bold" />
             <span>{t("header.quickAdd")}</span>
-          </button>
+          </TactileButton>
         </div>
       </div>
 

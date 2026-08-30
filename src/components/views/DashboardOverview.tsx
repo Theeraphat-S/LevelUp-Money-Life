@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -15,6 +15,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { BentoCard } from "../common/BentoCard";
 import { MetricTile } from "../common/MetricTile";
+import { TactileButton } from "../common/TactileButton";
+import { FloatingReward, type FloatingRewardItem } from "../common/FloatingReward";
 import {
   CATEGORY_BUCKET_MAP,
   CATEGORY_COLORS,
@@ -48,6 +50,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   onOpenQuickAdd,
 }) => {
   const { t } = useTranslation();
+  const [floatingRewards, setFloatingRewards] = useState<FloatingRewardItem[]>([]);
 
   // Filter transactions for the selected month
   const monthTransactions = transactions.filter((tx) => tx.date.startsWith(activeMonth));
@@ -90,35 +93,60 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
   const completedQuests = quests.filter((q) => q.done).length;
 
+  const handleQuestClick = (quest: Quest, e: React.MouseEvent) => {
+    if (!quest.done) {
+      const newReward: FloatingRewardItem = {
+        id: `${quest.id}-${Date.now()}`,
+        text: `+${quest.xp} XP Completed!`,
+        x: e.clientX,
+        y: e.clientY,
+      };
+      setFloatingRewards((prev) => [...prev, newReward]);
+    }
+    onToggleQuest(quest.id);
+  };
+
   return (
     <div className="space-y-6">
+      <FloatingReward
+        rewards={floatingRewards}
+        onComplete={(id) => {
+          setFloatingRewards((prev) => prev.filter((r) => r.id !== id));
+        }}
+      />
+
       {/* Top Metric Cards Grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <MetricTile
           icon={<ChartLineUp size={18} weight="duotone" />}
           label={t("metric.net")}
-          value={`${netCashFlow >= 0 ? "+" : ""}฿${thb.format(netCashFlow)}`}
+          numericValue={netCashFlow}
+          prefix="฿"
+          showSign={true}
           subtext={netCashFlow >= 0 ? "Positive cash flow" : "Net deficit"}
           tone={netCashFlow >= 0 ? "jade" : "rose"}
         />
         <MetricTile
           icon={<Coins size={18} weight="duotone" />}
           label={t("metric.income")}
-          value={`฿${thb.format(monthIncome)}`}
+          numericValue={monthIncome}
+          prefix="฿"
           subtext={`Budget baseline: ฿${thb.format(income)}`}
           tone="jade"
         />
         <MetricTile
           icon={<Receipt size={18} weight="duotone" />}
           label={t("metric.spent")}
-          value={`฿${thb.format(monthExpenses)}`}
+          numericValue={monthExpenses}
+          prefix="฿"
           subtext={`${totalCount} total entries logged`}
           tone="rose"
         />
         <MetricTile
           icon={<PiggyBank size={18} weight="duotone" />}
           label={t("metric.savingsRate")}
-          value={`${savingsRate}%`}
+          numericValue={savingsRate}
+          suffix="%"
           subtext={`Cleared logs: ${clearedCount}/${totalCount}`}
           tone={savingsRate >= 20 ? "jade" : "amber"}
         />
@@ -221,7 +249,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             {quests.slice(0, 3).map((quest) => (
               <div
                 key={quest.id}
-                onClick={() => onToggleQuest(quest.id)}
+                onClick={(e) => handleQuestClick(quest, e)}
                 className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition ${
                   quest.done
                     ? "border-[var(--jade)]/30 bg-[var(--jade-soft)]/50 text-[var(--color-ink-soft)]"
@@ -269,13 +297,13 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <span>{t("tabs.quests")}</span>
               <ArrowRight size={13} />
             </button>
-            <button
+            <TactileButton
               type="button"
               onClick={onOpenQuickAdd}
               className="rounded-lg bg-[#1C5954] text-[#FEFFFC] dark:bg-[#76AA9D] dark:text-[#071B1A] px-3 py-1.5 text-xs font-bold hover:opacity-90 transition shadow-xs"
             >
               + {t("header.quickAdd")}
-            </button>
+            </TactileButton>
           </div>
         </BentoCard>
       </div>
