@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white&style=flat-square" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white&style=flat-square" alt="Tailwind CSS v4" />
   <img src="https://img.shields.io/badge/SQLite-Local--First-003B57?logo=sqlite&logoColor=white&style=flat-square" alt="SQLite" />
-  <img src="https://img.shields.io/badge/Vitest-71%20Passed-brightgreen?logo=vitest&logoColor=white&style=flat-square" alt="Vitest Tests" />
+  <img src="https://img.shields.io/badge/Vitest-88%20Passed-brightgreen?logo=vitest&logoColor=white&style=flat-square" alt="Vitest Tests" />
   <img src="https://img.shields.io/badge/OCR-Tesseract.js-5C6BC0?style=flat-square" alt="Tesseract.js OCR" />
   <img src="https://img.shields.io/badge/i18n-TH%20%7C%20EN-orange?style=flat-square" alt="i18n TH/EN" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" />
@@ -38,9 +38,9 @@
 
 ### 🌟 Overview
 
-**LevelUp Money Life** is an ultra-fast, privacy-first desktop application designed to make personal financial management effortless, clear, and engaging. By seamlessly fusing **Notion-style high-density data tables** with an **RPG gamification layer (XP, Streaks, Daily Quests & Level Progression)** and **1-Click Smart Logging**, it transforms daily expense tracking into an enjoyable discipline.
+**LevelUp Money Life** is an ultra-fast, privacy-first desktop application designed to make personal financial management effortless, clear, and engaging. By seamlessly fusing **Notion-style high-density data tables** with an **RPG gamification layer (XP, Streaks, Daily Quests & Level Progression)**, **1-Click Smart Logging**, and **tactile dynamic micro-interactions**, it transforms daily expense tracking into an enjoyable discipline.
 
-> **Design Philosophy:** *Finance first, game layer second.* Your money data is always clean, clear, and accurate. The game mechanics motivate consistent habits without getting in the way of serious financial decisions.
+> **Design Philosophy:** *Finance first, game layer second.* Your money data is always clean, clear, and accurate. The game mechanics and fluid micro-interactions motivate consistent habits without visual clutter or getting in the way of serious financial decisions.
 
 ---
 
@@ -50,15 +50,16 @@
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        LEVELUP MONEY LIFE ARCHITECTURE                 │
 ├──────────────────┬───────────────────┬─────────────────────────────────┤
-│  ⚡ QUICK INPUT  │  📊 ANALYTICS     │  🎮 GAMIFICATION ENGINE         │
+│  ⚡ QUICK INPUT  │  📊 ANALYTICS     │  🎮 GAMIFICATION & MOTION       │
 │  • 1-Tap Presets │  • Safe-to-Spend  │  • RPG Leveling (Lv 1 - 50)     │
 │  • Smart Parser  │  • 50/30/20 Budget│  • Daily Habit Quests           │
-│  • Autocomplete  │  • Thai Tax Engine│  • Streak & Milestone Medals    │
-│  • Slip OCR Scan │  • Donut Charts   │  • Level-Up Celebrations        │
+│  • Autocomplete  │  • Thai Tax Engine│  • Spotlight Hover Glows        │
+│  • Slip OCR Scan │  • Donut Charts   │  • Spring Numeric Tickers       │
+│  • Undo Toast    │  • Cash Flow Trend│  • Tactile Micro-Spring Buttons │
 └──────────────────┴───────────────────┴─────────────────────────────────┘
 ```
 
-#### 1. ⚡ Quick Command Bar & One-Tap Presets *(New)*
+#### 1. ⚡ Quick Command Bar & One-Tap Presets
 - **One-Tap Quick Logging**: Click preconfigured buttons (☕ Coffee 60฿, 🍱 Lunch 70฿, 🚇 Transit 45฿, 🛒 7-11 100฿, ⛽ Fuel 500฿) to log expenses in under 1 second.
 - **Smart Frequent Suggestion**: Automatically analyzes recent transaction frequency to suggest your most common expenses.
 - **Natural Language Single-Line Input**: Type naturally in Thai or English (e.g. `กะเพรา 65`, `BTS 45`, `25*3`, `+salary 45000`) with auto arithmetic evaluation and automatic category inference.
@@ -66,47 +67,54 @@
 - **Interactive Undo Toast**: 5-second countdown notification with instant 1-click rollback in case of accidental entries.
 - **Custom Preset Manager**: Full CRUD dialog to create, edit, reorder, and personalize custom preset chips.
 
-#### 2. 🎯 Real-Time Daily Safe-to-Spend Indicator
+#### 2. ✨ Fluid Dynamic Micro-Interactions *(New)*
+- **Cursor Spotlight Bento Cards (`SpotlightCard` / `BentoCard`)**: High-performance CSS variable-driven radial glow (5–9% opacity) tracking cursor movement with zero React re-render overhead, paired with a gentle `-2px` hover lift.
+- **Spring Numeric Tickers (`AnimatedCounter`)**: Smooth 300–400ms spring-interpolated roll on financial values, net balance, savings rate, and EXP changes, accompanied by brief subtle semantic pulses (Soft Jade on increase, Soft Rose on decrease).
+- **Tactile Micro-Spring Buttons (`TactileButton`)**: Responsive `scale: 0.97` tap compression and subtle hover elevation.
+- **Clean Floating XP Rewards (`FloatingReward`)**: Non-intrusive floating `+XX XP Completed!` milestone pops on quest completion.
+- **Full Accessibility Guard**: Strictly adheres to `prefers-reduced-motion` for instant static rendering when reduced motion is requested.
+
+#### 3. 🎯 Real-Time Daily Safe-to-Spend Indicator
 - **Daily Financial Compass**: Real-time calculated daily spending allowance based on monthly disposable income, current day of month, and total spending to date.
 - **Visual Comfort States**: Color-coded indicators (`comfortable`, `caution`, `critical`) showing whether your daily pace is on track.
 - **Instant Reactive Updates**: Automatically recalculates immediately upon transaction creation or undo.
 
-#### 3. 🏠 Finance Command Deck (Dashboard)
-- **High-Altitude Overview**: Real-time KPI cards for Total Income, Total Expenses, Net Balance, and Savings Rate.
+#### 4. 🏠 Finance Command Deck (Dashboard)
+- **High-Altitude Overview**: Real-time KPI cards for Total Income, Total Expenses, Net Balance, and Savings Rate with interactive spotlight and animated counters.
 - **Level & XP Gauge**: Dynamic level badge (Novice to Grandmaster) and active streak tracker.
 - **Active Quests Widget**: Check off daily financial habits directly from the overview.
 
-#### 4. 📜 Notion-Style Transaction Ledger
+#### 5. 📜 Notion-Style Transaction Ledger
 - **Interactive Data Grid**: Clean, high-density spreadsheet experience tailored for desktop.
 - **Multi-Field Sorting & Filtering**: Sort by date, amount, category, or description with a single click.
 - **Instant Search & Category Filtering**: Filter by Food, Transport, Home, Health, Learning, Fun, Savings, Income, or Debt.
 - **Cleared Reconciliation Tracking**: Toggle verified status for reconciling bank accounts.
 
-#### 5. 🎯 Dynamic 50/30/20 Budget Planner
+#### 6. 🎯 Dynamic 50/30/20 Budget Planner
 - **Flexible Budget Allocations**: Set custom target percentages for **Needs**, **Wants**, and **Savings**.
 - **Live Target vs. Actuals**: Real-time comparison progress bars with semantic warnings against overspending.
 
-#### 6. 🧮 Thai Tax Planner (Personal Income Tax Calculator)
+#### 7. 🧮 Thai Tax Planner (Personal Income Tax Calculator)
 - **Revenue Department Tier Engine**: Full progressive tax bracket calculation (0% to 35%).
 - **Comprehensive Thai Deductions**: Personal allowance, Social Security (SSO), Provident Fund (PVD), RMF, SSF, ThaiESG, Easy E-Receipt, Life/Health insurance, and Home loan interest deductions.
 - **Tax Optimization Insights**: Real-time estimation of net taxable income and tax savings.
 
-#### 7. 📊 Analytics Hub
+#### 8. 📊 Analytics Hub
 - **Interactive Visualizations**: Powered by Recharts with custom curated accessible palettes.
 - **Category Spending Distribution**: Interactive donut charts revealing exactly where your money went.
 - **Monthly In/Out Flow**: Month-over-month financial trend comparisons.
 
-#### 8. ⚔️ Quests & Growth (Gamification Engine)
+#### 9. ⚔️ Quests & Growth (Gamification Engine)
 - **Daily Quests**: Complete daily financial actions to earn XP and level up.
 - **Streak Multipliers**: Maintain consecutive active days to boost XP gains.
 - **Achievements & Badges**: Unlock milestone medals (First Log, 7-Day Streak, Budget Master, Savings Champion).
 
-#### 9. 🧾 AI & OCR Bank Slip Scanner
+#### 10. 🧾 AI & OCR Bank Slip Scanner
 - **Thai Bank Recognition**: Pre-trained regex & OCR for major Thai banks (KBank, SCB, PromptPay, BBL, KTB, TTB).
 - **Auto Data Extraction**: Automatically extracts transfer amount, date/time, sender, receiver, and reference number.
 - **Canvas Image Preprocessing**: Grayscale & contrast enhancement for maximum OCR accuracy.
 
-#### 10. 🔒 100% Local-First & Private Data Management
+#### 11. 🔒 100% Local-First & Private Data Management
 - **Zero Cloud Dependence**: Data stays strictly on your local machine in an embedded SQLite database (`@tauri-apps/plugin-sql`).
 - **JSON Backup & Snapshot Restore**: Export and import complete snapshots including custom presets and quest history.
 - **CSV Data Export**: Export clean transaction history for Excel, Google Sheets, or tax filings.
@@ -117,7 +125,7 @@
 
 ### 🌟 ภาพรวมโครงการ
 
-**LevelUp Money Life** คือแอปพลิเคชันเดสก์ท็อปสำหรับการบริหารจัดการการเงินส่วนบุคคลที่ผสมผสานความเรียบง่าย รวดเร็ว และเป็นส่วนตัว ด้วยการนำตารางบันทึกข้อมูลแบบ **Notion Spreadsheet** มาผสานเข้ากับระบบ **RPG Gamification (XP, เลเวล, เควสต์ประจำวัน, เหรียญความสำเร็จ)** และระบบ **จดด่วน 1-Click** ช่วยเปลี่ยนการจดบันทึกรายรับ-รายจ่ายให้กลายเป็นนิสัยที่สนุกและทำได้ทุกวันอย่างง่ายดาย
+**LevelUp Money Life** คือแอปพลิเคชันเดสก์ท็อปสำหรับการบริหารจัดการการเงินส่วนบุคคลที่ผสมผสานความเรียบง่าย รวดเร็ว และเป็นส่วนตัว ด้วยการนำตารางบันทึกข้อมูลแบบ **Notion Spreadsheet** มาผสานเข้ากับระบบ **RPG Gamification (XP, เลเวล, เควสต์ประจำวัน, เหรียญความสำเร็จ)**, ระบบ **จดด่วน 1-Click**, และ **Dynamic Micro-Interactions สไตล์ Minimalist** ช่วยเปลี่ยนการจดบันทึกรายรับ-รายจ่ายให้กลายเป็นนิสัยที่สนุกและทำได้ทุกวันอย่างง่ายดาย
 
 > **หลักการออกแบบ:** *การเงินต้องมาก่อน เกมเป็นตัวเสริม (Finance first, game layer second)* ข้อมูลตัวเลขการเงินต้องถูกต้อง แม่นยำ อ่านง่าย ตอบคำถาม *"เงินหายไปกับอะไร?"* ได้ทันทีในคลิกเดียว
 
@@ -127,9 +135,10 @@
 
 | หมวดหมู่ | รายละเอียดฟีเจอร์ |
 |---|---|
-| ⚡ **แถบจดด่วน & One-Tap Presets (ใหม่)** | ปุ่มลัดจดรายจ่าย 1-Click (กาแฟ, ข้าวเที่ยง, เดินทาง, 7-11, น้ำมัน) + Auto-suggest รายการยอดฮิต + ช่องพิมพ์ภาษาธรรมชาติ (`กะเพรา 65`, `25*3`, `+เงินเดือน 45000`) รู้หมวดหมู่อัตโนมัติ + Dropdown แนะนำรายการเดิม |
-| 🎯 **Safe-to-Spend รายวัน (ใหม่)** | ตัวชี้วัดยอดเงินที่ "ปลอดภัยต่อการใช้จ่ายในแต่ละวัน" แบบเรียลไทม์ พร้อมไฟสถานะความสบายใจ (`comfortable`, `caution`, `critical`) |
-| ↩️ **Undo Toast 5 วินาที (ใหม่)** | ป้องกันการกดผิด ด้วยแถบแจ้งเตือนนับถอยหลัง 5 วินาที พร้อมปุ่มกดยกเลิกรายการและคืนค่า XP ทันที |
+| ⚡ **แถบจดด่วน & One-Tap Presets** | ปุ่มลัดจดรายจ่าย 1-Click (กาแฟ, ข้าวเที่ยง, เดินทาง, 7-11, น้ำมัน) + Auto-suggest รายการยอดฮิต + ช่องพิมพ์ภาษาธรรมชาติ (`กะเพรา 65`, `25*3`, `+เงินเดือน 45000`) รู้หมวดหมู่อัตโนมัติ + Dropdown แนะนำรายการเดิม |
+| ✨ **Dynamic Micro-Interactions (ใหม่)** | แสงเรือง Spotlight การ์ด Bento เคลื่อนตามเมาส์ (Zero re-render) + ตัวเลขยอดเงิน/EXP วิ่งนับแบบ Smooth Spring + ปุ่มกดสัมผัส Tactile สปริงยุบตัว + ป้าย `+XP` ลอยสวยงามเมื่อทำเควสต์สำเร็จ รองรับ `prefers-reduced-motion` |
+| 🎯 **Safe-to-Spend รายวัน** | ตัวชี้วัดยอดเงินที่ "ปลอดภัยต่อการใช้จ่ายในแต่ละวัน" แบบเรียลไทม์ พร้อมไฟสถานะความสบายใจ (`comfortable`, `caution`, `critical`) |
+| ↩️ **Undo Toast 5 วินาที** | ป้องกันการกดผิด ด้วยแถบแจ้งเตือนนับถอยหลัง 5 วินาที พร้อมปุ่มกดยกเลิกรายการและคืนค่า XP ทันที |
 | 🏠 **แดชบอร์ดศูนย์บัญชาการ (Dashboard)** | สรุปภาพรวม รายรับ, รายจ่าย, ยอดคงเหลือ, อัตราการออม, แถบเลเวล XP และ Streak การเข้าใช้งาน |
 | 📜 **สมุดบัญชีสไตล์ Notion (Ledger)** | ตารางบันทึกข้อมูลความหนาแน่นสูง รองรับการค้นหา, กรองหมวดหมู่, จัดเรียง (Sort), และติ๊กสถานะเคลียร์ยอด |
 | 🎯 **วางแผนงบประมาณ 50/30/20 (Budget)** | จัดสรรสัดส่วน Needs / Wants / Savings เทียบยอดใช้จริงกับเป้าหมายแบบเรียลไทม์ |
@@ -160,10 +169,10 @@ Frontend UI          React 19 + TypeScript + Vite
 Styling              Tailwind CSS v4 (@tailwindcss/postcss)
 Desktop Framework    Tauri v2 (Rust Native Core)
 Database Layer       SQLite (@tauri-apps/plugin-sql) — 100% Local-First
-Testing Engine       Vitest (71 Unit & Integration Tests Passing)
+Testing Engine       Vitest (88 Unit & Integration Tests Passing)
 OCR Engine           Tesseract.js + HTML5 Canvas Preprocessing
 Charts & Visuals     Recharts
-Motion & Animations  Framer Motion v12
+Motion & Animations  Framer Motion v12 (Spring Physics & Micro-Interactions)
 Iconography          Phosphor Icons React + Lucide React
 Typography           Outfit (UI Sans) + JetBrains Mono (Financial Numbers)
 Internationalization react-i18next (TH / EN)
@@ -177,7 +186,15 @@ Internationalization react-i18next (TH / EN)
 LevelUp-Money-Life/
 ├── src/
 │   ├── components/
-│   │   ├── common/                  # Reusable UI primitives (Select, Calendar, MetricTile, BentoCard)
+│   │   ├── common/                  # Reusable UI primitives
+│   │   │   ├── AnimatedCounter.tsx     # Smooth spring numeric ticker with semantic pulse
+│   │   │   ├── BentoCard.tsx           # Glass Bento card with zero-rerender CSS spotlight
+│   │   │   ├── CustomDatePicker.tsx    # Accessible custom calendar picker
+│   │   │   ├── CustomSelect.tsx        # Styled dropdown select box
+│   │   │   ├── FloatingReward.tsx      # Floating +XP quest completion toasts
+│   │   │   ├── MetricTile.tsx          # Dynamic financial KPI tile with cursor glow
+│   │   │   ├── SpotlightCard.tsx       # Standalone interactive spotlight container
+│   │   │   └── TactileButton.tsx       # Micro-spring tactile tap & hover button
 │   │   ├── views/                   # Main application views
 │   │   │   ├── DashboardOverview.tsx   # Financial overview, Safe-to-Spend & quick stats
 │   │   │   ├── TransactionLedger.tsx   # Notion-style interactive data grid
@@ -189,16 +206,12 @@ LevelUp-Money-Life/
 │   │   ├── PresetManagerModal.tsx   # ⚙️ Custom preset CRUD management dialog
 │   │   ├── UndoToast.tsx            # ↩️ 5-second countdown interactive undo notification
 │   │   ├── AppLogo.tsx              # Animated brand vector logo
-│   │   ├── CategorySpendingChart.tsx# Donut chart spending breakdown
-│   │   ├── DailyQuests.tsx          # Daily checklist widget
 │   │   ├── DataManagerModal.tsx     # JSON/CSV backup, restore, & demo seed
-│   │   ├── FinancialPlan.tsx        # Budget allocation sliders
 │   │   ├── HeaderCommandDeck.tsx    # XP bar, view tabs, language & action buttons
 │   │   ├── LevelUpCelebration.tsx   # Level up particle & modal reward screen
 │   │   ├── QuickAddModal.tsx        # Detailed transaction entry modal
-│   │   ├── SlipScanModal.tsx        # Thai bank slip OCR scanner & auto-parser
-│   │   └── SummaryStats.tsx         # Monthly KPI cards
-│   ├── hooks/                       # Custom React hooks (useTheme, useLocalStorage)
+│   │   └── SlipScanModal.tsx        # Thai bank slip OCR scanner & auto-parser
+│   ├── hooks/                       # Domain custom hooks (useTransactions, useGamification, useQuests, useTheme)
 │   ├── services/
 │   │   ├── db.ts                    # SQLite database service & schema migrations
 │   │   ├── exportImport.ts          # CSV and JSON backup/restore snapshot engine
