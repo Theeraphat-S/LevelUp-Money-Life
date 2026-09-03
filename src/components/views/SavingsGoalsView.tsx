@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   AirplaneTilt,
   ArrowDown,
@@ -88,6 +88,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
   activeMonth,
 }) => {
   const { t } = useTranslation();
+  const shouldReduceMotion = useReducedMotion();
 
   // Floating rewards queue for milestone XP pops
   const [floatingRewards, setFloatingRewards] = useState<FloatingRewardItem[]>([]);
@@ -124,13 +125,22 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
       }, 0);
   }, [goals]);
 
-  // Compute monthly expense for emergency fund calculator
+  // Compute average monthly expense across historical transactions for emergency fund calculator
   const monthlyExpenseEstimate = useMemo(() => {
-    const monthExpenses = transactions
-      .filter((t) => t.date.startsWith(activeMonth) && t.amount < 0 && t.category !== "Savings")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    return monthExpenses > 0 ? monthExpenses : 25000;
-  }, [transactions, activeMonth]);
+    const monthlyTotals: Record<string, number> = {};
+    transactions.forEach((t) => {
+      if (t.amount < 0 && t.category !== "Savings") {
+        const m = t.date ? t.date.slice(0, 7) : "";
+        if (m) {
+          monthlyTotals[m] = (monthlyTotals[m] || 0) + Math.abs(t.amount);
+        }
+      }
+    });
+    const months = Object.values(monthlyTotals);
+    if (months.length === 0) return 25000;
+    const avg = Math.round(months.reduce((sum, v) => sum + v, 0) / months.length);
+    return avg > 0 ? avg : 25000;
+  }, [transactions]);
 
   const emergencyTargetCalculated = useMemo(() => {
     return calculateEmergencyFundTarget(monthlyExpenseEstimate, emergencyMonths);
@@ -191,15 +201,14 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
 
     const res = await onDeposit(depositModalGoal.id, depositAmount, depositNote);
 
-    // If milestone reached, trigger floating reward
+    // If milestone reached, trigger floating reward with full cumulative earned XP
     if (res.newlyReachedMilestones.length > 0) {
       const highest = Math.max(...res.newlyReachedMilestones);
-      const bonusXp = SAVINGS_MILESTONE_XP[highest] || 100;
       setFloatingRewards((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
-          text: `+${bonusXp} XP (${highest}% Milestone!)`,
+          text: `+${res.xpEarned} XP (${highest}% Milestone!)`,
           type: "xp",
           x: window.innerWidth / 2,
           y: window.innerHeight / 3,
@@ -231,7 +240,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
       });
     } else {
       await onCreateGoal({
-        title: `เงินสำรองฉุกเฉิน (${emergencyMonths} เดือน)`,
+        title: t("savings.emergencyTitleFormatted", { months: emergencyMonths }),
         category: "emergency",
         targetAmount: emergencyTargetCalculated,
         icon: "ShieldCheck",
@@ -398,20 +407,24 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                   {/* Edit / Delete action buttons */}
                   <div className="flex items-center gap-1">
                     <button
+                      type="button"
                       onClick={() => openEditModal(goal)}
                       title={t("savings.edit")}
-                      className="p-1.5 rounded-lg text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-ink)] transition"
+                      aria-label={t("savings.edit")}
+                      className="p-1.5 rounded-lg text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] hover:text-[var(--color-ink)] active:scale-[0.98] transition"
                     >
                       <PencilSimple size={15} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => {
                         if (window.confirm(t("savings.confirmDelete"))) {
                           onDeleteGoal(goal.id);
                         }
                       }}
                       title={t("savings.delete")}
-                      className="p-1.5 rounded-lg text-[var(--color-ink-faint)] hover:bg-[var(--rose-soft)] hover:text-[var(--rose)] transition"
+                      aria-label={t("savings.delete")}
+                      className="p-1.5 rounded-lg text-[var(--color-ink-faint)] hover:bg-[var(--rose-soft)] hover:text-[var(--rose)] active:scale-[0.98] transition"
                     >
                       <Trash size={15} />
                     </button>
@@ -438,7 +451,11 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                       className="h-full rounded-full bg-gradient-to-r from-[#1C5954] to-[#4D8E75] dark:from-[#76AA9D] dark:to-[#8BB999]"
                       initial={{ width: 0 }}
                       animate={{ width: `${pace.progressPercent}%` }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      transition={
+                        shouldReduceMotion
+                          ? { duration: 0 }
+                          : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+                      }
                     />
                   </div>
 
@@ -473,7 +490,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                     <div className="flex items-center justify-between text-[var(--color-ink-soft)]">
                       <span>{t("savings.noDeadline")}</span>
                       <span className="font-mono text-xs">
-                        ฿{thb.format(pace.remainingAmount)} remaining
+                        ฿{thb.format(pace.remainingAmount)} {t("savings.remainingSuffix")}
                       </span>
                     </div>
                   ) : pace.status === "overdue" ? (
@@ -483,7 +500,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                         {t("savings.overdue")}
                       </span>
                       <span className="font-mono">
-                        ฿{thb.format(pace.remainingAmount)} needed
+                        ฿{thb.format(pace.remainingAmount)} {t("savings.neededSuffix")}
                       </span>
                     </div>
                   ) : (
@@ -492,9 +509,16 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                         <span className="h-2 w-2 rounded-full bg-[var(--jade)] animate-pulse" />
                         {t("savings.onTrack")} · {t("savings.daysRemaining", { days: pace.daysRemaining })}
                       </span>
-                      <span className="font-mono font-bold text-[var(--color-ink)]">
-                        ฿{thb.format(pace.requiredPerMonth)} / mo
-                      </span>
+                      <div className="text-right font-mono">
+                        <span className="font-bold text-[var(--color-ink)] block">
+                          ฿{thb.format(pace.requiredPerMonth)} / mo
+                        </span>
+                        {pace.requiredPerDay > 0 && (
+                          <span className="text-[10px] text-[var(--color-ink-soft)] font-normal">
+                            (~฿{thb.format(pace.requiredPerDay)} / day)
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -541,16 +565,19 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-xl"
+              className="relative w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)] overflow-hidden"
             >
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40 dark:bg-white/10" />
               <div className="flex items-center justify-between pb-3 border-b border-[var(--color-line)]">
                 <h3 className="text-base font-bold text-[var(--color-ink)] flex items-center gap-2">
                   <ArrowDown size={18} className="text-[var(--jade)]" weight="bold" />
                   {t("savings.depositTitle", { title: depositModalGoal.title })}
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setDepositModalGoal(null)}
-                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
+                  aria-label={t("common.close")}
+                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] active:scale-[0.98] transition"
                 >
                   <X size={18} />
                 </button>
@@ -575,7 +602,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                         key={chip}
                         type="button"
                         onClick={() => setDepositAmount(chip)}
-                        className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1 font-mono text-xs text-[var(--color-ink-soft)] hover:bg-[var(--jade-soft)] hover:text-[var(--jade-ink)] transition"
+                        className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] px-2.5 py-1 font-mono text-xs text-[var(--color-ink-soft)] hover:bg-[var(--jade-soft)] hover:text-[var(--jade-ink)] active:scale-[0.98] transition"
                       >
                         +฿{thb.format(chip)}
                       </button>
@@ -591,7 +618,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                     type="text"
                     value={depositNote}
                     onChange={(e) => setDepositNote(e.target.value)}
-                    placeholder="e.g. Monthly salary savings"
+                    placeholder={t("savings.notePlaceholderDeposit")}
                     className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3.5 py-2 text-xs text-[var(--color-ink)] focus:outline-hidden focus:ring-2 focus:ring-[var(--jade)]/40"
                   />
                 </div>
@@ -599,7 +626,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                 <div className="rounded-xl border border-[var(--jade)]/20 bg-[var(--jade-soft)]/30 p-3 text-xs text-[var(--jade-ink)] flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <Sparkle size={16} weight="fill" />
-                    <span>Reward XP:</span>
+                    <span>{t("savings.rewardXpLabel")}</span>
                   </span>
                   <span className="font-mono font-bold">+{XP_PER_SAVINGS_DEPOSIT} XP</span>
                 </div>
@@ -638,16 +665,19 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-xl"
+              className="relative w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)] overflow-hidden"
             >
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40 dark:bg-white/10" />
               <div className="flex items-center justify-between pb-3 border-b border-[var(--color-line)]">
                 <h3 className="text-base font-bold text-[var(--color-ink)] flex items-center gap-2">
                   <ArrowUp size={18} className="text-[var(--amber)]" weight="bold" />
                   {t("savings.withdrawTitle", { title: withdrawModalGoal.title })}
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setWithdrawModalGoal(null)}
-                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
+                  aria-label={t("common.close")}
+                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] active:scale-[0.98] transition"
                 >
                   <X size={18} />
                 </button>
@@ -660,7 +690,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                       {t("savings.amountLabel")}
                     </label>
                     <span className="font-mono text-[11px] text-[var(--color-ink-faint)]">
-                      Max: ฿{thb.format(withdrawModalGoal.currentAmount)}
+                      {t("savings.maxLabel", { amount: thb.format(withdrawModalGoal.currentAmount) })}
                     </span>
                   </div>
                   <input
@@ -681,7 +711,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                     type="text"
                     value={withdrawNote}
                     onChange={(e) => setWithdrawNote(e.target.value)}
-                    placeholder="e.g. Unplanned medical cost"
+                    placeholder={t("savings.notePlaceholderWithdraw")}
                     className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3.5 py-2 text-xs text-[var(--color-ink)] focus:outline-hidden"
                   />
                 </div>
@@ -697,7 +727,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                 <TactileButton
                   onClick={handleSubmitWithdraw}
                   disabled={withdrawAmount <= 0 || withdrawAmount > withdrawModalGoal.currentAmount}
-                  className="rounded-xl bg-[var(--amber-ink)] px-4 py-2 text-xs font-bold text-white shadow-sm hover:brightness-110"
+                  className="rounded-xl bg-[var(--amber-ink)] px-4 py-2 text-xs font-bold text-[#FEFFFC] shadow-sm hover:brightness-110"
                 >
                   {t("savings.confirmWithdraw")}
                 </TactileButton>
@@ -715,15 +745,18 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-xl"
+              className="relative w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)] overflow-hidden"
             >
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40 dark:bg-white/10" />
               <div className="flex items-center justify-between pb-3 border-b border-[var(--color-line)]">
                 <h3 className="text-base font-bold text-[var(--color-ink)]">
                   {editingGoal ? t("savings.editModalTitle") : t("savings.createModalTitle")}
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setIsGoalModalOpen(false)}
-                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
+                  aria-label={t("common.close")}
+                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] active:scale-[0.98] transition"
                 >
                   <X size={18} />
                 </button>
@@ -771,14 +804,14 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                       onChange={(e) => setFormIcon(e.target.value)}
                       className="w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)] px-3 py-2 text-xs text-[var(--color-ink)] focus:outline-hidden"
                     >
-                      <option value="ShieldCheck">Shield (Emergency)</option>
-                      <option value="AirplaneTilt">Airplane (Travel)</option>
-                      <option value="Laptop">Laptop (Gadgets)</option>
-                      <option value="House">House (Property)</option>
-                      <option value="Car">Car (Vehicle)</option>
-                      <option value="Gift">Gift (Wishlist)</option>
-                      <option value="GraduationCap">Graduation (Learning)</option>
-                      <option value="PiggyBank">Piggy Bank (General)</option>
+                      <option value="ShieldCheck">{t("savings.icons.ShieldCheck")}</option>
+                      <option value="AirplaneTilt">{t("savings.icons.AirplaneTilt")}</option>
+                      <option value="Laptop">{t("savings.icons.Laptop")}</option>
+                      <option value="House">{t("savings.icons.House")}</option>
+                      <option value="Car">{t("savings.icons.Car")}</option>
+                      <option value="Gift">{t("savings.icons.Gift")}</option>
+                      <option value="GraduationCap">{t("savings.icons.GraduationCap")}</option>
+                      <option value="PiggyBank">{t("savings.icons.PiggyBank")}</option>
                     </select>
                   </div>
                 </div>
@@ -838,16 +871,19 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-xl"
+              className="relative w-full max-w-md rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-diffuse)] overflow-hidden"
             >
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40 dark:bg-white/10" />
               <div className="flex items-center justify-between pb-3 border-b border-[var(--color-line)]">
                 <h3 className="text-base font-bold text-[var(--color-ink)] flex items-center gap-2">
                   <ShieldCheck size={20} className="text-[var(--jade)]" weight="fill" />
                   {t("savings.emergencyModal.title")}
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setIsEmergencyCalcOpen(false)}
-                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)]"
+                  aria-label={t("common.close")}
+                  className="rounded-lg p-1 text-[var(--color-ink-soft)] hover:bg-[var(--color-surface-subtle)] active:scale-[0.98] transition"
                 >
                   <X size={18} />
                 </button>
@@ -869,13 +905,13 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
 
                 <div className="space-y-2">
                   <label className="block text-xs font-semibold text-[var(--color-ink-soft)]">
-                    Safety Duration:
+                    {t("savings.safetyDurationLabel")}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setEmergencyMonths(3)}
-                      className={`p-3 rounded-xl border text-left transition ${
+                      className={`p-3 rounded-xl border text-left active:scale-[0.98] transition ${
                         emergencyMonths === 3
                           ? "border-[var(--jade)] bg-[var(--jade-soft)] text-[var(--jade-ink)]"
                           : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)]"
@@ -890,7 +926,7 @@ export const SavingsGoalsView: React.FC<SavingsGoalsViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setEmergencyMonths(6)}
-                      className={`p-3 rounded-xl border text-left transition ${
+                      className={`p-3 rounded-xl border text-left active:scale-[0.98] transition ${
                         emergencyMonths === 6
                           ? "border-[var(--jade)] bg-[var(--jade-soft)] text-[var(--jade-ink)]"
                           : "border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink-soft)]"

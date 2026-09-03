@@ -93,29 +93,31 @@ export function useSavingsGoals(props?: UseSavingsGoalsProps) {
 
   // Deposit money into goal
   const depositToGoal = useCallback(
-    async (goalId: string, amount: number, note?: string) => {
+    async (goalId: string, amount: number, note?: string, txName?: string) => {
       const goal = goalsRef.current.find((g) => g.id === goalId);
       if (!goal || amount <= 0) return { newlyReachedMilestones: [], xpEarned: 0 };
 
       const prevAmount = goal.currentAmount;
       const newAmount = prevAmount + amount;
-      const res = checkGoalMilestones(
+      const isCompleted = newAmount >= goal.targetAmount;
+
+      const { newlyReached, xpEarned: totalBonusXp } = checkGoalMilestones(
         prevAmount,
         newAmount,
         goal.targetAmount,
-        goal.milestonesReached
+        goal.milestonesReached || []
       );
-      const newlyReached = res.newlyReached;
-      const totalXpEarned = XP_PER_SAVINGS_DEPOSIT + res.xpEarned;
 
-      const updatedMilestones = Array.from(new Set([...goal.milestonesReached, ...newlyReached]));
-      const isCompleted = newAmount >= goal.targetAmount;
+      const totalXpEarned = XP_PER_SAVINGS_DEPOSIT + totalBonusXp;
 
       const updatedGoal: SavingsGoal = {
         ...goal,
         currentAmount: newAmount,
-        status: isCompleted ? "completed" : goal.status,
-        milestonesReached: updatedMilestones,
+        status: isCompleted ? "completed" : "active",
+        milestonesReached: [
+          ...(goal.milestonesReached || []),
+          ...newlyReached,
+        ],
         updatedAt: new Date().toISOString(),
       };
 
@@ -128,7 +130,7 @@ export function useSavingsGoals(props?: UseSavingsGoalsProps) {
       if (onAddTransaction) {
         const todayStr = new Date().toISOString().slice(0, 10);
         onAddTransaction({
-          name: `ออมเงินเข้า: ${goal.title}`,
+          name: txName || `${goal.title}`,
           amount: -Math.abs(amount),
           date: todayStr,
           category: "Savings",
@@ -152,7 +154,7 @@ export function useSavingsGoals(props?: UseSavingsGoalsProps) {
 
   // Withdraw money from goal
   const withdrawFromGoal = useCallback(
-    async (goalId: string, amount: number, note?: string) => {
+    async (goalId: string, amount: number, note?: string, txName?: string) => {
       const goal = goalsRef.current.find((g) => g.id === goalId);
       if (!goal || amount <= 0) return;
 
@@ -175,7 +177,7 @@ export function useSavingsGoals(props?: UseSavingsGoalsProps) {
       if (onAddTransaction) {
         const todayStr = new Date().toISOString().slice(0, 10);
         onAddTransaction({
-          name: `ถอนเงินจาก: ${goal.title}`,
+          name: txName || `${goal.title}`,
           amount: Math.abs(amount),
           date: todayStr,
           category: "Savings",

@@ -447,8 +447,26 @@ export async function saveAllSavingsGoals(goals: SavingsGoal[]): Promise<void> {
     const db = await getDb();
     if (db) {
       await db.execute("DELETE FROM savings_goals");
-      for (const g of goals) {
-        await saveSavingsGoal(g);
+      for (const goal of goals) {
+        await db.execute(
+          `INSERT OR REPLACE INTO savings_goals (
+            id, title, category, target_amount, current_amount, target_date, icon, color, status, milestones_reached, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            goal.id,
+            goal.title,
+            goal.category,
+            goal.targetAmount,
+            goal.currentAmount,
+            goal.targetDate || null,
+            goal.icon,
+            goal.color || null,
+            goal.status,
+            JSON.stringify(goal.milestonesReached || []),
+            goal.createdAt,
+            goal.updatedAt,
+          ]
+        );
       }
     }
   } catch (err) {

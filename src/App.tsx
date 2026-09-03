@@ -159,7 +159,11 @@ export default function App() {
         ...tx,
         id: crypto.randomUUID(),
       };
-      setTransactions((prev) => [newTx, ...prev]);
+      setTransactions((prev) => {
+        const next = [newTx, ...prev];
+        checkAchievements(next, quests, allocations, savingsGoals);
+        return next;
+      });
     },
     onAwardXp: (amount) => {
       addXp(amount);
@@ -177,6 +181,13 @@ export default function App() {
       savingsGoals
     );
   }, [transactions, quests, allocations, streakDays, unlockedAchievementIds, savingsGoals]);
+
+  // Sync achievements when savings goals or allocations change
+  useEffect(() => {
+    if (!loading && savingsGoals.length > 0) {
+      checkAchievements(transactions, quests, allocations, savingsGoals);
+    }
+  }, [savingsGoals, loading, checkAchievements, transactions, quests, allocations]);
 
   // Initial Load from DB / Storage
   useEffect(() => {
@@ -230,7 +241,7 @@ export default function App() {
       onAwardXp: addXp,
       onAfterLogged: (tx) => {
         autoCompleteLoggingQuest(addXp);
-        checkAchievements([tx, ...transactions], quests, allocations);
+        checkAchievements([tx, ...transactions], quests, allocations, savingsGoals);
       },
     });
   };
@@ -249,7 +260,7 @@ export default function App() {
     saveQuickTransaction(newTx, {
       onAwardXp: addXp,
       onAfterLogged: (tx) => {
-        checkAchievements([tx, ...transactions], quests, allocations);
+        checkAchievements([tx, ...transactions], quests, allocations, savingsGoals);
       },
     });
   };
@@ -260,7 +271,7 @@ export default function App() {
       onAwardXp: addXp,
       onAfterLogged: (tx) => {
         autoCompleteLoggingQuest(addXp);
-        checkAchievements([tx, ...transactions], quests, allocations);
+        checkAchievements([tx, ...transactions], quests, allocations, savingsGoals);
       },
       onToast: (msg) => showToast(msg, 4000),
       toastMessage: t("slipScanner.toastSuccess", { xp: xpBonus }),
@@ -291,7 +302,7 @@ export default function App() {
       onAwardXp: addXp,
       onAfterLoggedBatch: (txs) => {
         autoCompleteLoggingQuest(addXp);
-        checkAchievements([...txs, ...transactions], quests, allocations);
+        checkAchievements([...txs, ...transactions], quests, allocations, savingsGoals);
       },
       onToast: (msg) => showToast(msg, 5500),
       toastMessage: `${t("slipScanner.batchToastSuccess", { count: newTxs.length, xp: totalXpBonus })}${monthSummary}`,
