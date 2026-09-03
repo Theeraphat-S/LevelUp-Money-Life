@@ -17,7 +17,7 @@ import {
   parseCSV,
   type BackupData,
 } from "../services/exportImport";
-import type { Allocation, GamificationState, PresetItem, Quest, TaxProfile, Transaction } from "../types";
+import type { Allocation, GamificationState, PresetItem, Quest, SavingsGoal, TaxProfile, Transaction } from "../types";
 
 interface DataManagerModalProps {
   isOpen: boolean;
@@ -29,6 +29,7 @@ interface DataManagerModalProps {
   gamification: GamificationState;
   taxProfile?: TaxProfile;
   presets?: PresetItem[];
+  savingsGoals?: SavingsGoal[];
   onRestoreBackup: (data: BackupData) => void;
   onImportTransactions: (imported: Transaction[]) => void;
   onResetData: () => void;
@@ -44,6 +45,7 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
   gamification,
   taxProfile,
   presets,
+  savingsGoals,
   onRestoreBackup,
   onImportTransactions,
   onResetData,
@@ -73,6 +75,7 @@ export const DataManagerModal: React.FC<DataManagerModalProps> = ({
         gamification,
         taxProfile,
         presets,
+        savingsGoals,
       });
       setFeedback({ type: "success", msg: "JSON backup exported successfully!" });
     } catch {

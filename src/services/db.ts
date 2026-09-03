@@ -1,5 +1,5 @@
 import Database from "@tauri-apps/plugin-sql";
-import type { Allocation, Quest, TaxProfile, Transaction } from "../types";
+import type { Allocation, Quest, SavingsGoal, TaxProfile, Transaction } from "../types";
 import { getDefaultTaxProfile } from "./taxCalculator";
 
 let dbInstance: Database | null = null;
@@ -57,6 +57,23 @@ async function initTables(db: Database) {
       xp INTEGER NOT NULL,
       done INTEGER NOT NULL,
       category TEXT
+    )
+  `);
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS savings_goals (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL,
+      target_amount REAL NOT NULL,
+      current_amount REAL NOT NULL,
+      target_date TEXT,
+      icon TEXT NOT NULL,
+      color TEXT,
+      status TEXT NOT NULL,
+      milestones_reached TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     )
   `);
 
@@ -294,4 +311,165 @@ export async function getTaxProfile(): Promise<TaxProfile> {
 export async function saveTaxProfile(profile: TaxProfile): Promise<void> {
   return saveSetting<TaxProfile>("tax_profile", profile);
 }
+
+// --- Savings Goals CRUD ---
+export const INITIAL_SAVINGS_GOALS: SavingsGoal[] = [
+  {
+    id: "goal-emergency-fund",
+    title: "เงินสำรองฉุกเฉิน (Emergency Fund)",
+    category: "emergency",
+    targetAmount: 150000,
+    currentAmount: 45000,
+    targetDate: "2026-12-31",
+    icon: "ShieldCheck",
+    color: "#4D8E75",
+    status: "active",
+    milestonesReached: [25],
+    createdAt: "2026-01-01",
+    updatedAt: "2026-01-01",
+  },
+  {
+    id: "goal-vacation",
+    title: "ทริปเที่ยวสิ้นปี (Vacation Trip)",
+    category: "travel",
+    targetAmount: 40000,
+    currentAmount: 20000,
+    targetDate: "2026-11-30",
+    icon: "AirplaneTilt",
+    color: "#C99A4B",
+    status: "active",
+    milestonesReached: [25, 50],
+    createdAt: "2026-02-01",
+    updatedAt: "2026-02-01",
+  },
+];
+
+export async function getSavingsGoals(): Promise<SavingsGoal[]> {
+  try {
+    const db = await getDb();
+    if (!db) {
+      const stored = localStorage.getItem("levelup.savings_goals");
+      return stored ? JSON.parse(stored) : INITIAL_SAVINGS_GOALS;
+    }
+
+    const rows = await db.select<Array<{
+      id: string;
+      title: string;
+      category: string;
+      target_amount: number;
+      current_amount: number;
+      target_date: string | null;
+      icon: string;
+      color: string | null;
+      status: string;
+      milestones_reached: string;
+      created_at: string;
+      updated_at: string;
+    }>>("SELECT * FROM savings_goals ORDER BY created_at ASC");
+
+    if (rows.length === 0) {
+      for (const g of INITIAL_SAVINGS_GOALS) {
+        await saveSavingsGoal(g);
+      }
+      return INITIAL_SAVINGS_GOALS;
+    }
+
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      category: r.category as SavingsGoal["category"],
+      targetAmount: r.target_amount,
+      currentAmount: r.current_amount,
+      targetDate: r.target_date || undefined,
+      icon: r.icon,
+      color: r.color || undefined,
+      status: (r.status as SavingsGoal["status"]) || "active",
+      milestonesReached: r.milestones_reached ? JSON.parse(r.milestones_reached) : [],
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+    }));
+  } catch (err) {
+    console.error("Failed to get savings goals:", err);
+    const stored = localStorage.getItem("levelup.savings_goals");
+    return stored ? JSON.parse(stored) : INITIAL_SAVINGS_GOALS;
+  }
+}
+
+export async function saveSavingsGoal(goal: SavingsGoal): Promise<void> {
+  try {
+    const stored = localStorage.getItem("levelup.savings_goals");
+    const list: SavingsGoal[] = stored ? JSON.parse(stored) : [...INITIAL_SAVINGS_GOALS];
+    const idx = list.findIndex((g) => g.id === goal.id);
+    if (idx >= 0) list[idx] = goal;
+    else list.push(goal);
+    localStorage.setItem("levelup.savings_goals", JSON.stringify(list));
+
+    const db = await getDb();
+    if (db) {
+      await db.execute(
+        `INSERT INTO savings_goals (id, title, category, target_amount, current_amount, target_date, icon, color, status, milestones_reached, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+         ON CONFLICT(id) DO UPDATE SET
+           title=excluded.title,
+           category=excluded.category,
+           target_amount=excluded.target_amount,
+           current_amount=excluded.current_amount,
+           target_date=excluded.target_date,
+           icon=excluded.icon,
+           color=excluded.color,
+           status=excluded.status,
+           milestones_reached=excluded.milestones_reached,
+           updated_at=excluded.updated_at`,
+        [
+          goal.id,
+          goal.title,
+          goal.category,
+          goal.targetAmount,
+          goal.currentAmount,
+          goal.targetDate || null,
+          goal.icon,
+          goal.color || null,
+          goal.status,
+          JSON.stringify(goal.milestonesReached || []),
+          goal.createdAt,
+          goal.updatedAt,
+        ]
+      );
+    }
+  } catch (err) {
+    console.error("Failed to save savings goal to db:", err);
+  }
+}
+
+export async function saveAllSavingsGoals(goals: SavingsGoal[]): Promise<void> {
+  localStorage.setItem("levelup.savings_goals", JSON.stringify(goals));
+  try {
+    const db = await getDb();
+    if (db) {
+      await db.execute("DELETE FROM savings_goals");
+      for (const g of goals) {
+        await saveSavingsGoal(g);
+      }
+    }
+  } catch (err) {
+    console.error("Failed to save all savings goals to db:", err);
+  }
+}
+
+export async function deleteSavingsGoal(id: string): Promise<void> {
+  try {
+    const stored = localStorage.getItem("levelup.savings_goals");
+    if (stored) {
+      const list: SavingsGoal[] = JSON.parse(stored);
+      localStorage.setItem("levelup.savings_goals", JSON.stringify(list.filter((g) => g.id !== id)));
+    }
+    const db = await getDb();
+    if (db) {
+      await db.execute("DELETE FROM savings_goals WHERE id = $1", [id]);
+    }
+  } catch (err) {
+    console.error("Failed to delete savings goal:", err);
+  }
+}
+
 

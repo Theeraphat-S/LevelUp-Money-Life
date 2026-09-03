@@ -9,6 +9,7 @@ import type {
   Allocation,
   GamificationState,
   Quest,
+  SavingsGoal,
   Transaction,
 } from "../types";
 import { getInitialDates } from "../constants/sampleData";
@@ -71,7 +72,8 @@ export function useGamification() {
     (
       transactions: Transaction[],
       quests: Quest[],
-      allocations: Allocation[]
+      allocations: Allocation[],
+      savingsGoals?: SavingsGoal[]
     ) => {
       let newlyUnlockedList: { id: string }[] = [];
       let bonusReward = 0;
@@ -82,7 +84,8 @@ export function useGamification() {
           quests,
           allocations,
           streakDays,
-          currentIds
+          currentIds,
+          savingsGoals
         );
         newlyUnlockedList = newlyUnlocked;
         bonusReward = bonusXp;

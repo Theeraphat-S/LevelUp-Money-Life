@@ -147,7 +147,24 @@ export type GamificationState = {
   unlockedAchievementIds: string[];
 };
 
-export type ViewTab = "dashboard" | "ledger" | "budget" | "tax" | "analytics" | "quests";
+export type SavingsGoalCategory = "emergency" | "purchase" | "travel" | "investment" | "general";
+
+export type SavingsGoal = {
+  id: string;
+  title: string;
+  category: SavingsGoalCategory;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate?: string; // YYYY-MM-DD
+  icon: string;
+  color?: string;
+  status: "active" | "completed" | "archived";
+  milestonesReached: number[]; // e.g. [25, 50, 75, 100]
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ViewTab = "dashboard" | "ledger" | "budget" | "savings" | "tax" | "analytics" | "quests";
 
 export type SortField = "date" | "amount" | "name" | "category";
 export type SortOrder = "asc" | "desc";

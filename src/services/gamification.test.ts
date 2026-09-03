@@ -31,17 +31,17 @@ describe("Gamification Engine Logic", () => {
   it("should update streak correctly across days", () => {
     // Same day: streak remains unchanged
     const today = "2026-08-30";
-    const sameDayResult = updateStreak(today, 5);
+    const sameDayResult = updateStreak(today, 5, today);
     expect(sameDayResult.newStreak).toBe(5);
 
     // Consecutive day: if last active was yesterday, streak increments by 1
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-    const consecutiveResult = updateStreak(yesterday, 3);
+    const yesterday = "2026-08-29";
+    const consecutiveResult = updateStreak(yesterday, 3, today);
     expect(consecutiveResult.newStreak).toBe(4);
 
     // Long gap (e.g. 5 days ago): streak resets to 1
     const oldDate = "2026-01-01";
-    const resetResult = updateStreak(oldDate, 10);
+    const resetResult = updateStreak(oldDate, 10, today);
     expect(resetResult.newStreak).toBe(1);
   });
 });

@@ -1,4 +1,4 @@
-import type { Achievement, Allocation, GamificationState, Quest, Transaction } from "../types";
+import type { Achievement, Allocation, GamificationState, Quest, SavingsGoal, Transaction } from "../types";
 
 export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
@@ -92,6 +92,31 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     xpReward: 75,
     unlocked: false,
   },
+  {
+    id: "savings_first_goal",
+    titleKey: "achievements.savings_first_goal.title",
+    descKey: "achievements.savings_first_goal.desc",
+    iconName: "PiggyBank",
+    xpReward: 50,
+    unlocked: false,
+  },
+  {
+    id: "emergency_shield",
+    titleKey: "achievements.emergency_shield.title",
+    descKey: "achievements.emergency_shield.desc",
+    iconName: "ShieldCheck",
+    xpReward: 75,
+    unlocked: false,
+  },
+  {
+    id: "goal_conqueror",
+    titleKey: "achievements.goal_conqueror.title",
+    descKey: "achievements.goal_conqueror.desc",
+    iconName: "Trophy",
+    xpReward: 100,
+    unlocked: false,
+    target: 3,
+  },
 ];
 
 /**
@@ -149,8 +174,8 @@ export function calculateLevelFromTotalXp(totalXp: number): {
 /**
  * Calculates updated streak days comparing last active date with current date.
  */
-export function updateStreak(lastActiveDate: string, currentStreak: number): { newStreak: number; today: string } {
-  const today = new Date().toISOString().slice(0, 10);
+export function updateStreak(lastActiveDate: string, currentStreak: number, todayDate?: string): { newStreak: number; today: string } {
+  const today = todayDate || new Date().toISOString().slice(0, 10);
   if (!lastActiveDate) {
     return { newStreak: 1, today };
   }
@@ -179,6 +204,7 @@ export function evaluateAchievements(
   allocations: Allocation[],
   streakDays: number,
   unlockedIds: string[],
+  savingsGoals?: SavingsGoal[]
 ): { newlyUnlocked: Achievement[]; allAchievements: Achievement[]; bonusXp: number } {
   const today = new Date().toISOString().slice(0, 10);
   const newlyUnlocked: Achievement[] = [];
@@ -192,6 +218,9 @@ export function evaluateAchievements(
   const savingsAlloc = allocations.find((a) => a.id === "savings" || a.label.toLowerCase().includes("saving"));
   const hasGoodSavings = savingsAlloc ? savingsAlloc.percent >= 20 : false;
   const allCleared = transactions.length > 0 && transactions.every((t) => t.cleared);
+
+  const completedGoalsCount = savingsGoals?.filter((g) => g.status === "completed" || g.currentAmount >= g.targetAmount).length || 0;
+  const hasEmergencyShield = savingsGoals?.some((g) => g.category === "emergency" && (g.currentAmount / Math.max(1, g.targetAmount)) >= 0.5) || false;
 
   const allAchievements = INITIAL_ACHIEVEMENTS.map((ach) => {
     const isAlreadyUnlocked = unlockedIds.includes(ach.id);
@@ -234,6 +263,18 @@ export function evaluateAchievements(
       case "cleared_all":
         progress = allCleared ? 1 : 0;
         shouldUnlock = allCleared;
+        break;
+      case "savings_first_goal":
+        progress = completedGoalsCount > 0 ? 1 : 0;
+        shouldUnlock = completedGoalsCount > 0;
+        break;
+      case "emergency_shield":
+        progress = hasEmergencyShield ? 1 : 0;
+        shouldUnlock = hasEmergencyShield;
+        break;
+      case "goal_conqueror":
+        progress = Math.min(3, completedGoalsCount);
+        shouldUnlock = completedGoalsCount >= 3;
         break;
     }
 

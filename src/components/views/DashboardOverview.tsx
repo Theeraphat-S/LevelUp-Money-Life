@@ -22,6 +22,7 @@ import {
   CATEGORY_COLORS,
   type Allocation,
   type Quest,
+  type SavingsGoal,
   type Transaction,
   type ViewTab,
 } from "../../types";
@@ -37,6 +38,7 @@ interface DashboardOverviewProps {
   setActiveTab: (tab: ViewTab) => void;
   onToggleQuest: (id: string) => void;
   onOpenQuickAdd: () => void;
+  savingsGoals?: SavingsGoal[];
 }
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
@@ -48,6 +50,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   setActiveTab,
   onToggleQuest,
   onOpenQuickAdd,
+  savingsGoals,
 }) => {
   const { t } = useTranslation();
   const [floatingRewards, setFloatingRewards] = useState<FloatingRewardItem[]>([]);
@@ -308,7 +311,59 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         </BentoCard>
       </div>
 
-      {/* Bento Row 2: Recent Activity Ledger Feed */}
+      {/* Bento Row 2: Active Savings Goals Widget */}
+      {savingsGoals && savingsGoals.length > 0 && (
+        <BentoCard
+          header={
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <PiggyBank size={18} weight="fill" className="text-[var(--jade)]" />
+                <h3 className="text-sm font-bold tracking-tight text-[var(--color-ink)]">
+                  {t("tabs.savings")}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab("savings")}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--primary-ink)] hover:underline transition"
+              >
+                <span>{t("tabs.savings")}</span>
+                <ArrowRight size={13} />
+              </button>
+            </div>
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {savingsGoals.slice(0, 3).map((goal) => {
+              const pct = Math.min(100, Math.round((goal.currentAmount / Math.max(1, goal.targetAmount)) * 100));
+              return (
+                <div
+                  key={goal.id}
+                  onClick={() => setActiveTab("savings")}
+                  className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface-subtle)]/60 p-3 hover:bg-[var(--color-surface-subtle)] cursor-pointer transition"
+                >
+                  <div className="flex items-center justify-between text-xs font-bold text-[var(--color-ink)] mb-1">
+                    <span className="truncate">{goal.title}</span>
+                    <span className="font-mono text-[var(--jade-ink)]">{pct}%</span>
+                  </div>
+                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-[var(--color-line)]/50">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#1C5954] to-[#4D8E75] dark:from-[#76AA9D] dark:to-[#8BB999]"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between text-[10px] font-mono text-[var(--color-ink-soft)]">
+                    <span>฿{thb.format(goal.currentAmount)}</span>
+                    <span>฿{thb.format(goal.targetAmount)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </BentoCard>
+      )}
+
+      {/* Bento Row 3: Recent Activity Ledger Feed */}
       <BentoCard
         header={
           <div className="flex items-center justify-between">

@@ -16,6 +16,7 @@ import { LevelUpCelebration } from "./components/LevelUpCelebration";
 import { DashboardOverview } from "./components/views/DashboardOverview";
 import { TransactionLedger } from "./components/views/TransactionLedger";
 import { BudgetPlanner } from "./components/views/BudgetPlanner";
+import { SavingsGoalsView } from "./components/views/SavingsGoalsView";
 import { TaxPlannerView } from "./components/views/TaxPlannerView";
 import { AnalyticsHub } from "./components/views/AnalyticsHub";
 import { QuestsGrowth } from "./components/views/QuestsGrowth";
@@ -29,6 +30,7 @@ import { useBudgetAllocations } from "./hooks/useBudgetAllocations";
 import { useQuests } from "./hooks/useQuests";
 import { useTaxProfile } from "./hooks/useTaxProfile";
 import { useBankSlipListener } from "./hooks/useBankSlipListener";
+import { useSavingsGoals } from "./hooks/useSavingsGoals";
 
 // Services, Constants & Types
 import {
@@ -41,6 +43,8 @@ import {
   getSetting,
   saveSetting,
   getTaxProfile as getSavedTaxProfile,
+  saveAllSavingsGoals,
+  INITIAL_SAVINGS_GOALS,
 } from "./services/db";
 import { evaluateAchievements } from "./services/gamification";
 import { DEFAULT_PRESETS, getStoredPresets, saveStoredPresets } from "./utils/presetManager";
@@ -135,6 +139,33 @@ export default function App() {
     initTaxProfile,
   } = useTaxProfile();
 
+  const {
+    goals: savingsGoals,
+    isLoading: isSavingsLoading,
+    totalSaved,
+    totalTarget: savingsTotalTarget,
+    overallProgress: savingsOverallProgress,
+    activeGoalsCount: savingsActiveCount,
+    completedGoalsCount: savingsCompletedCount,
+    createGoal: handleCreateSavingsGoal,
+    updateGoal: handleUpdateSavingsGoal,
+    deleteGoal: handleDeleteSavingsGoal,
+    depositToGoal: handleDepositToSavingsGoal,
+    withdrawFromGoal: handleWithdrawFromSavingsGoal,
+    setAllGoals: setSavingsGoals,
+  } = useSavingsGoals({
+    onAddTransaction: (tx) => {
+      const newTx: Transaction = {
+        ...tx,
+        id: crypto.randomUUID(),
+      };
+      setTransactions((prev) => [newTx, ...prev]);
+    },
+    onAwardXp: (amount) => {
+      addXp(amount);
+    },
+  });
+
   // Evaluate Active Achievements
   const { allAchievements } = useMemo(() => {
     return evaluateAchievements(
@@ -142,9 +173,10 @@ export default function App() {
       quests,
       allocations,
       streakDays,
-      unlockedAchievementIds
+      unlockedAchievementIds,
+      savingsGoals
     );
-  }, [transactions, quests, allocations, streakDays, unlockedAchievementIds]);
+  }, [transactions, quests, allocations, streakDays, unlockedAchievementIds, savingsGoals]);
 
   // Initial Load from DB / Storage
   useEffect(() => {
@@ -274,6 +306,7 @@ export default function App() {
     if (typeof backup.income === "number") setIncome(backup.income);
     if (backup.taxProfile) setTaxProfile(backup.taxProfile);
     if (backup.presets) setPresets(backup.presets);
+    if (backup.savingsGoals) setSavingsGoals(backup.savingsGoals);
     if (backup.gamification?.totalXp) {
       setTotalXp(backup.gamification.totalXp);
     }
@@ -284,6 +317,7 @@ export default function App() {
     await saveAllTransactions(SAMPLE_TRANSACTIONS);
     await saveAllocations(SAMPLE_ALLOCATIONS);
     await saveAllQuests(SAMPLE_QUESTS);
+    await saveAllSavingsGoals(INITIAL_SAVINGS_GOALS);
     await saveSetting("income", 48000);
     await saveSetting("totalXp", 180);
     await saveSetting("streakDays", 1);
@@ -293,6 +327,7 @@ export default function App() {
     setTransactionsState(SAMPLE_TRANSACTIONS);
     setAllocationsState(SAMPLE_ALLOCATIONS);
     setQuestsState(SAMPLE_QUESTS);
+    setSavingsGoals(INITIAL_SAVINGS_GOALS);
     setIncomeState(48000);
     setTotalXp(180);
     setStreakDays(1);
@@ -357,6 +392,7 @@ export default function App() {
                 setActiveTab={setActiveTab}
                 onToggleQuest={(id) => toggleQuest(id, addXp)}
                 onOpenQuickAdd={() => setIsQuickAddOpen(true)}
+                savingsGoals={savingsGoals}
               />
             </motion.div>
           )}
@@ -391,6 +427,33 @@ export default function App() {
                 setIncome={setIncome}
                 allocations={allocations}
                 setAllocations={setAllocations}
+                transactions={transactions}
+                activeMonth={activeMonth}
+              />
+            </motion.div>
+          )}
+
+          {activeTab === "savings" && (
+            <motion.div
+              key="savings"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <SavingsGoalsView
+                goals={savingsGoals}
+                isLoading={isSavingsLoading}
+                totalSaved={totalSaved}
+                totalTarget={savingsTotalTarget}
+                overallProgress={savingsOverallProgress}
+                activeGoalsCount={savingsActiveCount}
+                completedGoalsCount={savingsCompletedCount}
+                onCreateGoal={handleCreateSavingsGoal}
+                onUpdateGoal={handleUpdateSavingsGoal}
+                onDeleteGoal={handleDeleteSavingsGoal}
+                onDeposit={handleDepositToSavingsGoal}
+                onWithdraw={handleWithdrawFromSavingsGoal}
                 transactions={transactions}
                 activeMonth={activeMonth}
               />
@@ -486,6 +549,7 @@ export default function App() {
           gamification={gamification}
           taxProfile={taxProfile}
           presets={presets}
+          savingsGoals={savingsGoals}
           onRestoreBackup={handleRestoreBackup}
           onImportTransactions={(txs) => importTransactions(txs, { onAwardXp: addXp })}
           onResetData={handleResetData}

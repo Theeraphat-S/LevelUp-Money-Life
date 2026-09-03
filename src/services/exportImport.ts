@@ -1,4 +1,4 @@
-import type { Allocation, GamificationState, PresetItem, Quest, TaxProfile, Transaction, TransactionCategory } from "../types";
+import type { Allocation, GamificationState, PresetItem, Quest, SavingsGoal, TaxProfile, Transaction, TransactionCategory } from "../types";
 import { TRANSACTION_CATEGORIES } from "../types";
 
 /**
@@ -137,6 +137,7 @@ export type BackupData = {
   gamification?: GamificationState;
   taxProfile?: TaxProfile;
   presets?: PresetItem[];
+  savingsGoals?: SavingsGoal[];
 };
 
 /**
